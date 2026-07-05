@@ -1,0 +1,88 @@
+# Honesty policy
+
+Tribunal's value proposition is **auditability**, not better answers. Every public statement, UI label, and scorecard comparison must respect the hierarchy below.
+
+## What we claim
+
+| Claim | Meaning |
+|-------|---------|
+| Due-process structure | Blind proposal, sealed commitments, anonymized feedback, revision, safety veto, named ratification, preserved dissent, STOP as first-class |
+| Cross-provider panel | Different vendors' models on different seats → decorrelated failure modes, not one vendor's blind spot |
+| Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
+| Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
+| Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
+| A1–A12 scorecard | Twelve checklist items scored only from the run's own artifacts, with anti-spoof guards |
+| Independent verify | Anyone can re-run `verifyLedger()` on exported events (`POST /api/verify`, `npm run demo`, or the Cloudflare Worker) |
+
+## What we do NOT claim
+
+| Non-claim | Why |
+|-----------|-----|
+| Better decision quality | No controlled study here; fluent text can still be wrong |
+| Faithful "chain of thought" | Post-hoc rationales are unreliable; we record cross-examined public warrants instead |
+| Cryptographic proof to third parties | Chains are **unanchored** unless the head hash is published outside the copy you are verifying |
+| Perfect anonymization | We strip identity/provider/seat fields by type; we do not claim stylometric anonymity |
+| Offline panel as AI | Deterministic offline mode is scripted for CI/tests and is always labeled |
+| Stored credentials | Keys and CLI auth are read from the environment at call time only |
+
+## Invariants (copy-paste for contributors)
+
+1. Never claim answer-quality improvement. The claim is auditability.
+2. Tamper-evidence is real but unanchored without external head-hash publication (`runs/*/meta.json` for committed runs).
+3. Offline mode is never presented as model output.
+4. CLI keys and `OPENROUTER_API_KEY` are env-only, never stored.
+5. Single-model baseline scores **0/12 by construction** on A1–A12. That asymmetry is the honest point, not a stacked deck.
+6. Anonymization removes identity fields, not writing style.
+7. Back-filled or trivial rationale **fails** scorecard items even when structure passes.
+8. If kernel ledger logic changes, update `apps/worker/src/index.ts` in the same change.
+
+## Scorecard honesty
+
+`@tribunal/scorecard` evaluates A1–A12 only against ledger artifacts:
+
+- **A1** — Blind commitments precede reveal; sealed hash matches proposal.
+- **A2** — Public warrant on every candidate; repairs fail.
+- **A3** — Feedback anonymized (no identity fields).
+- **A4** — Per-recipient candidate order randomized.
+- **A5** — Revision round with substantive objection answer + steelman (non-trivial).
+- **A6** — Safety veto exercised as real code path when enabled.
+- **A7** — Named ratification rule + public reason.
+- **A8** — Material dissent preserved.
+- **A9** — Provider provenance logged per call.
+- **A10** — Hash chain verifies (with unanchored caveat in evidence text).
+- **A11** — STOP ratified explicitly when chosen.
+- **A12** — Typed, schema-validatable event log.
+
+`baselineReport()` returns 0/12 for a hypothetical single-model answer with an explicit explanation that no ledger exists. The UI and docs must present that contrast as structural, not as proof Tribunal "wins" on merit.
+
+## Anchoring caveat (important)
+
+An adversary who holds the **only** copy of a ledger can recompute a self-consistent forged chain. Detection requires either:
+
+- an independently kept copy, or
+- a **published head hash** (we store `head` in `runs/<runId>/meta.json` for committed real runs).
+
+Verification proves internal consistency of the bytes you provide; it does not prove provenance unless anchored.
+
+## Sponsor and infra phrasing
+
+Use **supported / ready / available in repo** unless a run artifact proves use:
+
+- OpenRouter multi-vendor panel — ready when `OPENROUTER_API_KEY` is set
+- Cloudflare Worker verify — code deployable; not deployed during the event without a CF account
+- SUSE BCI container — `Dockerfile` uses `registry.suse.com/bci/nodejs:22`
+- Cursor — project built with Cursor; CLI seat uses locally installed `cursor-agent`
+
+Do not state that NVIDIA hardware, Azure, or Cloudflare edge was used in a specific demo unless the run's `provider_call` events show it.
+
+## Regulatory context (why audit surfaces matter)
+
+Tribunal does not provide legal advice. The product addresses a documented gap: high-stakes automated decisions often ship as fluent text with weak or unfaithful post-hoc explanation. Regulators and courts increasingly expect **reasons you can inspect**:
+
+- US fair lending: Equal Credit Opportunity Act (ECOA), Regulation B adverse-action notice requirements; CFPB Circular 2022-03 on black-box credit models
+- Insurance: public reporting on automated claim denials (e.g. ProPublica on Cigna's PxDx program), litigation such as *nH Predict* class actions, California SB 1120 (utilization review transparency)
+- Benefits: Royal Commission into Robodebt (Australia), Dutch *toeslagenaffaire*, Michigan MiDAS false fraud flags
+- Content moderation: EU Digital Services Act Article 17 statement-of-reasons obligations
+- EU AI Act: logging and human-oversight duties for high-risk systems; GDPR Article 22 on automated decisions with legal/significant effects
+
+Tribunal is a **technical demonstration** of a richer audit artifact, not a compliance certification.
