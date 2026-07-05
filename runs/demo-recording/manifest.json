@@ -1,9 +1,11 @@
 {
-  "recordedAt": "2026-07-05T00:56:23.868Z",
-  "mode": "replay",
+  "recordedAt": "2026-07-05T07:00:39.449Z",
+  "mode": "offline",
   "web": "http://localhost:5173",
   "api": "http://localhost:8787",
   "videoDir": "/Users/pablo/Desktop/RAISE Cursor/runs/demo-recording/webm",
+  "videoFile": "/Users/pablo/Desktop/RAISE Cursor/runs/demo-recording/demo.webm",
+  "sourceVideo": "/Users/pablo/Desktop/RAISE Cursor/runs/demo-recording/webm/page@6ca53f8d6f1c3a4d7085d0f00336c253.webm",
   "screenshot": "/Users/pablo/Desktop/RAISE Cursor/runs/demo-recording/final-frame.png",
   "submitUrl": "https://cerebralvalley.ai/e/raise-summit-hackathon/hackathon/submit",
   "repo": "https://github.com/pazare/tribunal",
