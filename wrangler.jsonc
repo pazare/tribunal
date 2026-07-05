@@ -1,0 +1,7 @@
+{
+  // Deploy from repo root: npx wrangler deploy -c apps/worker/wrangler.jsonc
+  // Or from apps/worker: npx wrangler deploy
+  "name": "tribunal-verify",
+  "main": "apps/worker/src/index.ts",
+  "compatibility_date": "2024-11-01"
+}
