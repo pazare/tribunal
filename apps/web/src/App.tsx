@@ -319,7 +319,7 @@ export default function App() {
                 <p className="mt-4 text-zinc-500 text-sm max-w-2xl mx-auto">
                   Tribunal is an <span className="text-zinc-300">explainable decoder</span>: instead of one model
                   sampling tokens in the dark, the verdict is generated span by span through an election — six seats
-                  from rival AI vendors cast secret ballots, cross-examine anonymously, and a named rule elects each
+                  (rival AI vendors live, scripted stand-ins offline) cast secret ballots, cross-examine anonymously, and a named rule elects each
                   span. Veto, preserved dissent, and a tamper-evident ledger are part of the decoding loop itself.
                 </p>
               </section>
@@ -351,7 +351,7 @@ export default function App() {
                   {panelChoice === "offline"
                     ? "— deterministic scripted panel, no model calls (labeled as such on the record)"
                     : panelChoice === "cli"
-                      ? "— real Codex, Grok and Claude seats via local CLIs"
+                      ? "— live seats via whichever local CLIs are present"
                       : panelChoice === "openrouter"
                         ? "— Microsoft, NVIDIA, Meta, DeepSeek, Mistral via one key"
                         : "— best available: OpenRouter, then CLIs, then scripted"}

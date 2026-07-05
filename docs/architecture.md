@@ -8,11 +8,11 @@ Tribunal is an npm-workspaces monorepo. The **kernel** owns the due-process engi
 |---------------|------|
 | `@tribunal/kernel` | Engine, ledger, panel adapters (CLI, OpenRouter, offline), `verifyLedger()` |
 | `@tribunal/scorecard` | A1–A12 auditability checklist with anti-spoof guards |
-| `@tribunal/packs` | Domain case files (lending live; insurance, benefits, moderation planned) |
+| `@tribunal/packs` | Domain case files — lending, insurance, benefits, moderation (all implemented) |
 | `@tribunal/server` | Node HTTP + SSE API, human intervention, run persistence |
 | `@tribunal/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker port of `verifyLedger()` (no kernel imports) |
-| `runs/` | Committed replayable real-run ledgers + `meta.json` head hashes |
+| `runs/` | Committed replayable run ledgers (live CLI + scripted offline) + `meta.json` head hashes |
 
 ## Event kinds (verdict ledger)
 
@@ -125,7 +125,8 @@ Recorded runs under `runs/` replay over SSE with `status: replay` so the UI neve
 
 ## Tests
 
-- `packages/kernel/test/kernel.test.ts` — 17 tests (determinism, tamper, veto, dissent, ablations)
+- `packages/kernel/test/kernel.test.ts` — 19 tests (determinism, tamper, veto, dissent, ablations)
+- `packages/packs/test/packs.test.ts` — 2 tests (pack integrity)
 - `packages/scorecard/test/scorecard.test.ts` — 10 tests (A1–A12, spoof guards, baseline 0/12)
 
 See [honesty.md](./honesty.md) for claims boundaries and [judging.md](./judging.md) for the demo script.

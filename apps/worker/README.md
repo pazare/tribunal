@@ -54,7 +54,7 @@ curl -s -X POST http://localhost:8787/verify \
   -d "{\"events\":$(cat ../../runs/<run-id>/ledger.json)}"
 ```
 
-(From repo root, or adjust the path to your recorded run under `runs/`.)
+(Run from `apps/worker/`; adjust the relative path for other working directories.)
 
 ## What it checks
 

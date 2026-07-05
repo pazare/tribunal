@@ -6,7 +6,7 @@ When a single model denies your loan, rejects your insurance claim, flags your b
 
 Tribunal replaces sampling with **election**. The output is decoded in atomic surface spans (the disposition, the required disclosure, …), and each span goes through electoral mechanisms adapted from human institutions — **secret ballots** (sealed commitments before reveal), **anonymized cross-examination** with ballot-order rotation, on-the-record vote changes, a binding **safety veto**, ratification under a **named constitutional rule**, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself. The explanation is not attached to the generation — it *is* the generation.
 
-- **Six chartered seats** staffed by rival AI vendors (evidence, adversary, law/policy, affected party, safety with veto, concision) — decorrelated by construction, not by prompt.
+- **Six chartered seats** (evidence, adversary, law/policy, affected party, safety with veto, concision) — rival AI vendors in live modes, scripted stand-ins offline; cross-vendor seating can reduce correlated failure.
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point).
 
@@ -82,7 +82,7 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 17 kernel + 10 scorecard tests
+npm test                 # 19 kernel + 2 packs + 10 scorecard tests
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
 ```
@@ -230,9 +230,8 @@ Serves the API on port 8787. Web static assets included only if `@tribunal/web` 
 Autonomous recording (Playwright computer-use — no operator present):
 
 ```bash
-npm run record:demo              # offline live run
-npm run record:demo -- --replay  # replay committed real CLI run (recommended for submission)
-npm run record:demo -- --live    # live OpenRouter/CLI panel
+npm run record:demo              # offline scripted demo (labeled; not model output)
+npm run record:demo -- --replay  # replay the committed 12/12 CLI lending run
 ```
 
 Output: `runs/demo-recording/webm/*.webm` + `final-frame.png` + `manifest.json`.
