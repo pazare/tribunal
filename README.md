@@ -16,6 +16,18 @@ Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Curs
 
 ---
 
+## The 60-second tour
+
+[![Watch the 53-second demo — a benefits verdict decoded as an election](docs/media/docket.png)](runs/demo-recording/demo.mp4)
+
+**[▶ Watch the demo (53s, captioned)](runs/demo-recording/demo.mp4)** — or re-record it yourself: `npm run record:demo` drives the UI end-to-end on your machine.
+
+| Every span is elected — RATIFIED on the record | Verified: 12/12 vs single-model 0/12 |
+|---|---|
+| ![Candidate ballot with a RATIFIED stamp and public reason](docs/media/ballot-ratified.png) | ![A1–A12 auditability scorecard, hash chain VALID](docs/media/scorecard-a1-a12.png) |
+
+---
+
 ## The problem is documented
 
 High-stakes automated decisions already face scrutiny; the audit surface has not kept up.

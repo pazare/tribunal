@@ -217,7 +217,7 @@ async function main() {
 
       if (REPLAY) {
         console.log("start replay");
-        await smoothScroll(page, '[data-testid="compare-strip"]', 700);
+        await caption(page, "Replaying a REAL recorded run — rival vendor seats, 12/12 audit, anchored in the repo.");
         await clickReplayRun(page);
       } else {
         console.log("start offline benefits run");
