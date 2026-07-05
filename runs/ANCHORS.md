@@ -8,4 +8,5 @@ rewritten wholesale — the exact forgery this table exists to catch.
 
 | run | pack | mode | providers | events | chain | auditability | head (sha256) |
 |---|---|---|---|---|---|---|---|
-| `run_c49cb4b4453e` | lending-adverse-action | cli | openai+xai | 138 | ✓ | 12/12 | `f853abc1aea9459163e0b21c956695a7d51e44dcd233c067de05127f0f68ed53` |
+| `run_c49cb4b4453e` | lending-adverse-action | cli | openai+xai | 126 | ✓ | 12/12 | `58692b1f95483f0ecf62c3adb48bd98da81d6995d15a16b67be231ffc1a76e6b` |
+| `run_e6c6225c0d49` | lending-adverse-action | offline | offline | 86 | ✓ | 12/12 | `cab65931beccb3b44388ff9fb59212e6132526648476904c78c6a3996229d602` |

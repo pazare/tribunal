@@ -297,14 +297,17 @@ function parseRevision(raw: string, society: Society, spanIndex: number, ownR1: 
 }
 
 function coerceScored(c: any, onRepair: () => void): ScoredCandidate {
-  const isStop = !!c.isStop || asString(c.text).trim() === "" && !c.text;
+  // "Empty iff isStop" (kernel contract): whitespace-only text IS a stop —
+  // never a phantom non-stop candidate carrying blank text.
+  const text = asString(c.text).trim();
+  const isStop = !!c.isStop || text === "";
   let warrant = asString(c.warrant);
   if (!warrant) {
     warrant = "(no warrant returned by model)";
     onRepair();
   }
   return {
-    candidate: { text: isStop ? "" : asString(c.text), isStop },
+    candidate: { text: isStop ? "" : text, isStop },
     confidence: clamp01(c.confidence, 0.6),
     factualityRisk: clamp01(c.factualityRisk, 0.3),
     legalRisk: clamp01(c.legalRisk, 0.2),

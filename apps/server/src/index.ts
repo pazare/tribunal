@@ -31,8 +31,27 @@ import { computeAuditability, baselineReport } from "@tribunal/scorecard";
 import { PACKS } from "@tribunal/packs";
 
 const PORT = Number(process.env.PORT ?? 8787);
+// Local-first by default: this server can spawn locally-authenticated agent
+// CLIs and spend API keys, so it must never listen on all interfaces unless
+// the operator explicitly opts in (e.g. HOST=0.0.0.0 inside a container).
+const HOST = process.env.HOST ?? "127.0.0.1";
 const RUNS_DIR = resolve(process.cwd(), process.env.TRIBUNAL_RUNS_DIR ?? "runs");
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
 mkdirSync(RUNS_DIR, { recursive: true });
+
+/** 4xx errors thrown by handlers; everything else is a 500. */
+class HttpError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+  }
+}
+
+/** Browser origins allowed to call this API (dev UI + same host). */
+function corsOriginFor(req: IncomingMessage): string | null {
+  const origin = req.headers.origin;
+  if (!origin) return null;
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ? origin : null;
+}
 
 // ---------------------------------------------------------------------------
 // Run registry: live runs stream; finished runs replay.
@@ -123,7 +142,6 @@ function subscribe(run: LiveRun, res: ServerResponse) {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
-    "Access-Control-Allow-Origin": "*",
   });
   for (const e of run.events) sseSend(res, "ledger", e);
   if (run.status !== "running") {
@@ -243,7 +261,17 @@ async function startRun(body: {
 }
 
 function persistRun(live: LiveRun, events: LedgerEvent[]) {
-  const dir = join(RUNS_DIR, live.runId);
+  let dir = join(RUNS_DIR, live.runId);
+  // Never overwrite a different ledger already stored under this id: a
+  // committed run is an anchored artifact. (Identical bytes — deterministic
+  // offline re-runs — are skipped entirely to avoid meta churn.)
+  const existing = join(dir, "ledger.json");
+  if (existsSync(existing)) {
+    const prev = readFileSync(existing, "utf8");
+    const next = JSON.stringify(events, null, 1);
+    if (prev === next) return;
+    dir = join(RUNS_DIR, `${live.runId}_${Date.now().toString(36)}`);
+  }
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "ledger.json"), JSON.stringify(events, null, 1));
   const verify = verifyLedger(events);
@@ -275,26 +303,46 @@ function persistRun(live: LiveRun, events: LedgerEvent[]) {
 // ---------------------------------------------------------------------------
 
 async function readBody(req: IncomingMessage): Promise<any> {
+  // Requiring application/json means browsers must preflight cross-origin
+  // POSTs (no-cors text/plain smuggling can't reach these handlers), and the
+  // size cap bounds memory per request.
+  const ct = String(req.headers["content-type"] ?? "");
+  if (!ct.includes("application/json")) {
+    throw new HttpError(415, "Content-Type must be application/json");
+  }
   const chunks: Buffer[] = [];
-  for await (const c of req) chunks.push(c as Buffer);
+  let size = 0;
+  for await (const c of req) {
+    size += (c as Buffer).length;
+    if (size > MAX_BODY_BYTES) throw new HttpError(413, `body exceeds ${MAX_BODY_BYTES} bytes`);
+    chunks.push(c as Buffer);
+  }
   const raw = Buffer.concat(chunks).toString("utf8");
-  return raw ? JSON.parse(raw) : {};
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    throw new HttpError(400, "body is not valid JSON");
+  }
 }
 
 function json(res: ServerResponse, status: number, data: unknown) {
-  const body = JSON.stringify(data);
-  res.writeHead(status, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  });
-  res.end(body);
+  res.writeHead(status, { "Content-Type": "application/json" });
+  res.end(JSON.stringify(data));
 }
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
+
+  // CORS: reflect only allowlisted (local) origins; set once for every route,
+  // including SSE. Non-local browser origins get no CORS grant at all.
+  const origin = corsOriginFor(req);
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Vary", "Origin");
+  }
 
   if (req.method === "OPTIONS") return json(res, 204, {});
 
@@ -408,7 +456,6 @@ const server = createServer(async (req, res) => {
         res.writeHead(200, {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          "Access-Control-Allow-Origin": "*",
         });
         sseSend(res, "status", { status: "replay", runId: id });
         let i = 0;
@@ -499,8 +546,10 @@ const server = createServer(async (req, res) => {
     if (req.method === "GET" && !path.startsWith("/api/")) {
       const webDist = resolve(process.cwd(), "apps/web/dist");
       const file = path === "/" ? "/index.html" : path;
-      const full = join(webDist, file);
-      if (existsSync(full) && !full.includes("..")) {
+      // Containment check on the RESOLVED path (string scanning for ".."
+      // runs after URL normalization and proves nothing).
+      const full = resolve(webDist, `.${file}`);
+      if (full.startsWith(webDist + "/") && existsSync(full)) {
         const ext = full.split(".").pop() ?? "";
         const mime: Record<string, string> = {
           html: "text/html", js: "text/javascript", css: "text/css", svg: "image/svg+xml",
@@ -519,12 +568,13 @@ const server = createServer(async (req, res) => {
 
     return json(res, 404, { error: `no route ${req.method} ${path}` });
   } catch (e: any) {
+    if (e instanceof HttpError) return json(res, e.status, { error: e.message });
     return json(res, 500, { error: e.message });
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`tribunal api listening on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`tribunal api listening on http://${HOST}:${PORT}`);
   console.log(`packs: ${PACKS.map((p) => p.id).join(", ")}`);
   console.log(`runs dir: ${RUNS_DIR}`);
 });

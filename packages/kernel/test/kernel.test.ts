@@ -159,6 +159,30 @@ test("tamper detection: editing any event breaks the chain at that seq", async (
   assert.ok(v.problems.some((p) => p.seq === idx && p.reason === "bad_hash"));
 });
 
+test("truncation forgery: dropping trailing events fails verification", async () => {
+  const r = await run(offlineConfig());
+  // Chop run_finished (and with it the final-answer binding): the chain up to
+  // that point is untouched, so only the completeness check can catch this.
+  const truncated = r.events.slice(0, -1);
+  const v = verifyLedger(truncated);
+  assert.equal(v.ok, false);
+  assert.ok(v.problems.some((p) => p.reason === "truncated"));
+});
+
+test("reveal hashChecks attest against the SEALED commitment, not themselves", async () => {
+  const r = await run(offlineConfig());
+  const reveal = r.events.find((e) => e.kind === "proposals_revealed")!;
+  const { proposals, hashChecks } = reveal.payload as any;
+  const commits = r.events.filter((e) => e.kind === "blind_commitment" && e.spanIndex === 0);
+  assert.equal(hashChecks.length, proposals.length);
+  for (const hc of hashChecks) {
+    const sealed = commits.find((c) => (c.payload as any).seatId === hc.seatId)!;
+    assert.equal(hc.committed, (sealed.payload as any).proposalHash, "committed must be the sealed hash");
+    assert.equal(hc.ok, hc.committed === hc.recomputed);
+    assert.equal(hc.ok, true);
+  }
+});
+
 test("relink forgery is caught by the answer cross-check", async () => {
   const r = await run(offlineConfig());
   const forged: LedgerEvent[] = structuredClone(r.events);

@@ -36,7 +36,7 @@ function normalize(s: string): string {
   return s.replace(/\s+/g, " ").trim();
 }
 
-type ProblemReason = "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch";
+type ProblemReason = "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch" | "truncated";
 
 interface VerifyProblem {
   seq: number;
@@ -102,6 +102,20 @@ async function verifyLedger(events: LedgerEvent[]): Promise<VerifyResult> {
     if (e.kind === "run_finished") {
       finalAnswer = (e.payload as { finalAnswer?: string }).finalAnswer ?? null;
     }
+  }
+
+  // Parity with kernel: a complete run must end with run_finished, otherwise
+  // tail-truncation (dropping the final-answer binding) would verify.
+  const last = events[events.length - 1];
+  if (!last || last.kind !== "run_finished") {
+    problems.push({
+      seq: last ? last.seq : 0,
+      kind: last ? last.kind : "(empty)",
+      reason: "truncated",
+      detail: last
+        ? `ledger ends at "${last.kind}" — a complete run must end with run_finished`
+        : "empty ledger",
+    });
   }
 
   let answerConsistent = true;

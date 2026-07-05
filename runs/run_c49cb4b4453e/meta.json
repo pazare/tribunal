@@ -2,11 +2,11 @@
  "runId": "run_c49cb4b4453e",
  "packId": "lending-adverse-action",
  "mode": "cli",
- "startedAt": 1783212765631,
- "finishedAt": 1783212845988,
- "events": 59,
- "head": "7a2efcd408fc2a764948d6d34766ac316796d47df1dafa4682ec8f7581998557",
+ "startedAt": 1783212865887,
+ "finishedAt": 1783213184695,
+ "events": 126,
+ "head": "58692b1f95483f0ecf62c3adb48bd98da81d6995d15a16b67be231ffc1a76e6b",
  "verified": true,
  "auditability": "12/12",
- "label": "lending-adverse-action · cli · 2026-07-05T00:52:45.631Z"
+ "label": "lending-adverse-action · cli · 2026-07-05T00:54:25.887Z"
 }

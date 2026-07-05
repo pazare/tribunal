@@ -71,8 +71,21 @@ const SAFETY_VETO_THRESHOLD = 0.6;
 
 export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   const { pack, config, seats } = opts;
-  const runId = stableId("run", pack.id, config.seed, seats.map((s) => s.client.provider));
-  const ledger = new Ledger(runId, opts.clock ?? "wall");
+  const clock = opts.clock ?? "wall";
+  // Live (wall-clock) runs carry a unique nonce: model output varies run to
+  // run, so reusing a config-derived id would overwrite the persisted artifact
+  // and silently de-anchor any published head hash. Logical-clock runs stay
+  // purely content-addressed — that is what makes offline runs byte-identical.
+  const runId = stableId(
+    "run",
+    pack.id,
+    config.seed,
+    seats.map((s) => s.client.provider),
+    // Spread (not a conditional value) so logical-clock ids hash the exact
+    // same parts as always — recorded offline runs stay content-addressed.
+    ...(clock === "wall" ? [[Date.now(), Math.random()]] : []),
+  );
+  const ledger = new Ledger(runId, clock);
   const emit = (e: LedgerEvent) => opts.onEvent?.(e);
   const append: Ledger["append"] = ((kind: any, span: any, payload: any) => {
     const e = ledger.append(kind, span, payload);
@@ -167,22 +180,33 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     }
 
     // ---- Seal commitments BEFORE reveal (blind-round control) --------------
+    const sealedHashes = new Map<string, string>();
     if (config.flags.blindRound) {
       for (const p of proposals) {
+        const sealed = hashOf(p);
+        sealedHashes.set(p.seatId, sealed);
         append("blind_commitment", slot.index, {
           seatId: p.seatId,
           society: p.society,
           provider: p.provider,
           spanIndex: slot.index,
-          proposalHash: hashOf(p),
+          proposalHash: sealed,
         });
       }
     }
-    // Reveal + verify each sealed commitment recomputes.
-    const hashChecks = proposals.map((p) => {
-      const recomputed = hashOf(p);
-      return { seatId: p.seatId, committed: recomputed, recomputed, ok: true };
-    });
+    // Reveal + verify: `committed` is the hash SEALED in the blind_commitment
+    // event, `recomputed` is the hash of what is being revealed now. Comparing
+    // a value to a recomputation of itself would attest nothing; this check is
+    // only meaningful against the sealed record, and a mismatch is ledgered
+    // as ok:false, never masked. (With no blind round there are no seals, so
+    // no checks are claimed.)
+    const hashChecks = config.flags.blindRound
+      ? proposals.map((p) => {
+          const recomputed = hashOf(p);
+          const committed = sealedHashes.get(p.seatId) ?? "";
+          return { seatId: p.seatId, committed, recomputed, ok: committed === recomputed };
+        })
+      : [];
     append("proposals_revealed", slot.index, { proposals, hashChecks });
 
     // ---- Delphi feedback (anonymized) + per-recipient order ---------------

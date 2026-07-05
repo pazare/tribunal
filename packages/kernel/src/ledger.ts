@@ -64,7 +64,7 @@ export interface VerifyResult {
   problems: {
     seq: number;
     kind: string;
-    reason: "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch";
+    reason: "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch" | "truncated";
     detail: string;
   }[];
   /** True iff the concatenation of committed spans equals the run's final answer. */
@@ -122,6 +122,22 @@ export function verifyLedger(events: LedgerEvent[]): VerifyResult {
     if (e.kind === "run_finished") {
       finalAnswer = (e.payload as EventPayloadMap["run_finished"]).finalAnswer;
     }
+  }
+
+  // A complete run always ends in run_finished. Without this check, chopping
+  // trailing events (including the final-answer binding itself) would still
+  // verify — a truncation forgery. An intact chain that just stops early is
+  // therefore rejected, not passed vacuously.
+  const last = events[events.length - 1];
+  if (!last || last.kind !== "run_finished") {
+    problems.push({
+      seq: last ? last.seq : 0,
+      kind: last ? last.kind : "(empty)",
+      reason: "truncated",
+      detail: last
+        ? `ledger ends at "${last.kind}" — a complete run must end with run_finished`
+        : "empty ledger",
+    });
   }
 
   let answerConsistent = true;

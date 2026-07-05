@@ -21,6 +21,9 @@ WORKDIR /app
 COPY --from=build /app /app
 
 ENV PORT=8787
+# The API binds 127.0.0.1 by default (it can drive local agent CLIs); inside a
+# container the boundary is the container itself, so opt in to all interfaces.
+ENV HOST=0.0.0.0
 ENV TRIBUNAL_RUNS_DIR=runs
 
 EXPOSE 8787

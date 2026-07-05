@@ -17,4 +17,7 @@ jobs:
           cache: npm
       - run: npm install
       - run: npm run test --workspaces --if-present
-      - run: npx tsc -p packages/kernel/tsconfig.json --noEmit
+      - run: npm run typecheck --workspaces --if-present
+      # Every committed ledger must verify AND match its published anchor —
+      # anchor drift (rewrite or forgotten re-anchor) fails the build.
+      - run: npx tsx scripts/check_anchors.ts

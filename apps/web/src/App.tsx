@@ -239,6 +239,12 @@ export default function App() {
     [events, runId],
   );
 
+  /** Live chain head — the hash of the newest ledger event (anchor externally). */
+  const headHash = useMemo(
+    () => (events.length ? events[events.length - 1].hash : null),
+    [events],
+  );
+
   const auditScore = verifyResult?.audit?.total ?? null;
   const baselineScore = verifyResult?.baseline?.total ?? 0;
 
