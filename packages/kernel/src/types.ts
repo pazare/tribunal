@@ -60,6 +60,7 @@ export type Provider =
   | "meta"
   | "deepseek"
   | "mistral"
+  | "cursor"
   | "offline"; // deterministic scripted panel — CI/tests only, never in a live demo
 
 export type TurnStatus = "ok" | "refusal" | "incomplete" | "error";

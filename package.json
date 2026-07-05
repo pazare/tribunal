@@ -15,7 +15,8 @@
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev": "node scripts/dev.mjs",
-    "demo": "node --loader tsx packages/kernel/scripts/demo.ts",
+    "demo": "tsx packages/kernel/scripts/demo.ts",
+    "demo:real": "tsx packages/kernel/scripts/real_smoke.ts",
     "server": "npm run dev --workspace @tribunal/server",
     "web": "npm run dev --workspace @tribunal/web"
   },

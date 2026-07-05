@@ -33,6 +33,16 @@ export interface Pack {
   slots: DecisionSlot[];
   /** Optional per-seat evidence assignment (independent-evidence path). */
   evidenceBySociety?: Partial<Record<string, string[]>>;
+  /** One-line hook for the case picker UI. */
+  tagline?: string;
+  /**
+   * The documented real-world problem this case dramatizes — plain prose with
+   * verifiable anchors (statutes, public incidents, transparency databases).
+   * Shown on the docket; keep it factual and cited.
+   */
+  problemStatement?: string;
+  /** What the planted trap is and what catching it looks like (shown post-run). */
+  trapNote?: string;
 }
 
 export interface PanelSeat {
@@ -48,6 +58,11 @@ export interface RunOptions {
   onEvent?: (e: LedgerEvent) => void;
   /** Human auditor interventions to inject, keyed by span index. */
   humanInterventions?: HumanIntervention[];
+  /**
+   * Live pull point: called right before ratification of each span so a running
+   * UI can inject typed/voice objections and vetoes into THIS run in real time.
+   */
+  pullHumanInterventions?: (spanIndex: number) => HumanIntervention[] | Promise<HumanIntervention[]>;
   /** "logical" gives byte-deterministic timestamps (offline/tests). */
   clock?: "logical" | "wall";
 }
@@ -228,7 +243,8 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     append("safety_review", slot.index, { verdicts: safety, vetoEnabled: config.flags.safetyVeto });
 
     // ---- Human intervention (auditor in the loop) ------------------------
-    const humans = humanBySpan.get(slot.index) ?? [];
+    const pulled = opts.pullHumanInterventions ? await opts.pullHumanInterventions(slot.index) : [];
+    const humans = [...(humanBySpan.get(slot.index) ?? []), ...pulled];
     for (const h of humans) {
       append("human_intervention", slot.index, h);
       if (h.kind === "veto" && h.targetKey) {

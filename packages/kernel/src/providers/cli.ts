@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdtempSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
   Objection,
@@ -53,16 +53,35 @@ const CLI: Record<string, CliSpec> = {
     model: "openai/codex-cli",
   },
   xai: {
-    bin: "agent",
+    // IMPORTANT: "agent" on PATH may be shadowed by another vendor's CLI (both
+    // ship an `agent` binary). Resolve the xAI one by its install dir explicitly.
+    bin: existsSync(join(homedir(), ".grok/bin/agent")) ? join(homedir(), ".grok/bin/agent") : "agent",
     buildArgs: (p) => ["-p", p],
     inputMode: "argv",
     model: "xai/grok-cli",
   },
   anthropic: {
+    // Model is pinned explicitly (operator requirement: never the default alias).
     bin: "claude",
-    buildArgs: (p) => ["-p", p, "--max-turns", "1"],
+    buildArgs: (p) => [
+      "-p",
+      p,
+      "--max-turns",
+      "1",
+      "--model",
+      process.env.TRIBUNAL_CLAUDE_MODEL ?? "sonnet",
+    ],
     inputMode: "argv",
-    model: "anthropic/claude-cli",
+    model: `anthropic/${process.env.TRIBUNAL_CLAUDE_MODEL ?? "sonnet"}`,
+  },
+  cursor: {
+    bin: "cursor-agent",
+    buildArgs: (p) =>
+      process.env.TRIBUNAL_CURSOR_MODEL
+        ? ["-p", p, "--output-format", "text", "--model", process.env.TRIBUNAL_CURSOR_MODEL]
+        : ["-p", p, "--output-format", "text"],
+    inputMode: "argv",
+    model: `cursor/${process.env.TRIBUNAL_CURSOR_MODEL ?? "default"}`,
   },
 };
 
