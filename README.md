@@ -111,7 +111,7 @@ export TRIBUNAL_CLAUDE_MODEL=sonnet   # pinned alias, not the default
 # export TRIBUNAL_CURSOR_MODEL=...    # optional
 
 npm run demo:real                     # smoke test across available CLIs
-# or POST /api/run  { "packId": "lending_adverse_v1", "mode": "cli" }
+# or POST /api/run  { "packId": "lending-adverse-action", "mode": "cli" }
 ```
 
 Probe availability: `GET http://localhost:8787/api/panel`
@@ -120,7 +120,7 @@ Probe availability: `GET http://localhost:8787/api/panel`
 
 ```bash
 export OPENROUTER_API_KEY=sk-or-...
-# POST /api/run  { "packId": "lending_adverse_v1", "mode": "openrouter" }
+# POST /api/run  { "packId": "lending-adverse-action", "mode": "openrouter" }
 ```
 
 Default model slugs (override per seat in code via `packages/kernel/src/panel.ts`):

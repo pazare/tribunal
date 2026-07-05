@@ -7,7 +7,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Claim | Meaning |
 |-------|---------|
 | Due-process structure | Blind proposal, sealed commitments, anonymized feedback, revision, safety veto, named ratification, preserved dissent, STOP as first-class |
-| Cross-provider panel | Different vendors' models on different seats → decorrelated failure modes, not one vendor's blind spot |
+| Cross-provider panel | Different vendors' models on different seats can reduce correlated failure modes — the committed flagship lending run used two vendors (openai+xai) round-robined across six seats |
 | Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
 | Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
 | Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
@@ -48,7 +48,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 - **A6** — Safety veto exercised as real code path when enabled.
 - **A7** — Named ratification rule + public reason.
 - **A8** — Material dissent preserved.
-- **A9** — Provider provenance logged per call.
+- **A9** — Deliberation memory persisted across spans.
 - **A10** — Hash chain verifies (with unanchored caveat in evidence text).
 - **A11** — STOP ratified explicitly when chosen.
 - **A12** — Typed, schema-validatable event log.

@@ -51,10 +51,10 @@ Then:
 ```bash
 curl -s -X POST http://localhost:8787/verify \
   -H 'Content-Type: application/json' \
-  -d @../runs/<run-id>/ledger.json
+  -d "{\"events\":$(cat ../../runs/<run-id>/ledger.json)}"
 ```
 
-(Adjust path if you have a recorded run under `runs/`.)
+(From repo root, or adjust the path to your recorded run under `runs/`.)
 
 ## What it checks
 

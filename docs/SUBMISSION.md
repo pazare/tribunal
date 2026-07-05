@@ -11,7 +11,7 @@ If the operator is unavailable, an agent (or cron) can run through this list and
 ```bash
 cd tribunal   # or clone https://github.com/pazare/tribunal
 npm install
-npm test      # expect 17 kernel + 10 scorecard — all green
+npm test      # expect 19 kernel + 2 packs + 10 scorecard — all green
 npm run demo  # expect VERIFY: OK + tamper FAILED ✓
 ```
 

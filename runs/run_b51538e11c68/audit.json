@@ -1,0 +1,79 @@
+{
+ "runId": "run_b51538e11c68",
+ "items": [
+  {
+   "id": "A1",
+   "label": "Blind commitments sealed before reveal",
+   "pass": true,
+   "evidence": "15 commitments sealed before 3 reveal(s); all hashes recompute"
+  },
+  {
+   "id": "A2",
+   "label": "Public warrant on every candidate",
+   "pass": true,
+   "evidence": "36 candidate warrants, all substantive (≥20 chars, no repair markers)"
+  },
+  {
+   "id": "A3",
+   "label": "Cross-seat feedback anonymized",
+   "pass": true,
+   "evidence": "3 packet(s), no identity fields in any summary (type-level anonymization)"
+  },
+  {
+   "id": "A4",
+   "label": "Per-recipient order randomized (position-bias control)",
+   "pass": true,
+   "evidence": "3/3 spans show genuinely differing per-recipient orders"
+  },
+  {
+   "id": "A5",
+   "label": "Revisions answer objections + steelman rivals",
+   "pass": true,
+   "evidence": "15 revisions; every one answers the strongest objection, steelmans the rival, and names what would change its mind"
+  },
+  {
+   "id": "A6",
+   "label": "Safety review with real veto power",
+   "pass": true,
+   "evidence": "3 review(s) with veto enabled; 0 veto(es) actually fired with public reasons"
+  },
+  {
+   "id": "A7",
+   "label": "Named ratification rule + public reason",
+   "pass": true,
+   "evidence": "3 decisions, each names the fired rule and a substantive public reason"
+  },
+  {
+   "id": "A8",
+   "label": "Material dissent preserved (winner or loser targets alike)",
+   "pass": true,
+   "evidence": "37/37 material objections preserved on the record"
+  },
+  {
+   "id": "A9",
+   "label": "Deliberation memory persisted",
+   "pass": true,
+   "evidence": "97 memory writes across 3 update(s)"
+  },
+  {
+   "id": "A10",
+   "label": "Hash chain verifies (tamper-evident)",
+   "pass": true,
+   "evidence": "201 events verify; head 49557764560d…; answer cross-check passes. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it."
+  },
+  {
+   "id": "A11",
+   "label": "STOP ratified explicitly (no silent trailing-off)",
+   "pass": false,
+   "evidence": "run ended by \"max_spans\""
+  },
+  {
+   "id": "A12",
+   "label": "Typed, schema-validatable event log",
+   "pass": true,
+   "evidence": "201 events, all of known kinds with required fields present"
+  }
+ ],
+ "total": 11,
+ "outOf": 12
+}

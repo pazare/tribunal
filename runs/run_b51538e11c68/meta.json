@@ -1,0 +1,12 @@
+{
+ "runId": "run_b51538e11c68",
+ "packId": "insurance-utilization-review",
+ "mode": "cli",
+ "startedAt": 1783230680677,
+ "finishedAt": 1783231238670,
+ "events": 201,
+ "head": "49557764560d2eb91b70080ede45e4aa5222ed352ba311bb033972ccae83ab40",
+ "verified": true,
+ "auditability": "11/12",
+ "label": "insurance-utilization-review · cli · 2026-07-05T05:51:20.677Z"
+}
