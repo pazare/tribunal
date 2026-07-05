@@ -56,8 +56,10 @@ CASE DOCUMENTS:
 ${docs || "(none)"}
 ${carried ? `\nUNRESOLVED DISSENT CARRIED FORWARD:\n${carried}` : ""}
 
-Propose 1-3 candidate spans for THIS span only (a STOP candidate is allowed and
-encouraged when the verdict is already complete). Output exactly this JSON shape:
+Propose 1-3 candidate spans for THIS span only. On a completion span, make your
+FIRST candidate STOP (text "", isStop true) unless you identify a specific legally
+or materially required gap — a complete verdict must end by electing STOP, not by
+padding. Output exactly this JSON shape:
 {
   "candidates": [
     {

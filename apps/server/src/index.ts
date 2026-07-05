@@ -217,9 +217,10 @@ async function startRun(body: {
 
   const config: RunConfig = {
     seed: body.seed ?? 7,
-    // +1 leaves room for the completion span (explicit STOP ratification)
-    // when every pack slot commits substantive text.
-    maxSpans: body.maxSpans ?? pack.slots.length + 1,
+    // +2 leaves room for the completion span (explicit STOP ratification)
+    // plus one retry when the completion slot itself commits substantive
+    // text instead of STOP (observed on run_b51538e11c68 — A11 miss).
+    maxSpans: body.maxSpans ?? pack.slots.length + 2,
     flags: { ...DEFAULT_FLAGS, ...(body.flags ?? {}) },
     clientView: "answer_plus_summary",
   };

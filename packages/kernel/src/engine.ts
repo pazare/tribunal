@@ -144,7 +144,15 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     candidatesHint: ["<STOP>"],
   };
 
-  for (const slot of [...pack.slots, completionSlot]) {
+  // Growable queue: if the completion slot itself commits text instead of STOP
+  // (observed on run_b51538e11c68, where STOP lost the election 2–1), ONE retry
+  // slot is appended so the run can still end by an explicit STOP rather than
+  // slot exhaustion. Runs that ratify STOP on the first completion slot — every
+  // offline run — never grow the queue, so their ledgers are unchanged.
+  const slotQueue: DecisionSlot[] = [...pack.slots, completionSlot];
+  let completionRetried = false;
+  for (let qi = 0; qi < slotQueue.length; qi++) {
+    const slot = slotQueue[qi];
     if (spanCount >= config.maxSpans) {
       stoppedBy = "max_spans";
       break;
@@ -412,6 +420,19 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     if (isStop) {
       stoppedBy = "stop_ratified";
       break;
+    }
+
+    if (slot.index >= pack.slots.length && !completionRetried && spanCount < config.maxSpans) {
+      completionRetried = true;
+      slotQueue.push({
+        ...completionSlot,
+        index: slot.index + 1,
+        label: "completion retry — final STOP call",
+        instruction:
+          "The panel has now committed text past every pack slot. Ratify STOP — the explicit, " +
+          "first-class decision that the verdict is whole. Propose additional text ONLY for a " +
+          "legally mandatory omission you can name precisely.",
+      });
     }
   }
 
