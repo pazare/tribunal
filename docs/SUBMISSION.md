@@ -66,7 +66,7 @@ Upload the WebM/MP4 to **YouTube** (unlisted) or **Loom**. Note the public URL.
 | **Track** | Cursor |
 | **GitHub** | https://github.com/pazare/tribunal |
 | **Demo video** | *(URL from step 3)* |
-| **Description** | Tribunal runs loan denials, claim rejections, benefits flags, and moderation takedowns through a six-seat cross-provider panel with sealed commitments, anonymized Delphi feedback, safety veto, preserved dissent, and a hash-chained ledger scored A1–A12 (baseline single-model: 0/12 by construction). Built during RAISE Hackathon 2026. `npm run demo` proves verification; `runs/` holds replayable recorded ledgers — 2 live CLI runs + 4 scripted offline runs, all anchored. |
+| **Description** | Tribunal runs loan denials, claim rejections, benefits flags, and moderation takedowns through a six-seat cross-provider panel with sealed commitments, anonymized Delphi feedback, safety veto, preserved dissent, and a hash-chained ledger scored A1–A12 (baseline single-model: 0/12 by construction). Built during RAISE Hackathon 2026. `npm run demo` proves verification; `runs/` holds replayable recorded ledgers — 4 live cross-vendor CLI runs + 4 scripted offline runs, all anchored. |
 | **Built during event** | Yes — all code in public repo; kernel + scorecard + API + UI + recorded runs committed during hackathon window. |
 
 Run the automated opener (opens browser tabs — **does not** auto-submit credentials):
@@ -89,7 +89,7 @@ npm run submit:prep
 ## 6. Honesty guardrails (do not overclaim)
 
 - Offline demo = deterministic scripts, **not** model output — always labeled.
-- Replays in `runs/` are **recorded** ledgers — 2 real CLI runs + 4 scripted offline runs; the UI labels each mode honestly.
+- Replays in `runs/` are **recorded** ledgers — 4 real CLI runs + 4 scripted offline runs; the UI labels each mode honestly.
 - We do **not** claim legal compliance or answer-quality superiority.
 - Cursor CLI auth: if `cursor-agent status` shows logged out, omit cursor seat or use OpenRouter/codex/grok only.
 
