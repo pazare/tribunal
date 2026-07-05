@@ -248,6 +248,12 @@ async function startRun(body: {
         clock: mode === "offline" ? "logical" : "wall",
         onEvent: (e) => {
           live.events.push(e);
+          // Alias the kernel's content-derived runId to this live run from the
+          // FIRST event, so clients that switch to it mid-run (SSE reconnects,
+          // /intervene, /tampered) resolve while the run is still going.
+          if (live.events.length === 1 && e.runId && e.runId !== live.runId) {
+            runs.set(e.runId, live);
+          }
           if (e.spanIndex != null) live.currentSpan = e.spanIndex;
           broadcast(live, "ledger", e);
         },

@@ -74,8 +74,10 @@ export default function App() {
     const m = new URLSearchParams(window.location.search).get("mode");
     return m === "offline" || m === "cli" || m === "openrouter" ? m : "auto";
   });
+  const [vetoNote, setVetoNote] = useState("");
   const ledgerRef = useRef<HTMLDivElement>(null);
   const unsubRef = useRef<(() => void) | null>(null);
+  const pollRef = useRef<number | null>(null);
   const sseCountRef = useRef(0);
 
   useEffect(() => {
@@ -99,27 +101,40 @@ export default function App() {
     return "offline";
   }, [panel, panelChoice]);
 
-  const beginRun = async (pack: PackSummary, opts?: { replayId?: string; forceMode?: typeof mode }) => {
+  const beginRun = async (
+    pack: PackSummary,
+    opts?: { replayId?: string; replayMode?: string; forceMode?: typeof mode },
+  ) => {
     setError("");
     setEvents([]);
     setVerifyResult(null);
     setTamperResult(null);
     setFinalAnswer("");
+    setVetoNote("");
     setSelectedPack(pack);
     setView("chamber");
+    // Kill any previous run's stream + fallback poll before starting a new one.
+    unsubRef.current?.();
+    unsubRef.current = null;
+    if (pollRef.current) window.clearInterval(pollRef.current);
+    pollRef.current = null;
 
     if (opts?.replayId) {
       setRunId(opts.replayId);
       setStatus("replay");
+      // Honest labeling: show the mode the RECORDED run actually used.
+      setMode((opts.replayMode as typeof mode) ?? "offline");
       setRunning(true);
-      unsubRef.current?.();
       unsubRef.current = subscribeRun(
         opts.replayId,
         (e) => setEvents((prev) => [...prev, e]),
         (s) => {
-          if (s.status === "finished" || s.status === "replay") {
-            if (s.status === "finished") setRunning(false);
+          if (s.status === "finished") {
+            setRunning(false);
+            setStatus("replayed");
             if (s.finalAnswer) setFinalAnswer(String(s.finalAnswer));
+            unsubRef.current?.();
+            unsubRef.current = null;
           }
         },
         180,
@@ -132,12 +147,18 @@ export default function App() {
     setRunning(true);
     setStatus("starting");
     try {
-      const providers = m === "cli" ? ["openai", "xai", "anthropic"] : undefined;
-      const { runId: id } = await startRun({ packId: pack.id, mode: m, providers });
+      const providers =
+        m === "cli"
+          ? (["openai", "xai", "anthropic"] as const).filter((p) => panel?.cli?.[p]?.present)
+          : undefined;
+      const { runId: id } = await startRun({
+        packId: pack.id,
+        mode: m,
+        providers: providers?.length ? [...providers] : undefined,
+      });
       setRunId(id);
       setStatus("running");
       sseCountRef.current = 0;
-      unsubRef.current?.();
       // Offline runs finish in milliseconds; a paced SSE playback lets the
       // theater animate the deliberation instead of receiving one dump.
       const pace = m === "offline" ? 140 : undefined;
@@ -146,34 +167,40 @@ export default function App() {
         (e) => {
           sseCountRef.current += 1;
           setEvents((prev) => [...prev, e]);
-          if (e.runId && e.kind === "run_started") setRunId(e.runId);
           if (e.kind === "run_finished") {
             setFinalAnswer(String((e.payload as any).finalAnswer ?? ""));
             setRunning(false);
             setStatus("finished");
             setRunId(e.runId);
+            unsubRef.current?.();
+            unsubRef.current = null;
           }
         },
         (s) => {
-          if (s.status === "finished" || s.status === "replay") {
+          if (s.status === "finished") {
             setRunning(false);
-            setStatus(String(s.status));
+            setStatus("finished");
             if (s.runId) setRunId(String(s.runId));
             if (s.finalAnswer) setFinalAnswer(String(s.finalAnswer));
+            unsubRef.current?.();
+            unsubRef.current = null;
           }
           if (s.status === "error") {
             setRunning(false);
             setStatus("error");
             setError(String(s.error ?? "run failed"));
+            unsubRef.current?.();
+            unsubRef.current = null;
           }
         },
         pace,
       );
       // Pure fallback: if the SSE stream delivers nothing, fetch the finished
       // run. Disengages the moment any event arrives over SSE.
-      const poll = window.setInterval(async () => {
+      pollRef.current = window.setInterval(async () => {
         if (sseCountRef.current > 0) {
-          window.clearInterval(poll);
+          if (pollRef.current) window.clearInterval(pollRef.current);
+          pollRef.current = null;
           return;
         }
         try {
@@ -182,7 +209,8 @@ export default function App() {
           const j = await r.json();
           const fin = j.events?.find((e: LedgerEvent) => e.kind === "run_finished");
           if (fin || j.status === "finished" || j.status === "error") {
-            window.clearInterval(poll);
+            if (pollRef.current) window.clearInterval(pollRef.current);
+            pollRef.current = null;
             if (sseCountRef.current > 0) return;
             if (j.events?.length) setEvents(j.events);
             setRunning(false);
@@ -196,7 +224,6 @@ export default function App() {
           /* ignore */
         }
       }, 2500);
-      setTimeout(() => window.clearInterval(poll), 120_000);
     } catch (e: any) {
       setRunning(false);
       setError(e.message);
@@ -210,7 +237,7 @@ export default function App() {
   };
 
   const doTamper = async () => {
-    if (!runId) return;
+    if (!runId || !canVerify) return;
     setTamperResult(await tamperRun(runId));
   };
 
@@ -218,7 +245,7 @@ export default function App() {
   const doVeto = async () => {
     if (!runId || !running) return;
     const target = delib.candidates.find((c) => !c.isStop && !c.vetoed);
-    await intervene(runId, {
+    const res = await intervene(runId, {
       kind: "veto",
       actor: "Compliance auditor",
       text: target
@@ -226,6 +253,11 @@ export default function App() {
         : "Blocking the leading candidate pending human review.",
       targetKey: target?.key,
     });
+    setVetoNote(
+      res?.queued
+        ? `Veto queued — will be ledgered at span ${res.willApplyAtSpan}.`
+        : `Veto not accepted: ${res?.error ?? "run is not live"}.`,
+    );
   };
 
   const canVerify = useMemo(
@@ -252,18 +284,26 @@ export default function App() {
           </span>
         </div>
         <nav className="flex gap-2 text-sm">
-          {(["docket", "chamber", "scorecard"] as View[]).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => setView(v)}
-              className={`px-3 py-1.5 rounded-lg capitalize transition ${
-                view === v ? "bg-tribunal-gold/20 text-tribunal-gold" : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {v}
-            </button>
-          ))}
+          {(["docket", "chamber", "scorecard"] as View[]).map((v) => {
+            const enabled = v === "docket" || (v === "chamber" ? events.length > 0 : Boolean(verifyResult));
+            return (
+              <button
+                key={v}
+                type="button"
+                disabled={!enabled}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-lg capitalize transition ${
+                  view === v
+                    ? "bg-tribunal-gold/20 text-tribunal-gold"
+                    : enabled
+                      ? "text-zinc-400 hover:text-zinc-200"
+                      : "text-zinc-700 cursor-not-allowed"
+                }`}
+              >
+                {v}
+              </button>
+            );
+          })}
         </nav>
       </header>
 
@@ -361,20 +401,26 @@ export default function App() {
 
               {recordedRuns.length > 0 && (
                 <section className="glass p-4">
-                  <h3 className="text-sm font-medium text-zinc-400 mb-1">Recorded real runs (replay the actual ledger)</h3>
+                  <h3 className="text-sm font-medium text-zinc-400 mb-1">Recorded runs (replay the actual ledger)</h3>
                   <p className="text-[11px] text-zinc-600 mb-3">
-                    These are committed, anchored ledgers from live cross-provider panels — replayed event-by-event, not
-                    simulated.
+                    Committed, anchored ledgers replayed event-by-event — not simulated. `cli` runs are real
+                    cross-provider panels; `offline` runs are the deterministic scripted panel, labeled as such on the
+                    record.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {recordedRuns.map((r) => (
                       <button
                         key={r.runId}
                         type="button"
-                        className="text-xs font-mono px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700"
+                        data-testid={`replay-${r.runId}`}
+                        className={`text-xs font-mono px-3 py-1.5 rounded hover:bg-zinc-700 ${
+                          r.mode === "cli" || r.mode === "openrouter"
+                            ? "bg-emerald-500/10 text-emerald-200"
+                            : "bg-zinc-800"
+                        }`}
                         onClick={() => {
                           const pack = packs.find((p) => p.id === r.packId) ?? packs[0];
-                          if (pack) beginRun(pack, { replayId: r.runId });
+                          if (pack) beginRun(pack, { replayId: r.runId, replayMode: r.mode });
                         }}
                       >
                         {r.label} · {r.auditability ?? "?"}
@@ -407,10 +453,24 @@ export default function App() {
                     {selectedPack?.question ?? ""}
                   </p>
                 </div>
-                <span className="text-xs font-mono px-2.5 py-1.5 rounded bg-zinc-800 shrink-0">
-                  {status} · {mode}
-                  {running && <span className="ml-2 inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  {delib.liveNote && (
+                    <span
+                      className={`text-[10px] font-mono px-2 py-1 rounded ${
+                        delib.liveNote.startsWith("OFFLINE")
+                          ? "bg-zinc-800 text-zinc-400"
+                          : "bg-emerald-500/10 text-emerald-300"
+                      }`}
+                      title={delib.liveNote}
+                    >
+                      {delib.liveNote.startsWith("OFFLINE") ? "scripted panel (CI) — not model output" : "live multi-provider panel"}
+                    </span>
+                  )}
+                  <span className="text-xs font-mono px-2.5 py-1.5 rounded bg-zinc-800">
+                    {status} · {mode}
+                    {running && <span className="ml-2 inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
+                  </span>
+                </div>
               </div>
 
               <PhaseTracker view={delib} />
@@ -446,13 +506,14 @@ export default function App() {
                     </button>
                     <button
                       type="button"
-                      disabled={!runId}
+                      disabled={!canVerify}
                       onClick={doTamper}
                       className="w-full py-2 text-sm rounded bg-zinc-800 text-zinc-300 disabled:opacity-40 hover:bg-zinc-700"
                       data-testid="tamper-btn"
                     >
                       Tamper demo
                     </button>
+                    {vetoNote && <p className="text-[10px] text-sky-300/90 leading-snug">{vetoNote}</p>}
                     <p className="text-[10px] text-zinc-600 leading-snug pt-1">
                       A human veto lands in the ledger like any seat's act — attributed, timestamped, hash-chained.
                     </p>
