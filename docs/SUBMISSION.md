@@ -66,7 +66,7 @@ Upload the WebM/MP4 to **YouTube** (unlisted) or **Loom**. Note the public URL.
 | **Track** | Cursor |
 | **GitHub** | https://github.com/pazare/tribunal |
 | **Demo video** | *(URL from step 3)* |
-| **Description** | Tribunal runs loan denials, claim rejections, benefits flags, and moderation takedowns through a six-seat cross-provider panel with sealed commitments, anonymized Delphi feedback, safety veto, preserved dissent, and a hash-chained ledger scored A1–A12 (baseline single-model: 0/12 by construction). Built during RAISE Hackathon 2026. `npm run demo` proves verification; `runs/` holds replayable recorded ledgers — 4 live cross-vendor CLI runs + 4 scripted offline runs, all anchored. |
+| **Description** | Tribunal runs loan denials, claim rejections, benefits flags, and moderation takedowns through a six-seat cross-provider panel with sealed commitments, anonymized Delphi feedback, safety veto, preserved dissent, and a hash-chained ledger scored A1–A12 (baseline single-model: 0/12 by construction). Built during RAISE Hackathon 2026. `npm run demo` proves verification and tamper detection; `runs/` holds replayable recorded ledgers with head hashes stored for external anchoring. |
 | **Built during event** | Yes — all code in public repo; kernel + scorecard + API + UI + recorded runs committed during hackathon window. |
 
 Run the automated opener (opens browser tabs — **does not** auto-submit credentials):
@@ -81,7 +81,7 @@ npm run submit:prep
 
 1. **Problem (10s):** Denials and flags ship as fluent text with no verifiable record — ECOA, DSA, Robodebt all demand more.
 2. **Mechanism (25s):** Six seats, blind propose → seal → reveal → anonymized feedback → revise → safety veto → named ratification → dissent preserved. Show ledger stream.
-3. **Proof (15s):** Scorecard 12/12 (committed CLI lending run) vs baseline 0/12. Tamper demo breaks the chain. `verify` passes on the committed run.
+3. **Proof (15s):** Show the scorecard contrast: demo run 12/12, baseline 0/12 by construction, and committed live runs honestly show 11/12 when STOP is not ratified. Tamper demo breaks the chain; `verify` passes on intact ledgers.
 4. **Close (10s):** Clone, run `npm run demo`, watch tamper fail. Not claiming better answers — claiming an audit surface regulators are moving toward.
 
 ---

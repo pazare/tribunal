@@ -2,6 +2,8 @@
 
 **An explainable decoder: high-stakes verdicts are generated span by span, and every span is elected.**
 
+**Authorship:** Tribunal is the original idea and work of **Pablo Zavala**. Pablo Zavala is the author, originator, and project lead for the concept, mechanism, implementation, demo, and public repository.
+
 When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful.
 
 Tribunal replaces sampling with **election**. The output is decoded in atomic surface spans (the disposition, the required disclosure, …), and each span goes through electoral mechanisms adapted from human institutions — **secret ballots** (sealed commitments before reveal), **anonymized cross-examination** with ballot-order rotation, on-the-record vote changes, a binding **safety veto**, ratification under a **named constitutional rule**, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself. The explanation is not attached to the generation — it *is* the generation.
@@ -209,7 +211,21 @@ Details: [`docs/honesty.md`](docs/honesty.md).
 | `apps/server` | Node SSE API, human intervention, persistence |
 | `apps/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker verify endpoint (ready to deploy) |
-| `runs/` | Replayable real-run ledgers + anchored head hashes |
+| `runs/` | Replayable real-run ledgers + head hashes for anchoring |
+
+---
+
+## Future plans: impact at scale
+
+Tribunal's next step is to make contested AI decisions reviewable wherever they touch ordinary people. A bank denial, an insurer's "no," a locked marketplace account, a moderation takedown, a refund dispute, a benefit flag, a workplace screen, or a school eligibility call should not end as a private paragraph from a model; it should leave a record people can inspect, challenge, and hand to someone else.
+
+- **Adapt the seats, not one generic judge.** Each role should become sharper at its duty while the ledger still exposes every move. Technically, we plan to adapt or fine-tune frontier models such as GPT-5.6 Sol and Claude Fable 5, if provider-supported tuning or adapter access is available, into seat-specific specialists for evidence checking, adversarial objection, law and policy, affected-party impact, safety veto review, and concise drafting.
+- **Prove the process before claiming the outcome.** Progress only counts when reviewers can inspect the artifact that produced it. Technically, each tuning loop will run locked eval packs against single-model baselines and untuned panels, measuring A1-A12 deltas, trap detection, objection quality, veto calibration, tamper resistance, latency, cost, and human-review usefulness.
+- **Turn use cases into packs.** A person, company, agency, school, platform, or support team should be able to bring a real decision workflow without rewriting the engine. Technically, versioned domain packs will define facts, citations, planted traps, required notices, allowed outcomes, STOP rules, and seat templates while preserving the same hash-chained event schema.
+- **Make the record portable.** The output should be a decision record that travels: what was checked, who objected, what changed, what was vetoed, what dissent survived, and whether the ledger still verifies. Technically, the SDK/API roadmap includes run creation, event streaming, ledger verification, head-hash anchoring, signed replay bundles, webhook export, and read-only auditor links.
+- **Make relevance broad, not merely industrial.** Tribunal matters anywhere AI closes a door: money, care, work, speech, housing, benefits, education, commerce, or account access. Technically, the same ledger primitive can attach to consumer appeals, internal review queues, public-service oversight, marketplace trust teams, case-management systems, and personal evidence packets without changing the core verification model.
+
+This roadmap stays narrow: stronger auditability first. Accuracy, safety, or compliance claims require controlled studies, external review, and replayable run artifacts.
 
 ---
 

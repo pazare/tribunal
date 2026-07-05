@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Tribunal — a glass-box due-process layer for high-stakes AI decisions.",
+  "author": "Pablo Zavala",
   "workspaces": [
     "packages/*",
     "apps/*"
