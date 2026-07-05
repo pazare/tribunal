@@ -7,7 +7,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Claim | Meaning |
 |-------|---------|
 | Due-process structure | Blind proposal, sealed commitments, anonymized feedback, revision, safety veto, named ratification, preserved dissent, STOP as first-class |
-| Cross-provider panel | Different vendors' models on different seats can reduce correlated failure modes — the committed flagship lending run used two vendors (openai+xai) round-robined across six seats |
+| Cross-provider panel | Different vendors' models on different seats can reduce correlated failure modes — committed live runs used two vendors (openai+xai) and three vendors (openai+xai+anthropic) round-robined across six seats |
 | Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
 | Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
 | Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
@@ -54,6 +54,16 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 - **A12** — Typed, schema-validatable event log.
 
 `baselineReport()` returns 0/12 for a hypothetical single-model answer with an explicit explanation that no ledger exists. The UI and docs must present that contrast as structural, not as proof Tribunal "wins" on merit.
+
+## The scorecard fails our own live runs — on purpose
+
+Three committed live cli runs score **11/12**, missing only A11 ("STOP ratified explicitly"), and the ledgers show exactly why:
+
+- `run_a25a5165e3a7` (insurance, openai+xai+anthropic, 346 events): on both completion spans every seat proposed STOP first — then, after anonymous cross-examination, the panel ratified text naming an unsupported physician-review attestation instead of declaring the verdict whole.
+- `run_5467a5efcf9c` (lending, openai+xai+anthropic, 306 events): on the completion retry span STOP won majority support 3–2 — and the safety seat's binding veto (`safety_gate`) overrode it, electing a scope-limitation clause instead.
+- `run_b51538e11c68` (insurance, openai+xai+anthropic, 201 events): the earliest of the three; the completion span committed notice text and the run ended by slot exhaustion — the miss that motivated the completion-retry mechanism.
+
+We could tune the election so A11 always passes on our own demos. We won't: a panel that refuses to call an incomplete verdict "whole" — or whose safety seat vetoes STOP over a residual risk — is the mechanism working. The refusal is on the ledger with a named rule and a public reason, and the scorecard reports what happened, not what markets well.
 
 ## Anchoring caveat (important)
 
