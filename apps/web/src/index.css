@@ -20,3 +20,24 @@ body {
 .ledger-glow {
   box-shadow: 0 0 40px rgba(201, 169, 98, 0.06);
 }
+
+/* Rubber stamps for RATIFIED / VETOED verdict marks */
+.stamp {
+  @apply shrink-0 select-none font-mono text-[10px] font-bold tracking-[0.18em] px-2 py-0.5 rounded border-2;
+  text-shadow: 0 0 12px currentColor;
+}
+.stamp-gold {
+  @apply text-tribunal-gold border-tribunal-gold/70 bg-tribunal-gold/10;
+}
+.stamp-rose {
+  @apply text-rose-300 border-rose-400/70 bg-rose-500/10;
+}
+.stamp-human {
+  @apply text-sky-300 border-sky-400/70 bg-sky-500/10;
+}
+
+/* subtle vertical scanline over the courtroom */
+.courtroom-bg {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 32px;
+}

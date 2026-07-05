@@ -137,24 +137,43 @@ function sseSend(res: ServerResponse, event: string, data: unknown) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-function subscribe(run: LiveRun, res: ServerResponse) {
+function subscribe(run: LiveRun, res: ServerResponse, paceMs = 0) {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
   });
-  for (const e of run.events) sseSend(res, "ledger", e);
   if (run.status !== "running") {
     const fin = run.events.find((e) => e.kind === "run_finished");
-    sseSend(res, "status", {
-      status: run.status,
-      runId: run.runId,
-      error: run.error ?? null,
-      finalAnswer: fin ? String((fin.payload as any).finalAnswer ?? "") : undefined,
-    });
-    res.end();
+    const done = () => {
+      sseSend(res, "status", {
+        status: run.status,
+        runId: run.runId,
+        error: run.error ?? null,
+        finalAnswer: fin ? String((fin.payload as any).finalAnswer ?? "") : undefined,
+      });
+      res.end();
+    };
+    if (paceMs > 0) {
+      // Paced playback of a finished run (e.g. an instant offline run) so the
+      // client can animate the deliberation instead of receiving one dump.
+      let i = 0;
+      const timer = setInterval(() => {
+        if (i >= run.events.length) {
+          clearInterval(timer);
+          done();
+          return;
+        }
+        sseSend(res, "ledger", run.events[i++]);
+      }, paceMs);
+      res.on("close", () => clearInterval(timer));
+    } else {
+      for (const e of run.events) sseSend(res, "ledger", e);
+      done();
+    }
     return;
   }
+  for (const e of run.events) sseSend(res, "ledger", e);
   run.subscribers.add(res);
   sseSend(res, "status", { status: "running" });
   const ping = setInterval(() => res.write(": ping\n\n"), 15000);
@@ -198,7 +217,9 @@ async function startRun(body: {
 
   const config: RunConfig = {
     seed: body.seed ?? 7,
-    maxSpans: body.maxSpans ?? Math.min(pack.slots.length, 4),
+    // +1 leaves room for the completion span (explicit STOP ratification)
+    // when every pack slot commits substantive text.
+    maxSpans: body.maxSpans ?? pack.slots.length + 1,
     flags: { ...DEFAULT_FLAGS, ...(body.flags ?? {}) },
     clientView: "answer_plus_summary",
   };
@@ -448,7 +469,7 @@ const server = createServer(async (req, res) => {
     if (req.method === "GET" && evMatch) {
       const id = evMatch[1];
       const live = runs.get(id);
-      if (live) return subscribe(live, res);
+      if (live) return subscribe(live, res, Number(url.searchParams.get("pace") ?? 0));
       const rec = recordedLedger(id);
       if (rec) {
         // Replay a recorded (real) run over SSE with a small pacing delay so the

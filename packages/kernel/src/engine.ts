@@ -127,7 +127,24 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   let stoppedBy: RunResult["stoppedBy"] = "max_spans";
   let spanCount = 0;
 
-  for (const slot of pack.slots) {
+  // STOP is a first-class decision, so a complete verdict must END by electing
+  // it. If every pack slot commits substantive text, a final completion span
+  // gives the panel the explicit "the verdict is whole" vote; runs that ratify
+  // STOP inside a pack slot never reach it. (Without this, a fully-answered
+  // case would end by slot exhaustion — indistinguishable on the record from
+  // being cut off, which is exactly what A11 exists to catch.)
+  const completionSlot: DecisionSlot = {
+    index: pack.slots.length,
+    label: "completion — is the verdict whole?",
+    instruction:
+      "Review the verdict committed so far against the question and every constraint. " +
+      "If it fully resolves the matter, propose STOP — a first-class decision that the verdict is complete. " +
+      "Propose additional text ONLY if something legally or materially required is still missing.",
+    riskBands: {},
+    candidatesHint: ["<STOP>"],
+  };
+
+  for (const slot of [...pack.slots, completionSlot]) {
     if (spanCount >= config.maxSpans) {
       stoppedBy = "max_spans";
       break;

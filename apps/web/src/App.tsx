@@ -15,51 +15,24 @@ import {
   tamperRun,
   intervene,
 } from "./api";
+import { deriveDeliberation } from "./lib/deliberation";
+import {
+  Bench,
+  CandidateBoard,
+  CompareStrip,
+  DissentRegister,
+  PhaseTracker,
+  VerdictStrip,
+  truncate,
+} from "./components";
 
 type View = "docket" | "chamber" | "scorecard";
-
-const SHOWCASE_DOMAINS = [
-  {
-    domain: "insurance",
-    title: "Claim #882 — utilization review denial",
-    tagline: "Algorithm flagged 'not medically necessary' with no inspectable path.",
-    problem:
-      "ProPublica documented Cigna's PxDx system auto-denying claims in seconds with no physician review. California SB 1120 (2024) now requires transparency in utilization-review algorithms.",
-    trap: "The denial cites a guideline version superseded 18 months ago — still in the training corpus.",
-    live: false,
-  },
-  {
-    domain: "benefits",
-    title: "Case #204 — overpayment flag",
-    tagline: "A single model matched a name; benefits were cut for 14 months.",
-    problem:
-      "Australia's Robodebt Royal Commission, the Dutch toeslagenaffaire, and Michigan's MiDAS system all show what happens when fraud flags scale without due process or preserved dissent.",
-    trap: "The flag relies on employer name fuzzy-match, not verified income — the applicant's W-2 is in the file.",
-    live: false,
-  },
-  {
-    domain: "moderation",
-    title: "Post #9912 — platform takedown",
-    tagline: "Content removed with a generic reason; no record of what rule fired.",
-    problem:
-      "EU Digital Services Act Article 17 requires platforms to give users a specific statement of reasons for moderation decisions — not a boilerplate 'community guidelines' paragraph.",
-    trap: "The post is news reporting on a public figure; the 'violence' classifier confuses quotation with endorsement.",
-    live: false,
-  },
-];
-
-const SOCIETIES = [
-  { id: "evidence", label: "Evidence", power: "citations" },
-  { id: "adversary", label: "Adversary", power: "red team" },
-  { id: "law_policy", label: "Law", power: "constraints" },
-  { id: "affected_party", label: "Affected party", power: "harm" },
-  { id: "safety", label: "Safety", power: "VETO", highlight: true },
-  { id: "concision", label: "Concision", power: "STOP" },
-];
 
 function eventSummary(e: LedgerEvent): string {
   const p = e.payload as any;
   switch (e.kind) {
+    case "run_started":
+      return `${p.panel?.length ?? 0} seats · ${p.note ?? ""}`;
     case "blind_commitment":
       return `${p.society} · ${p.provider} sealed ${String(p.proposalHash).slice(0, 10)}…`;
     case "proposals_revealed":
@@ -81,11 +54,6 @@ function eventSummary(e: LedgerEvent): string {
   }
 }
 
-function truncate(s: string, n: number) {
-  if (!s) return "";
-  return s.length > n ? s.slice(0, n - 1) + "…" : s;
-}
-
 export default function App() {
   const [view, setView] = useState<View>("docket");
   const [packs, setPacks] = useState<PackSummary[]>([]);
@@ -101,8 +69,14 @@ export default function App() {
   const [recordedRuns, setRecordedRuns] = useState<any[]>([]);
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
+  const [showRawLedger, setShowRawLedger] = useState(false);
+  const [panelChoice, setPanelChoice] = useState<"auto" | "offline" | "cli" | "openrouter">(() => {
+    const m = new URLSearchParams(window.location.search).get("mode");
+    return m === "offline" || m === "cli" || m === "openrouter" ? m : "auto";
+  });
   const ledgerRef = useRef<HTMLDivElement>(null);
   const unsubRef = useRef<(() => void) | null>(null);
+  const sseCountRef = useRef(0);
 
   useEffect(() => {
     fetchPacks().then(setPacks).catch(console.error);
@@ -114,12 +88,16 @@ export default function App() {
     if (ledgerRef.current) ledgerRef.current.scrollTop = ledgerRef.current.scrollHeight;
   }, [events.length]);
 
+  /** Everything the theater shows is derived purely from ledger events. */
+  const delib = useMemo(() => deriveDeliberation(events), [events]);
+
   const pickMode = useCallback((): "offline" | "cli" | "openrouter" => {
+    if (panelChoice !== "auto") return panelChoice;
     if (panel?.openrouter?.available) return "openrouter";
     const cliLive = panel?.cli && Object.values(panel.cli).some((c) => c.present);
     if (cliLive) return "cli";
     return "offline";
-  }, [panel]);
+  }, [panel, panelChoice]);
 
   const beginRun = async (pack: PackSummary, opts?: { replayId?: string; forceMode?: typeof mode }) => {
     setError("");
@@ -140,7 +118,7 @@ export default function App() {
         (e) => setEvents((prev) => [...prev, e]),
         (s) => {
           if (s.status === "finished" || s.status === "replay") {
-            setRunning(false);
+            if (s.status === "finished") setRunning(false);
             if (s.finalAnswer) setFinalAnswer(String(s.finalAnswer));
           }
         },
@@ -154,14 +132,19 @@ export default function App() {
     setRunning(true);
     setStatus("starting");
     try {
-      const providers = m === "cli" ? ["openai", "xai"] : undefined;
+      const providers = m === "cli" ? ["openai", "xai", "anthropic"] : undefined;
       const { runId: id } = await startRun({ packId: pack.id, mode: m, providers });
       setRunId(id);
       setStatus("running");
+      sseCountRef.current = 0;
       unsubRef.current?.();
+      // Offline runs finish in milliseconds; a paced SSE playback lets the
+      // theater animate the deliberation instead of receiving one dump.
+      const pace = m === "offline" ? 140 : undefined;
       unsubRef.current = subscribeRun(
         id,
         (e) => {
+          sseCountRef.current += 1;
           setEvents((prev) => [...prev, e]);
           if (e.runId && e.kind === "run_started") setRunId(e.runId);
           if (e.kind === "run_finished") {
@@ -184,19 +167,26 @@ export default function App() {
             setError(String(s.error ?? "run failed"));
           }
         },
+        pace,
       );
-      // Fast offline runs can finish before EventSource connects — poll as backup.
+      // Pure fallback: if the SSE stream delivers nothing, fetch the finished
+      // run. Disengages the moment any event arrives over SSE.
       const poll = window.setInterval(async () => {
+        if (sseCountRef.current > 0) {
+          window.clearInterval(poll);
+          return;
+        }
         try {
           const r = await fetch(`/api/runs/${id}`);
           if (!r.ok) return;
           const j = await r.json();
-          if (j.events?.length) setEvents(j.events);
           const fin = j.events?.find((e: LedgerEvent) => e.kind === "run_finished");
-          if (fin || j.status === "finished") {
+          if (fin || j.status === "finished" || j.status === "error") {
             window.clearInterval(poll);
+            if (sseCountRef.current > 0) return;
+            if (j.events?.length) setEvents(j.events);
             setRunning(false);
-            setStatus("finished");
+            setStatus(j.status === "error" ? "error" : "finished");
             if (fin) {
               setFinalAnswer(String((fin.payload as any).finalAnswer ?? ""));
               setRunId(fin.runId);
@@ -205,7 +195,7 @@ export default function App() {
         } catch {
           /* ignore */
         }
-      }, 400);
+      }, 2500);
       setTimeout(() => window.clearInterval(poll), 120_000);
     } catch (e: any) {
       setRunning(false);
@@ -224,13 +214,17 @@ export default function App() {
     setTamperResult(await tamperRun(runId));
   };
 
+  /** Human veto targets the current leading (non-STOP, non-vetoed) candidate — works on every pack. */
   const doVeto = async () => {
     if (!runId || !running) return;
+    const target = delib.candidates.find((c) => !c.isStop && !c.vetoed);
     await intervene(runId, {
       kind: "veto",
       actor: "Compliance auditor",
-      text: "The stated DTI does not reconcile with verified income and debt in the record.",
-      targetKey: "Deny for excessive debt-to-income ratio (52%).",
+      text: target
+        ? `Blocking "${truncate(target.text || target.key, 80)}" pending human review of the contested evidence.`
+        : "Blocking the leading candidate pending human review.",
+      targetKey: target?.key,
     });
   };
 
@@ -249,7 +243,7 @@ export default function App() {
   const baselineScore = verifyResult?.baseline?.total ?? 0;
 
   return (
-    <div className="min-h-screen flex flex-col" data-testid="tribunal-app">
+    <div className="min-h-screen flex flex-col courtroom-bg" data-testid="tribunal-app">
       <header className="border-b border-tribunal-border/60 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="font-serif text-3xl text-tribunal-gold tracking-tight">Tribunal</h1>
@@ -282,10 +276,46 @@ export default function App() {
                   When AI denies your loan, claim, or benefits — you deserve a{" "}
                   <em className="text-tribunal-gold">record</em>, not a paragraph.
                 </p>
-                <p className="mt-4 text-zinc-500 text-sm max-w-xl mx-auto">
-                  Six independent seats · sealed commitments · anonymized critique · safety veto · preserved dissent ·
-                  tamper-evident ledger anyone can verify.
+                <p className="mt-4 text-zinc-500 text-sm max-w-2xl mx-auto">
+                  Tribunal is an <span className="text-zinc-300">explainable decoder</span>: instead of one model
+                  sampling tokens in the dark, the verdict is generated span by span through an election — six seats
+                  from rival AI vendors cast secret ballots, cross-examine anonymously, and a named rule elects each
+                  span. Veto, preserved dissent, and a tamper-evident ledger are part of the decoding loop itself.
                 </p>
+              </section>
+
+              <section className="flex items-center justify-center gap-2 text-[11px]" data-testid="mode-picker">
+                <span className="text-zinc-500 uppercase tracking-widest text-[10px]">Panel</span>
+                {(
+                  [
+                    { id: "auto", label: "Auto" },
+                    { id: "cli", label: "Live cross-provider" },
+                    { id: "openrouter", label: "OpenRouter ×5" },
+                    { id: "offline", label: "Instant (scripted)" },
+                  ] as const
+                ).map((o) => (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => setPanelChoice(o.id)}
+                    className={`px-2.5 py-1 rounded-full border transition ${
+                      panelChoice === o.id
+                        ? "border-tribunal-gold/60 text-tribunal-gold bg-tribunal-gold/10"
+                        : "border-zinc-800 text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+                <span className="text-zinc-600 hidden md:inline">
+                  {panelChoice === "offline"
+                    ? "— deterministic scripted panel, no model calls (labeled as such on the record)"
+                    : panelChoice === "cli"
+                      ? "— real Codex, Grok and Claude seats via local CLIs"
+                      : panelChoice === "openrouter"
+                        ? "— Microsoft, NVIDIA, Meta, DeepSeek, Mistral via one key"
+                        : "— best available: OpenRouter, then CLIs, then scripted"}
+                </span>
               </section>
 
               <section className="grid md:grid-cols-2 gap-4">
@@ -294,7 +324,7 @@ export default function App() {
                   return (
                     <article
                       key={p.id}
-                      className="glass p-5 ledger-glow hover:border-tribunal-gold/40 transition cursor-pointer group"
+                      className="glass p-5 ledger-glow hover:border-tribunal-gold/40 transition cursor-pointer group flex flex-col"
                       onClick={() => beginRun(p)}
                       data-testid={`pack-${p.domain}`}
                     >
@@ -307,40 +337,35 @@ export default function App() {
                       <h2 className="font-serif text-xl mt-2 group-hover:text-tribunal-gold transition">{p.title}</h2>
                       <p className="text-xs text-zinc-500 mt-1">{meta.statute}</p>
                       <p className="text-sm text-zinc-400 mt-3">{p.tagline}</p>
-                      <p className="text-xs text-amber-200/70 mt-2 font-mono">Trap: {p.trapNote?.slice(0, 120)}…</p>
+                      <p className="text-xs text-amber-200/70 mt-2 font-mono">
+                        Planted trap: {truncate(p.trapNote ?? "", 150)}
+                      </p>
                       <button
                         type="button"
-                        className="mt-4 w-full py-2 rounded-lg bg-tribunal-gold/15 text-tribunal-gold text-sm font-medium hover:bg-tribunal-gold/25"
+                        className="mt-auto pt-4 w-full"
                         onClick={(e) => {
                           e.stopPropagation();
                           beginRun(p);
                         }}
                       >
-                        Convene panel →
+                        <span className="block w-full py-2 rounded-lg bg-tribunal-gold/15 text-tribunal-gold text-sm font-medium hover:bg-tribunal-gold/25 text-center">
+                          Convene the panel →
+                        </span>
                       </button>
-                    </article>
-                  );
-                })}
-                {SHOWCASE_DOMAINS.map((d) => {
-                  const meta = DOMAIN_META[d.domain];
-                  return (
-                    <article key={d.domain} className="glass p-5 opacity-90 border-dashed">
-                      <div className="flex justify-between">
-                        <span className={`text-2xl ${meta.color}`}>{meta.icon}</span>
-                        <span className="text-[10px] font-mono text-zinc-600 uppercase">Same mechanism</span>
-                      </div>
-                      <h2 className="font-serif text-xl mt-2">{d.title}</h2>
-                      <p className="text-xs text-zinc-500">{meta.statute}</p>
-                      <p className="text-sm text-zinc-400 mt-3">{d.tagline}</p>
-                      <p className="text-xs text-zinc-500 mt-2">{d.problem}</p>
                     </article>
                   );
                 })}
               </section>
 
+              <CompareStrip />
+
               {recordedRuns.length > 0 && (
                 <section className="glass p-4">
-                  <h3 className="text-sm font-medium text-zinc-400 mb-3">Recorded real runs (replay)</h3>
+                  <h3 className="text-sm font-medium text-zinc-400 mb-1">Recorded real runs (replay the actual ledger)</h3>
+                  <p className="text-[11px] text-zinc-600 mb-3">
+                    These are committed, anchored ledgers from live cross-provider panels — replayed event-by-event, not
+                    simulated.
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {recordedRuns.map((r) => (
                       <button
@@ -374,113 +399,125 @@ export default function App() {
           )}
 
           {view === "chamber" && (
-            <motion.div key="chamber" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 space-y-4">
-                <div className="glass p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h2 className="font-serif text-xl">{selectedPack?.title ?? "Deliberation chamber"}</h2>
-                    <span className="text-xs font-mono px-2 py-1 rounded bg-zinc-800">
-                      {status} · {mode}
-                      {running && <span className="ml-2 inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {SOCIETIES.map((s) => (
-                      <span
-                        key={s.id}
-                        className={`text-[10px] px-2 py-1 rounded-full border ${
-                          s.highlight
-                            ? "border-rose-500/50 text-rose-300 bg-rose-500/10"
-                            : "border-zinc-700 text-zinc-400"
-                        }`}
-                      >
-                        {s.label}
-                        {s.highlight && " · VETO"}
-                      </span>
-                    ))}
-                  </div>
+            <motion.div key="chamber" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <h2 className="font-serif text-2xl leading-tight">{selectedPack?.title ?? "Deliberation chamber"}</h2>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    {selectedPack?.question ?? ""}
+                  </p>
                 </div>
-
-                <div
-                  ref={ledgerRef}
-                  className="glass p-3 h-[420px] overflow-y-auto font-mono text-xs space-y-1 ledger-glow"
-                  data-testid="ledger-stream"
-                >
-                  {events.map((e) => (
-                    <div
-                      key={e.seq}
-                      className={`flex gap-2 py-1 border-b border-zinc-800/50 animate-slide ${
-                        e.kind === "ratification" ? "text-tribunal-gold" : ""
-                      } ${e.kind === "dissent_preserved" ? "text-rose-300/80" : ""}`}
-                    >
-                      <span className="text-zinc-600 w-8 shrink-0">{e.seq}</span>
-                      <span className="text-zinc-500 w-36 shrink-0 truncate">{EVENT_LABELS[e.kind] ?? e.kind}</span>
-                      <span className="text-zinc-300 flex-1">{eventSummary(e)}</span>
-                      <span className="text-zinc-600 w-16 shrink-0 truncate" title={e.hash}>
-                        {e.hash.slice(0, 8)}
-                      </span>
-                    </div>
-                  ))}
-                  {events.length === 0 && <p className="text-zinc-600 p-4">Waiting for ledger events…</p>}
-                </div>
-
-                {finalAnswer && (
-                  <div className="glass p-4 border-l-2 border-tribunal-gold">
-                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Ratified verdict</p>
-                    <p className="font-serif text-lg text-zinc-100">{finalAnswer}</p>
-                  </div>
-                )}
-
-                {error && <p className="text-rose-400 text-sm">{error}</p>}
+                <span className="text-xs font-mono px-2.5 py-1.5 rounded bg-zinc-800 shrink-0">
+                  {status} · {mode}
+                  {running && <span className="ml-2 inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
+                </span>
               </div>
 
-              <aside className="space-y-4">
-                <div className="glass p-4 space-y-2">
-                  <h3 className="text-sm text-zinc-400">Auditor controls</h3>
-                  <button
-                    type="button"
-                    disabled={!running}
-                    onClick={doVeto}
-                    className="w-full py-2 text-sm rounded bg-rose-500/20 text-rose-300 disabled:opacity-40 hover:bg-rose-500/30"
-                    data-testid="human-veto"
-                  >
-                    Inject human veto
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!canVerify}
-                    onClick={doVerify}
-                    className="w-full py-2 text-sm rounded bg-tribunal-mint/15 text-tribunal-mint disabled:opacity-40"
-                    data-testid="verify-btn"
-                  >
-                    Verify ledger + scorecard
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!runId}
-                    onClick={doTamper}
-                    className="w-full py-2 text-sm rounded bg-zinc-800 text-zinc-300 disabled:opacity-40"
-                    data-testid="tamper-btn"
-                  >
-                    Tamper demo
-                  </button>
+              <PhaseTracker view={delib} />
+
+              <div className="grid lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2 space-y-4">
+                  <Bench view={delib} />
+                  <CandidateBoard view={delib} />
+                  <VerdictStrip view={delib} />
+                  {error && <p className="text-rose-400 text-sm">{error}</p>}
                 </div>
 
-                {headHash && (
-                  <div className="glass p-3">
-                    <p className="text-[10px] text-zinc-500 uppercase">Chain head (anchor externally)</p>
-                    <p className="font-mono text-[10px] text-zinc-400 break-all mt-1">{headHash}</p>
-                  </div>
-                )}
-
-                {tamperResult && (
-                  <div className="glass p-3 border border-rose-500/30">
-                    <p className="text-xs text-rose-300">
-                      Tamper at seq {tamperResult.tamperedSeq}: verify {tamperResult.verify?.ok ? "OK (bad)" : "FAILED ✓"}
+                <aside className="space-y-4">
+                  <div className="glass p-4 space-y-2">
+                    <h3 className="text-xs uppercase tracking-widest text-zinc-500">Auditor controls</h3>
+                    <button
+                      type="button"
+                      disabled={!running}
+                      onClick={doVeto}
+                      className="w-full py-2 text-sm rounded bg-rose-500/20 text-rose-300 disabled:opacity-40 hover:bg-rose-500/30"
+                      data-testid="human-veto"
+                    >
+                      Inject human veto
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!canVerify}
+                      onClick={doVerify}
+                      className="w-full py-2 text-sm rounded bg-tribunal-mint/15 text-tribunal-mint disabled:opacity-40 hover:bg-tribunal-mint/25"
+                      data-testid="verify-btn"
+                    >
+                      Verify ledger + scorecard
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!runId}
+                      onClick={doTamper}
+                      className="w-full py-2 text-sm rounded bg-zinc-800 text-zinc-300 disabled:opacity-40 hover:bg-zinc-700"
+                      data-testid="tamper-btn"
+                    >
+                      Tamper demo
+                    </button>
+                    <p className="text-[10px] text-zinc-600 leading-snug pt-1">
+                      A human veto lands in the ledger like any seat's act — attributed, timestamped, hash-chained.
                     </p>
                   </div>
-                )}
-              </aside>
+
+                  {tamperResult && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="glass p-3.5 border border-rose-500/30"
+                    >
+                      <p className="text-xs text-rose-300 font-medium">
+                        Tamper injected at seq {tamperResult.tamperedSeq} ({tamperResult.kind})
+                      </p>
+                      <p className="text-[11px] text-zinc-400 mt-1">
+                        One rewritten field → verification {tamperResult.verify?.ok ? "still passes (BAD)" : "breaks immediately"}
+                        {tamperResult.verify?.problems?.length
+                          ? ` — ${tamperResult.verify.problems.length} problem(s), first at seq ${tamperResult.verify.problems[0].seq} (${tamperResult.verify.problems[0].reason}).`
+                          : "."}
+                      </p>
+                      <p className="text-[10px] text-emerald-300/80 mt-1 font-mono">
+                        {tamperResult.verify?.ok ? "" : "✓ the chain caught it"}
+                      </p>
+                    </motion.div>
+                  )}
+
+                  <DissentRegister view={delib} />
+
+                  {headHash && (
+                    <div className="glass p-3">
+                      <p className="text-[10px] text-zinc-500 uppercase">Chain head (anchor externally)</p>
+                      <p className="font-mono text-[10px] text-zinc-400 break-all mt-1">{headHash}</p>
+                    </div>
+                  )}
+
+                  <div className="glass p-3">
+                    <button
+                      type="button"
+                      className="w-full text-left text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-300"
+                      onClick={() => setShowRawLedger((v) => !v)}
+                    >
+                      Raw ledger · {events.length} events {showRawLedger ? "▾" : "▸"}
+                    </button>
+                    <div
+                      ref={ledgerRef}
+                      data-testid="ledger-stream"
+                      className={`font-mono text-[10px] space-y-0.5 overflow-y-auto transition-all ${
+                        showRawLedger ? "max-h-[300px] mt-2" : "max-h-[64px] mt-2 opacity-70"
+                      }`}
+                    >
+                      {events.map((e) => (
+                        <div key={e.seq} className="flex gap-1.5 py-0.5 border-b border-zinc-800/40 animate-slide">
+                          <span className="text-zinc-600 w-6 shrink-0">{e.seq}</span>
+                          <span className="text-zinc-500 w-28 shrink-0 truncate">{EVENT_LABELS[e.kind] ?? e.kind}</span>
+                          <span className="text-zinc-400 flex-1 truncate">{eventSummary(e)}</span>
+                          <span className="text-zinc-700 w-12 shrink-0 truncate" title={e.hash}>
+                            {e.hash.slice(0, 6)}
+                          </span>
+                        </div>
+                      ))}
+                      {events.length === 0 && <p className="text-zinc-600 py-2">Waiting for ledger events…</p>}
+                    </div>
+                  </div>
+                </aside>
+              </div>
             </motion.div>
           )}
 

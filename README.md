@@ -1,14 +1,16 @@
 # Tribunal
 
-**Due process for high-stakes AI decisions.**
+**An explainable decoder: high-stakes verdicts are generated span by span, and every span is elected.**
 
-When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you usually get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful. Tribunal runs each decision through a **cross-provider panel** and emits the answer **plus** a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself.
+When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful.
 
-- **Six chartered seats** (evidence, adversary, law/policy, affected party, safety with veto, concision) deliberate in structured phases with sealed commitments and preserved dissent.
+Tribunal replaces sampling with **election**. The output is decoded in atomic surface spans (the disposition, the required disclosure, …), and each span goes through electoral mechanisms adapted from human institutions — **secret ballots** (sealed commitments before reveal), **anonymized cross-examination** with ballot-order rotation, on-the-record vote changes, a binding **safety veto**, ratification under a **named constitutional rule**, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself. The explanation is not attached to the generation — it *is* the generation.
+
+- **Six chartered seats** staffed by rival AI vendors (evidence, adversary, law/policy, affected party, safety with veto, concision) — decorrelated by construction, not by prompt.
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point).
 
-Tests: **17** kernel · **10** scorecard (`npm test`).
+Tests: **19** kernel · **10** scorecard · **2** packs (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -30,18 +32,35 @@ Tribunal does not certify compliance. It demonstrates a richer **audit artifact*
 
 ---
 
+## "Couldn't you just use SHAP or LIME?"
+
+No — different question. Feature attribution explains a **score**; Tribunal makes the **decision procedure** contestable. They are complements, not substitutes.
+
+| | Feature attribution (SHAP / LIME) | Tribunal (deliberative decoding) |
+|---|---|---|
+| **Question answered** | Which input features moved this model's score | Whether the decision survives adversarial scrutiny, and on what recorded grounds |
+| **When it runs** | Post-hoc, on a decision already made | During decoding — every span is contested and elected before it ships |
+| **Artifact produced** | Feature weights (Shapley values / local surrogate coefficients) | Hash-chained ledger: sealed ballots, anonymous critique, vetoes, named decision rule, preserved dissent |
+| **Free-text / LLM decisions** | Not designed for them (no feature vector over a generated paragraph) | Native — the unit of explanation is an argued, cross-examined span of text |
+| **Gaming resistance** | Adversarial models can fool attribution audits ([Slack et al., AIES 2020](https://dl.acm.org/doi/10.1145/3375627.3375830)) | The record is tamper-evident; editing any event breaks the chain; spoof guards fail trivial rationale (A2/A5) |
+| **Regulator-ready reasons** | Weights must be translated into the "specific reasons" notices require | The verdict ships with verbatim public reasons and the losing arguments — the notice writes itself |
+
+Honest footnote: SHAP/LIME remain the right tool for debugging feature-based scoring models. Tribunal governs the decision *procedure* and can sit on top of any underlying scorer.
+
+---
+
 ## How it works
 
-Eight phases per decision slot, each emitting ledger events:
+The verdict is decoded one atomic surface span at a time. Each span is an election with eight phases, each emitting ledger events:
 
-1. **Blind proposal** — each seat proposes without peer material.
-2. **Sealed commitment** — SHA-256 hash of each proposal ledgered **before** reveal.
-3. **Anonymized Delphi feedback** — critiques with authorship hidden; candidate order shuffled per recipient.
-4. **Revision** — answer the strongest objection; steelman the best rival; state what would change your mind.
-5. **Safety review** — safety seat may **veto** with a public reason.
-6. **Constitutional ratification** — a **named** rule selects the span; public reason on record.
-7. **Dissent preserved** — material minority objections kept forever.
-8. **Span committed** — ratified text appended, or **STOP/abstain** as first-class.
+1. **Secret ballot** — each seat drafts its candidate span in isolation, without peer material.
+2. **Sealed commitment** — SHA-256 hash of each ballot ledgered **before** reveal (no rewriting after seeing the room).
+3. **Anonymized cross-examination** — critiques with authorship hidden; candidate order rotated per recipient (ballot-order/position-bias control).
+4. **Revision** — answer the strongest objection; steelman the best rival; state what would change your vote — all on the record.
+5. **Safety review** — safety seat may **veto** any candidate with a public reason.
+6. **Election** — a **named** constitutional rule elects the span; public reason on record.
+7. **Minority report** — material dissent preserved forever, never deleted.
+8. **Span committed** — elected text appended to the verdict, or **STOP/abstain** as a first-class winner.
 
 ```
   [case] → blind propose → SEAL hashes → reveal
@@ -174,7 +193,7 @@ Details: [`docs/honesty.md`](docs/honesty.md).
 |------|------|
 | `packages/kernel` | Engine, ledger, panel adapters, `verifyLedger()` |
 | `packages/scorecard` | A1–A12 checklist + baseline 0/12 |
-| `packages/packs` | Domain cases (lending live; insurance, benefits, moderation landing) |
+| `packages/packs` | Four live domain cases: lending, insurance, benefits, moderation — each with a planted trap |
 | `apps/server` | Node SSE API, human intervention, persistence |
 | `apps/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker verify endpoint (ready to deploy) |

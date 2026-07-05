@@ -109,7 +109,7 @@ export async function intervene(
 }
 
 export const EVENT_LABELS: Record<string, string> = {
-  run_started: "Proposal sealed",
+  run_started: "Panel convened",
   blind_commitment: "Proposal sealed",
   proposals_revealed: "Proposals revealed",
   feedback_issued: "Anonymized feedback",
