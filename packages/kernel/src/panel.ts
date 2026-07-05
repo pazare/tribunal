@@ -50,6 +50,33 @@ const OPENROUTER_DEFAULT: Record<Society, { provider: Provider; model: string }>
   concision: { provider: "microsoft", model: "microsoft/phi-4" },
 };
 
+/**
+ * Build a panel from an explicit list of LIVE providers: all six societies stay
+ * staffed, round-robined across the given providers. This is how a live demo
+ * degrades gracefully when a vendor's CLI session expires: the institution keeps
+ * every seat (incl. safety) and the ledger records which vendor staffed it.
+ */
+export function buildPanelFromProviders(
+  providers: Provider[],
+  opts: { mode: Exclude<PanelMode, "offline">; cliTimeoutMs?: number; models?: Partial<Record<Provider, string>> },
+): PanelSeat[] {
+  if (!providers.length) throw new Error("buildPanelFromProviders: no providers given");
+  return DEFAULT_SOCIETIES.map((society, i) => {
+    const seatId = `seat_${i + 1}_${society}`;
+    const provider = providers[i % providers.length];
+    const client: PanelClient =
+      opts.mode === "cli"
+        ? new CliPanelClient(seatId, society, provider, {
+            timeoutMs: opts.cliTimeoutMs,
+            modelLabel: opts.models?.[provider],
+          })
+        : new OpenRouterPanelClient(seatId, society, provider, {
+            model: opts.models?.[provider] ?? OPENROUTER_DEFAULT[society].model,
+          });
+    return { seatId, client };
+  });
+}
+
 export function buildPanel(opts: PanelBuildOptions): PanelSeat[] {
   return DEFAULT_SOCIETIES.map((society, i) => {
     const seatId = `seat_${i + 1}_${society}`;

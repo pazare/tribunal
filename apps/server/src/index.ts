@@ -17,11 +17,14 @@ import {
   runTribunal,
   verifyLedger,
   buildPanel,
+  buildPanelFromProviders,
+  CliPanelClient,
   DEFAULT_FLAGS,
   type ControlFlags,
   type HumanIntervention,
   type LedgerEvent,
   type PanelMode,
+  type Provider,
   type RunConfig,
 } from "@tribunal/kernel";
 import { computeAuditability, baselineReport } from "@tribunal/scorecard";
@@ -160,13 +163,14 @@ async function startRun(body: {
 
   let seats;
   try {
-    seats = buildPanel({ mode, cliTimeoutMs: 180_000 });
+    // With an explicit provider list, keep ALL SIX societies staffed by
+    // round-robining live providers (graceful degradation when a CLI is down).
+    seats =
+      body.providers?.length && mode !== "offline"
+        ? buildPanelFromProviders(body.providers as Provider[], { mode, cliTimeoutMs: 180_000 })
+        : buildPanel({ mode, cliTimeoutMs: 180_000 });
   } catch (e: any) {
     return { error: e.message };
-  }
-  if (body.providers?.length && mode === "cli") {
-    seats = seats.filter((s) => body.providers!.includes(s.client.provider));
-    if (seats.length === 0) return { error: "no seats left after provider filter" };
   }
 
   const config: RunConfig = {
@@ -309,6 +313,57 @@ const server = createServer(async (req, res) => {
 
     // ---- panel health -------------------------------------------------------
     if (req.method === "GET" && path === "/api/panel") {
+      if (url.searchParams.get("probe") === "1") {
+        const targets: Provider[] = ["openai", "xai", "anthropic", "cursor"];
+        const results = await Promise.all(
+          targets.map(async (p) => {
+            const t0 = Date.now();
+            try {
+              const client = new CliPanelClient(`probe_${p}`, "concision", p, { timeoutMs: 60_000 });
+              // A real, minimal propose() against a truthful micro-case.
+              const view = {
+                case: {
+                  runId: "probe",
+                  packId: "probe",
+                  title: "Liveness probe",
+                  domain: "probe",
+                  question: "Confirm panel liveness.",
+                  constraints: [],
+                  evidence: [],
+                  documents: [
+                    { id: "d1", title: "Probe", body: "This is a liveness probe. Propose the span 'LIVE'." },
+                  ],
+                  prefix: "",
+                  slot: {
+                    index: 0,
+                    label: "the probe span",
+                    instruction: "Propose the single word LIVE (or STOP).",
+                    riskBands: {},
+                    candidatesHint: ["LIVE"],
+                  },
+                  ratifiedCommitments: [],
+                  rejectedAlternatives: [],
+                  unresolvedDissent: [],
+                },
+                seatId: `probe_${p}`,
+                society: "concision" as const,
+                evidence: [],
+                memory: [],
+              };
+              const r = await client.propose({ view, seed: 1 });
+              return {
+                provider: p,
+                live: true,
+                latencyMs: Date.now() - t0,
+                note: `responded with ${r.proposal.candidates.length} candidate(s)`,
+              };
+            } catch (e: any) {
+              return { provider: p, live: false, latencyMs: Date.now() - t0, note: String(e.message).slice(0, 160) };
+            }
+          }),
+        );
+        return json(res, 200, { ...panelHealth(), probes: results });
+      }
       return json(res, 200, panelHealth());
     }
 
