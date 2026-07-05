@@ -258,7 +258,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     }
 
     // ---- Constitutional ratification -------------------------------------
-    const decision = ratify({
+    let decision = ratify({
       spanIndex: slot.index,
       revisions,
       safety,
@@ -267,11 +267,54 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
       escalationRoundsDone: 0,
     });
 
-    if (decision.escalationRounds > 0) {
+    // R3 escalation is REAL: one further revision round with the contested table
+    // in view, then a final ratification with escalation spent. Never cosmetic.
+    if (decision.method === "escalate_for_evidence" && config.flags.debateRounds > 0) {
       append("escalation_triggered", slot.index, {
         reason: decision.publicReason,
         requestedBy: "evidence",
-        roundNo: 1,
+        roundNo: 2,
+      });
+      const packet2 = buildFeedbackPacket(proposals, slot.index, 2, config.flags.anonymizeFeedback);
+      packet2.guidance =
+        "ESCALATION ROUND: the leading candidates are within the decision margin at high dispersion. " +
+        "Re-examine the primary evidence for the contested spans and commit to a final position.";
+      append("feedback_issued", slot.index, { packet: packet2, anonymized: config.flags.anonymizeFeedback });
+      const revised2 = await Promise.all(
+        revisions.map((prev) => {
+          const seat = seats.find((s) => s.seatId === prev.seatId);
+          if (!seat) return Promise.resolve(null);
+          const order = orders.get(prev.seatId) ?? packet2.summaries.map((_, i) => i);
+          return seat.client
+            .revise({
+              view: viewFor(baseCase, seat, config),
+              ownRound1: [prev.final],
+              feedback: applyOrder(packet2.summaries, order),
+              guidance: packet2.guidance,
+              seed: config.seed + 1,
+            })
+            .then((r) => ({ seat, ...r }))
+            .catch(() => null);
+        }),
+      );
+      const revisions2: Revision[] = [];
+      for (const r of revised2) {
+        if (!r) continue;
+        revisions2.push(r.revision);
+        recordUsage(usageTotals, r.usage, r.repaired);
+        append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
+        append("revision_received", slot.index, { revision: r.revision });
+      }
+      if (revisions2.length > 0) revisions = revisions2;
+      const safety2 = computeSafety(revisions, leadingCandidateKey(revisions), config.flags.safetyVeto);
+      append("safety_review", slot.index, { verdicts: safety2, vetoEnabled: config.flags.safetyVeto });
+      decision = ratify({
+        spanIndex: slot.index,
+        revisions,
+        safety: [...safety2, ...safety.filter((s) => s.veto)],
+        vetoEnabled: config.flags.safetyVeto,
+        carriedDissent,
+        escalationRoundsDone: 1,
       });
     }
     append("ratification", slot.index, { decision });

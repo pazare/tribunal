@@ -1,0 +1,12 @@
+{
+ "runId": "run_c49cb4b4453e",
+ "packId": "lending-adverse-action",
+ "mode": "cli",
+ "startedAt": 1783212259002,
+ "finishedAt": 1783212423373,
+ "events": 138,
+ "head": "f853abc1aea9459163e0b21c956695a7d51e44dcd233c067de05127f0f68ed53",
+ "verified": true,
+ "auditability": "12/12",
+ "label": "lending-adverse-action · cli · 2026-07-05T00:44:19.002Z"
+}
