@@ -123,6 +123,67 @@ async function caption(page, text) {
   }, text);
 }
 
+/** Draw a glowing callout box around a component with a plain-language tag. */
+async function spotlight(page, target, title, note) {
+  await page.evaluate(
+    ({ sel, findText, title, note }) => {
+      document.getElementById("demo-spot")?.remove();
+      let el = sel ? document.querySelector(sel) : null;
+      if (!el && findText) {
+        const re = new RegExp(findText, "i");
+        const p = [...document.querySelectorAll("p")].find((n) => re.test(n.innerText));
+        el = p?.closest(".glass") ?? p;
+      }
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const wrap = document.createElement("div");
+      wrap.id = "demo-spot";
+      Object.assign(wrap.style, { position: "fixed", inset: "0", pointerEvents: "none", zIndex: "99998" });
+      const box = document.createElement("div");
+      Object.assign(box.style, {
+        position: "fixed",
+        left: `${r.left - 7}px`,
+        top: `${r.top - 7}px`,
+        width: `${r.width + 14}px`,
+        height: `${r.height + 14}px`,
+        border: "3px solid #e8c96a",
+        borderRadius: "16px",
+        boxShadow: "0 0 0 6px rgba(232,201,106,0.16), 0 0 30px rgba(232,201,106,0.35)",
+        opacity: "0",
+        transition: "opacity 250ms",
+      });
+      const tag = document.createElement("div");
+      tag.innerHTML =
+        `<div style="font:700 15px system-ui,sans-serif;color:#141414">${title}</div>` +
+        (note ? `<div style="font:500 12.5px/1.4 system-ui,sans-serif;color:#3c3c3c;margin-top:3px">${note}</div>` : "");
+      Object.assign(tag.style, {
+        position: "fixed",
+        left: `${Math.max(12, Math.min(r.left, innerWidth - 412))}px`,
+        maxWidth: "400px",
+        padding: "10px 14px",
+        background: "#e8c96a",
+        borderRadius: "10px",
+        boxShadow: "0 10px 28px rgba(0,0,0,0.55)",
+        opacity: "0",
+        transition: "opacity 250ms",
+      });
+      if (r.top > 120) tag.style.bottom = `${innerHeight - r.top + 12}px`;
+      else tag.style.top = `${Math.min(r.bottom + 12, innerHeight - 90)}px`;
+      wrap.append(box, tag);
+      document.body.appendChild(wrap);
+      requestAnimationFrame(() => {
+        box.style.opacity = "1";
+        tag.style.opacity = "1";
+      });
+    },
+    { sel: target.selector ?? null, findText: target.findText ?? null, title, note },
+  );
+}
+
+async function clearSpotlight(page) {
+  await page.evaluate(() => document.getElementById("demo-spot")?.remove());
+}
+
 async function waitUntilSince(page, startedAt, targetMs) {
   const remaining = targetMs - (Date.now() - startedAt);
   if (remaining > 0) await page.waitForTimeout(remaining);
@@ -230,12 +291,26 @@ async function main() {
       await page.waitForSelector('[data-testid="ledger-stream"]', { timeout: REPLAY ? 90_000 : 15_000 });
       await page.waitForSelector('[data-testid="bench"]', { timeout: REPLAY ? 90_000 : 20_000 });
       await caption(page, "Six AI seats: secret ballots → reveal → anonymous cross-examination → safety veto.");
+      await spotlight(
+        page,
+        { selector: '[data-testid="bench"]' },
+        "Six AI seats — from rival vendors",
+        "Each seat has one job: evidence, devil's advocate, law & policy, the affected person's voice, safety (holds a veto), brevity. They draft in secret.",
+      );
       await page.waitForTimeout(REPLAY ? 8000 : 5200);
+      await clearSpotlight(page);
 
       await page.waitForSelector('[data-testid="candidate-board"]', { timeout: REPLAY ? 90_000 : 30_000 });
       await caption(page, "Every candidate answer is voted on the record — RATIFIED or VETOED, under a named rule.");
       await smoothScroll(page, '[data-testid="candidate-board"]', 1000);
+      await spotlight(
+        page,
+        { selector: '[data-testid="candidate-board"]' },
+        "The ballot",
+        "Every proposed sentence is a candidate. Seats critique it anonymously, then vote. RATIFIED or VETOED — always with a stated public reason.",
+      );
       await page.waitForTimeout(REPLAY ? 6000 : 5200);
+      await clearSpotlight(page);
 
       console.log("wait for ratified verdict");
       await page.waitForFunction(() => /ratified verdict/i.test(document.body.innerText), null, {
@@ -248,12 +323,26 @@ async function main() {
       if (!REPLAY) await waitUntilSince(page, chamberStartedAt, 21_000);
       await caption(page, "The verdict ships span by span — each line elected, then STOP is ratified: it is whole.");
       await smoothScroll(page, '[data-testid="verdict-strip"]', 900);
+      await spotlight(
+        page,
+        { selector: '[data-testid="verdict-strip"]' },
+        "The final decision — assembled from winners",
+        "Nothing here was sampled in the dark. Every line won an election, and the reasoning is on the record.",
+      );
       await page.waitForTimeout(4500);
+      await clearSpotlight(page);
 
       await page.waitForSelector('[data-testid="dissent-register"]', { timeout: REPLAY ? 90_000 : 30_000 });
       await caption(page, "Losing arguments are preserved forever — the minority report.");
       await smoothScroll(page, '[data-testid="dissent-register"]', 900);
+      await spotlight(
+        page,
+        { selector: '[data-testid="dissent-register"]' },
+        "The losing side — kept forever",
+        "Disagreements are never deleted. An auditor can always see what was argued and overruled.",
+      );
       await page.waitForTimeout(3200);
+      await clearSpotlight(page);
 
       console.log("verify + scorecard");
       if (!REPLAY) await waitUntilSince(page, chamberStartedAt, 33_000);
@@ -267,7 +356,14 @@ async function main() {
       );
       await page.getByRole("button", { name: /^scorecard$/i }).click();
       await page.waitForFunction(() => /tribunal ledger/i.test(document.body.innerText), null, { timeout: 15_000 });
+      await spotlight(
+        page,
+        { selector: ".grid.grid-cols-2" },
+        "The score: 12/12 vs 0/12",
+        "Twelve audit checks, scored only from the run's own records. A single model leaves no record at all — it scores zero.",
+      );
       await page.waitForTimeout(2600);
+      await clearSpotlight(page);
       await scrollScorecardList(page);
 
       console.log("tamper demo");
@@ -288,7 +384,14 @@ async function main() {
         );
         marker?.closest(".glass")?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(700);
+      await spotlight(
+        page,
+        { findText: "chain caught it|breaks immediately" },
+        "We just tampered with the record",
+        "One field was rewritten → the hash chain breaks and verification FAILS. Nobody can quietly rewrite history.",
+      );
+      await page.waitForTimeout(4300);
 
       await page.screenshot({ path: FINAL_FRAME, fullPage: false });
       console.log(`final frame: ${FINAL_FRAME}`);
