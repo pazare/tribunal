@@ -17,10 +17,14 @@
     "dev": "node scripts/dev.mjs",
     "demo": "tsx packages/kernel/scripts/demo.ts",
     "demo:real": "tsx packages/kernel/scripts/real_smoke.ts",
+    "record:demo": "node scripts/record_demo.mjs",
+    "submit:prep": "node scripts/submit_prep.mjs",
+    "build:web": "npm run build --workspace @tribunal/web",
     "server": "npm run dev --workspace @tribunal/server",
     "web": "npm run dev --workspace @tribunal/web"
   },
   "devDependencies": {
+    "playwright": "^1.49.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

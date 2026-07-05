@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-tribunal-bg text-zinc-100 font-sans antialiased min-h-screen;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 169, 98, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(94, 234, 212, 0.04), transparent);
+}
+
+.glass {
+  @apply bg-tribunal-panel/80 backdrop-blur-md border border-tribunal-border rounded-xl;
+}
+
+.ledger-glow {
+  box-shadow: 0 0 40px rgba(201, 169, 98, 0.06);
+}

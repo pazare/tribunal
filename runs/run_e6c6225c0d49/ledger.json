@@ -1,0 +1,3274 @@
+[
+ {
+  "seq": 0,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": null,
+  "ts": 1,
+  "kind": "run_started",
+  "payload": {
+   "packId": "lending-adverse-action",
+   "title": "Loan #4471 — adverse-action review",
+   "domain": "lending",
+   "question": "Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?",
+   "panel": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    }
+   ],
+   "config": {
+    "seed": 7,
+    "maxSpans": 2,
+    "flags": {
+     "blindRound": true,
+     "anonymizeFeedback": true,
+     "randomizeCandidateOrder": true,
+     "debateRounds": 1,
+     "roleMemory": true,
+     "independentEvidence": true,
+     "safetyVeto": true
+    },
+    "clientView": "answer_plus_summary"
+   },
+   "note": "OFFLINE deterministic panel (no model calls) — CI/smoke mode."
+  },
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "7d350caef142d96a44515ee6f0001b215f89f16d478b63230c705203ea1d36bf"
+ },
+ {
+  "seq": 1,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 2,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 0,
+    "label": "the disposition",
+    "instruction": "Decide the disposition of loan #4471. DTI = total monthly debt / gross monthly income. Recompute it from the verified figures BEFORE adopting any drafted number, and say what you did.",
+    "riskBands": {
+     "factual": "high",
+     "legal": "high",
+     "fairness": "medium"
+    },
+    "candidatesHint": [
+     "Deny for excessive debt-to-income ratio (52%).",
+     "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+     "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason."
+    ]
+   }
+  },
+  "prevHash": "7d350caef142d96a44515ee6f0001b215f89f16d478b63230c705203ea1d36bf",
+  "hash": "553642d51d3c8b7820243a80913d7de5e0023f3af499973e0f979a34dd03a14e"
+ },
+ {
+  "seq": 2,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 3,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_e6c6225c0d49",
+    "packId": "lending-adverse-action",
+    "title": "Loan #4471 — adverse-action review",
+    "domain": "lending",
+    "question": "Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?",
+    "constraints": [
+     {
+      "id": "c_ecoa",
+      "kind": "regulation",
+      "text": "An adverse-action notice must state the specific principal reason(s) for denial; generic or inaccurate statements are non-compliant.",
+      "cite": "ECOA 15 U.S.C. §1691(d); Reg B 12 CFR §1002.9"
+     },
+     {
+      "id": "c_cfpb",
+      "kind": "regulation",
+      "text": "Creditors relying on complex models must still provide specific and accurate reasons; model opacity is not a defense.",
+      "cite": "CFPB Circular 2022-03"
+     },
+     {
+      "id": "c_fairlend",
+      "kind": "regulation",
+      "text": "The decision must not rely on a prohibited basis or a proxy for one.",
+      "cite": "Reg B 12 CFR §1002.6"
+     },
+     {
+      "id": "c_policy45",
+      "kind": "policy",
+      "text": "Internal policy: applications at or above 45% DTI are declined absent compensating factors."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_income",
+      "source": "verified_income",
+      "citation": "paystub bundle p.2",
+      "summary": "Verified gross monthly income is $7,200 (annual $86,400), stable for 3+ years.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_debt",
+      "source": "credit_report",
+      "citation": "tradelines p.4",
+      "summary": "Total documented monthly debt obligations are $2,050 (auto $410, cards $340, student $520, proposed mortgage escrowed $780).",
+      "quality": 0.9
+     },
+     {
+      "id": "e_dti_draft",
+      "source": "underwriting_draft",
+      "citation": "worksheet cell D12",
+      "summary": "Draft worksheet states DTI = 52% and recommends denial for 'excessive DTI'. No computation shown.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_income",
+       "e_debt"
+      ]
+     },
+     {
+      "id": "e_score",
+      "source": "credit_report",
+      "citation": "summary p.1",
+      "summary": "Credit score 690; two 30-day late payments in the last 24 months (both on the same card, 14 months ago).",
+      "quality": 0.9
+     },
+     {
+      "id": "e_ltv",
+      "source": "appraisal",
+      "citation": "appraisal p.3",
+      "summary": "Loan-to-value 82%, within program limits (max 95%).",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_policy",
+      "title": "Lending policy excerpt",
+      "body": "Applications with a debt-to-income ratio at or above 45% are declined absent compensating factors. DTI is computed as total monthly debt obligations divided by gross monthly income. The principal reason stated on any denial must be specific and accurate; template language without case-specific reconciliation is prohibited."
+     },
+     {
+      "id": "d_draft",
+      "title": "Draft denial letter (as queued for sending)",
+      "body": "Dear applicant: We regret to inform you that your application has been denied due to excessive debt-to-income ratio (52%), which exceeds our program maximum. This decision was generated by our automated underwriting assistant."
+     },
+     {
+      "id": "d_file_summary",
+      "title": "Application file summary",
+      "body": "Applicant seeks a $312,000 30-year fixed mortgage. Verified income $7,200/month. Documented monthly obligations $2,050 including the proposed housing payment. Credit score 690 with two 30-day delinquencies 14 months ago. LTV 82%. No bankruptcies, no collections."
+     }
+    ],
+    "prefix": "",
+    "slot": {
+     "index": 0,
+     "label": "the disposition",
+     "instruction": "Decide the disposition of loan #4471. DTI = total monthly debt / gross monthly income. Recompute it from the verified figures BEFORE adopting any drafted number, and say what you did.",
+     "riskBands": {
+      "factual": "high",
+      "legal": "high",
+      "fairness": "medium"
+     },
+     "candidatesHint": [
+      "Deny for excessive debt-to-income ratio (52%).",
+      "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+      "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason."
+     ]
+    },
+    "ratifiedCommitments": [],
+    "rejectedAlternatives": [],
+    "unresolvedDissent": []
+   }
+  },
+  "prevHash": "553642d51d3c8b7820243a80913d7de5e0023f3af499973e0f979a34dd03a14e",
+  "hash": "bc73ff0949ad0224ac5bc153520e35576004b0d5c5bf0b71a9ba0328f1d052e2"
+ },
+ {
+  "seq": 3,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 4,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "bc73ff0949ad0224ac5bc153520e35576004b0d5c5bf0b71a9ba0328f1d052e2",
+  "hash": "1239857cc59c224cbf1891f2e288d0d63a7c90d426ae0a44af73728b6e16bcbf"
+ },
+ {
+  "seq": 4,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 5,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1239857cc59c224cbf1891f2e288d0d63a7c90d426ae0a44af73728b6e16bcbf",
+  "hash": "fc8c22aa31dec183bd383bbac1e7819c18793448d571604c20dc753bb9c11ca3"
+ },
+ {
+  "seq": 5,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 6,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "fc8c22aa31dec183bd383bbac1e7819c18793448d571604c20dc753bb9c11ca3",
+  "hash": "3453e179b7b13891ef116d084eb25151429559a8c8ab3133ccc357a57e1f8446"
+ },
+ {
+  "seq": 6,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 7,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "3453e179b7b13891ef116d084eb25151429559a8c8ab3133ccc357a57e1f8446",
+  "hash": "ce65adf6b3f6cb3902b551180737aa9edfb8c79a5d90f78cfad5723ca9de05cd"
+ },
+ {
+  "seq": 7,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 8,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ce65adf6b3f6cb3902b551180737aa9edfb8c79a5d90f78cfad5723ca9de05cd",
+  "hash": "6f787a7858f3cee20fc8f6a82bf9fdfb6f5e628e308f7f5038a321040f1d504d"
+ },
+ {
+  "seq": 8,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 9,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "6f787a7858f3cee20fc8f6a82bf9fdfb6f5e628e308f7f5038a321040f1d504d",
+  "hash": "02d55fc240c118e30f564cb11a87d30c0f72832ca3de880ce1c399fc43729401"
+ },
+ {
+  "seq": 9,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 10,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "e30d587e2aaa04081e5e7197bd0e5f65e5cf1102bcb594bb993fe95e6ebeb321"
+  },
+  "prevHash": "02d55fc240c118e30f564cb11a87d30c0f72832ca3de880ce1c399fc43729401",
+  "hash": "4f315f862ef8edcaaff390b38d089b6ee092c37349d847942c0fe85e34536f13"
+ },
+ {
+  "seq": 10,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 11,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "b4631e4ae86beda8c91d03789835d8f8d7389d27b6e459f856cef8b7437eeedf"
+  },
+  "prevHash": "4f315f862ef8edcaaff390b38d089b6ee092c37349d847942c0fe85e34536f13",
+  "hash": "c599bf74b6fff4ac7d8f13c3956feee53aa04dda7ddcfda619edfb3a875173a6"
+ },
+ {
+  "seq": 11,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 12,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "8d548760ffe1e86c13f5692203c9e1d66251379063b0b32db676d95c63e76d44"
+  },
+  "prevHash": "c599bf74b6fff4ac7d8f13c3956feee53aa04dda7ddcfda619edfb3a875173a6",
+  "hash": "6d45ce3e43397eb5e72198a0d6351714bdbf2c7c94799693feb429c3eb2739aa"
+ },
+ {
+  "seq": 12,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 13,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "06754363c4942947659cb51fc02190e391edf9bea67e6a9da0a853af95d22c3f"
+  },
+  "prevHash": "6d45ce3e43397eb5e72198a0d6351714bdbf2c7c94799693feb429c3eb2739aa",
+  "hash": "6a1e1628a05010f5ad3b07403b06548bab9b61e5213ced24173991c77d1700a8"
+ },
+ {
+  "seq": 13,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 14,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "21f3b951b9406ff0e6c8fad38efc94c47aa80af2d66d5b8c2a953ff48666c84d"
+  },
+  "prevHash": "6a1e1628a05010f5ad3b07403b06548bab9b61e5213ced24173991c77d1700a8",
+  "hash": "6b91f5d3b99e90468bda91f20487ef3110d7bbe9f825b0109c17d6a76093e234"
+ },
+ {
+  "seq": 14,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 15,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "0c1b0e46b5c0041ed47158a58b285bac426252cf0938be39422d2c238b090de1"
+  },
+  "prevHash": "6b91f5d3b99e90468bda91f20487ef3110d7bbe9f825b0109c17d6a76093e234",
+  "hash": "d5cf5d9ac85c98a7e9ecb51e20e5f968c2773356cce522a69061e7921d729892"
+ },
+ {
+  "seq": 15,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 16,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.7,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.15,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Evidence seat: \"Deny for excessive debt-to-income ratio (52%).\" is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.62,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.54,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Evidence seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Deny for excessive debt-to-income ratio (52%).\" is the span best supported by the case record grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.6,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Adversary seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.32,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Adversary seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.36,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Adversary seat: \"Deny for excessive debt-to-income ratio (52%).\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_fd0b4a0da6dd",
+       "targetKey": "Deny for excessive debt-to-income ratio (52%).",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.64,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.6,
+       "warrant": "Law/Policy seat: \"Deny for excessive debt-to-income ratio (52%).\" satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Law/Policy seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Law/Policy seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Deny for excessive debt-to-income ratio (52%).\" satisfies the binding constraints and required disclosures grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.18,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.69,
+       "warrant": "Affected-party seat: \"Deny for excessive debt-to-income ratio (52%).\" is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.7,
+       "warrant": "Affected-party seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.68,
+       "warrant": "Affected-party seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Deny for excessive debt-to-income ratio (52%).\" is the least-harmful span consistent with the evidence grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.64,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.31,
+       "fairnessRisk": 0.33,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Safety seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Safety seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.48,
+       "factualityRisk": 0.28,
+       "legalRisk": 0.34,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Safety seat: \"Deny for excessive debt-to-income ratio (52%).\" does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" does not, on review, cross the veto threshold grounded in e_income.",
+     "objections": [
+      {
+       "id": "obj_44c2597a83eb",
+       "targetKey": "Deny for excessive debt-to-income ratio (52%).",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Concision seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny for excessive debt-to-income ratio (52%).",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Concision seat: \"Deny for excessive debt-to-income ratio (52%).\" is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Concision seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the shortest span that fully answers the slot grounded in e_income.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "e30d587e2aaa04081e5e7197bd0e5f65e5cf1102bcb594bb993fe95e6ebeb321",
+     "recomputed": "e30d587e2aaa04081e5e7197bd0e5f65e5cf1102bcb594bb993fe95e6ebeb321",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "b4631e4ae86beda8c91d03789835d8f8d7389d27b6e459f856cef8b7437eeedf",
+     "recomputed": "b4631e4ae86beda8c91d03789835d8f8d7389d27b6e459f856cef8b7437eeedf",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "8d548760ffe1e86c13f5692203c9e1d66251379063b0b32db676d95c63e76d44",
+     "recomputed": "8d548760ffe1e86c13f5692203c9e1d66251379063b0b32db676d95c63e76d44",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "06754363c4942947659cb51fc02190e391edf9bea67e6a9da0a853af95d22c3f",
+     "recomputed": "06754363c4942947659cb51fc02190e391edf9bea67e6a9da0a853af95d22c3f",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "21f3b951b9406ff0e6c8fad38efc94c47aa80af2d66d5b8c2a953ff48666c84d",
+     "recomputed": "21f3b951b9406ff0e6c8fad38efc94c47aa80af2d66d5b8c2a953ff48666c84d",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "0c1b0e46b5c0041ed47158a58b285bac426252cf0938be39422d2c238b090de1",
+     "recomputed": "0c1b0e46b5c0041ed47158a58b285bac426252cf0938be39422d2c238b090de1",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "d5cf5d9ac85c98a7e9ecb51e20e5f968c2773356cce522a69061e7921d729892",
+  "hash": "df9b7da1fb6158fd98dbae2cb871b05897ee49f837336264d37f8178090297dd"
+ },
+ {
+  "seq": 16,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 17,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 0,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "Deny for excessive debt-to-income ratio (52%).",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5933,
+      "confidenceDispersion": 0.0832,
+      "strongestArgument": "Evidence seat: \"Deny for excessive debt-to-income ratio (52%).\" is the span best supported by the case record grounded in e_income.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5833,
+      "confidenceDispersion": 0.0364,
+      "strongestArgument": "Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5833,
+      "confidenceDispersion": 0.0585,
+      "strongestArgument": "Concision seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the shortest span that fully answers the slot grounded in e_income.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0594,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "df9b7da1fb6158fd98dbae2cb871b05897ee49f837336264d37f8178090297dd",
+  "hash": "5f90b48014e409ad56cb08e8c26cccc2bb65b29798f7a03f31bed9f8b2a49571"
+ },
+ {
+  "seq": 17,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 18,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "5f90b48014e409ad56cb08e8c26cccc2bb65b29798f7a03f31bed9f8b2a49571",
+  "hash": "3632e747bd9ce43ebc004d8b8642a469660f1e435a639af13904962268f596a1"
+ },
+ {
+  "seq": 18,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 19,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "3632e747bd9ce43ebc004d8b8642a469660f1e435a639af13904962268f596a1",
+  "hash": "3ca83b4035b84072372f91d2462a5ff5def3e64242d7620d015f9bfe3443f59d"
+ },
+ {
+  "seq": 19,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 20,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "3ca83b4035b84072372f91d2462a5ff5def3e64242d7620d015f9bfe3443f59d",
+  "hash": "f136197a7b46e979b4fe1bd1a54204cc21b6de3e4142593a73c0cb3ee83e5e4c"
+ },
+ {
+  "seq": 20,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 21,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "f136197a7b46e979b4fe1bd1a54204cc21b6de3e4142593a73c0cb3ee83e5e4c",
+  "hash": "43edac894d85ce70da07b6622f41f29b017deb16b222e8ce2fe25c923842af61"
+ },
+ {
+  "seq": 21,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 22,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "43edac894d85ce70da07b6622f41f29b017deb16b222e8ce2fe25c923842af61",
+  "hash": "02af1525ce7ac59f5dc5716f44d0400a3fef0691d2dc9f77cc7a72813becebc4"
+ },
+ {
+  "seq": 22,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 23,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "02af1525ce7ac59f5dc5716f44d0400a3fef0691d2dc9f77cc7a72813becebc4",
+  "hash": "4c9d4ee4a8820987c820345cbb363830d4050e19c6432090bd7f1b92a6010ca2"
+ },
+ {
+  "seq": 23,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 24,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "4c9d4ee4a8820987c820345cbb363830d4050e19c6432090bd7f1b92a6010ca2",
+  "hash": "05eac6d19654930e63dc9ea5bbf89acc995b9ef02e70480a41770b9f2e6eddde"
+ },
+ {
+  "seq": 24,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 25,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "isStop": false
+     },
+     "confidence": 0.77,
+     "factualityRisk": 0.14,
+     "legalRisk": 0.15,
+     "fairnessRisk": 0.29,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "05eac6d19654930e63dc9ea5bbf89acc995b9ef02e70480a41770b9f2e6eddde",
+  "hash": "755520db147eebd940394d1350015b2a4b506d6b8bb1bdf66bd83edbc2785b34"
+ },
+ {
+  "seq": 25,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 26,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "755520db147eebd940394d1350015b2a4b506d6b8bb1bdf66bd83edbc2785b34",
+  "hash": "7421c6bb517009aff60ff757d361cc9d779ff23e4031272e870d61ba8d9393b6"
+ },
+ {
+  "seq": 26,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 27,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "isStop": false
+     },
+     "confidence": 0.65,
+     "factualityRisk": 0.27,
+     "legalRisk": 0.2,
+     "fairnessRisk": 0.3,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Adversary seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_a3c592562f7a",
+      "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "7421c6bb517009aff60ff757d361cc9d779ff23e4031272e870d61ba8d9393b6",
+  "hash": "3e60ee159ee95653a0ee43e0710b9a3888d91509419fe7be7ef2646e75e4dcca"
+ },
+ {
+  "seq": 27,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 28,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "3e60ee159ee95653a0ee43e0710b9a3888d91509419fe7be7ef2646e75e4dcca",
+  "hash": "8f218e781d56ad8c4ff66b62904aa9ac777177d3bb4a97f7e307667a137c70ef"
+ },
+ {
+  "seq": 28,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 29,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny for excessive debt-to-income ratio (52%).",
+      "isStop": false
+     },
+     "confidence": 0.66,
+     "factualityRisk": 0.25,
+     "legalRisk": 0.26,
+     "fairnessRisk": 0.23,
+     "affectedPartyImpact": 0.6,
+     "warrant": "Law/Policy seat: \"Deny for excessive debt-to-income ratio (52%).\" satisfies the binding constraints and required disclosures grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_income, e_debt, e_dti_draft, e_score, e_ltv) addresses it, and the law_policy mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny for excessive debt-to-income ratio (52%).\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "8f218e781d56ad8c4ff66b62904aa9ac777177d3bb4a97f7e307667a137c70ef",
+  "hash": "114d95f1b214156ded61f018f15ea2fd1b6bb4993685d9a2db6cce5449756ca6"
+ },
+ {
+  "seq": 29,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 30,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "114d95f1b214156ded61f018f15ea2fd1b6bb4993685d9a2db6cce5449756ca6",
+  "hash": "2321556451a9cc5a24b2b06c8dffe758bc48d74d58b079991e80374031548e3a"
+ },
+ {
+  "seq": 30,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 31,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny for excessive debt-to-income ratio (52%).",
+      "isStop": false
+     },
+     "confidence": 0.69,
+     "factualityRisk": 0.24,
+     "legalRisk": 0.18,
+     "fairnessRisk": 0.36,
+     "affectedPartyImpact": 0.69,
+     "warrant": "Affected-party seat: \"Deny for excessive debt-to-income ratio (52%).\" is the least-harmful span consistent with the evidence grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_income, e_debt, e_dti_draft, e_score, e_ltv) addresses it, and the affected_party mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny for excessive debt-to-income ratio (52%).\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "2321556451a9cc5a24b2b06c8dffe758bc48d74d58b079991e80374031548e3a",
+  "hash": "fbae2a5fbb11e10197278afae7010673b4534936127409301e1f29388cd1c6e3"
+ },
+ {
+  "seq": 31,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 32,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "fbae2a5fbb11e10197278afae7010673b4534936127409301e1f29388cd1c6e3",
+  "hash": "37d3a8c2ff8cc3ff811debfd09cae390da7cc4ac5bfe05cc6cb490e7d9efcd66"
+ },
+ {
+  "seq": 32,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 33,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+      "isStop": false
+     },
+     "confidence": 0.7,
+     "factualityRisk": 0.29,
+     "legalRisk": 0.31,
+     "fairnessRisk": 0.33,
+     "affectedPartyImpact": 0.63,
+     "warrant": "Safety seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" does not, on review, cross the veto threshold grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_7668c56c9482",
+      "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "37d3a8c2ff8cc3ff811debfd09cae390da7cc4ac5bfe05cc6cb490e7d9efcd66",
+  "hash": "9290d6e5bb1e8c757e30e593e0a16f2d818efc96b13d79383fca1480c9c605f1"
+ },
+ {
+  "seq": 33,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 34,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "9290d6e5bb1e8c757e30e593e0a16f2d818efc96b13d79383fca1480c9c605f1",
+  "hash": "1594e53e8d09f6dc72dbec878b7382ec6487894bba349205a9ae8de03a493b55"
+ },
+ {
+  "seq": 34,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 35,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+      "isStop": false
+     },
+     "confidence": 0.7,
+     "factualityRisk": 0.25,
+     "legalRisk": 0.25,
+     "fairnessRisk": 0.29,
+     "affectedPartyImpact": 0.56,
+     "warrant": "Concision seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the shortest span that fully answers the slot grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.\" is the shortest span that fully answers the slot grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "1594e53e8d09f6dc72dbec878b7382ec6487894bba349205a9ae8de03a493b55",
+  "hash": "a480d9f1e6330dd139e69b382c9536218fd630a1dd986cdfbaee2ffa6d2fe047"
+ },
+ {
+  "seq": 35,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 36,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+     "veto": true,
+     "legalRisk": 0.31,
+     "publicReason": "Safety seat vetoes \"Deny, citing the delinquency history (two 30-…\": This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "a480d9f1e6330dd139e69b382c9536218fd630a1dd986cdfbaee2ffa6d2fe047",
+  "hash": "4740e75a403e61bd3b5fb8a88ddca4113ee1f9b7d010b26861e9dc62e15b3ab4"
+ },
+ {
+  "seq": 36,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 37,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 0,
+    "method": "safety_gate",
+    "metaRule": "R1: the highest-scoring candidate was vetoed → pick best non-vetoed",
+    "selected": {
+     "candidate": {
+      "text": "Deny for excessive debt-to-income ratio (52%).",
+      "isStop": false
+     },
+     "confidence": 0.69,
+     "factualityRisk": 0.24,
+     "legalRisk": 0.18,
+     "fairnessRisk": 0.36,
+     "affectedPartyImpact": 0.69,
+     "warrant": "Affected-party seat: \"Deny for excessive debt-to-income ratio (52%).\" is the least-harmful span consistent with the evidence grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "publicReason": "The leading candidate was vetoed for a stated safety reason; the best non-vetoed candidate \"Deny for excessive debt-to-income ratio (52%).\" is ratified.",
+    "candidateTable": [
+     {
+      "key": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "support": 2,
+      "meanConfidence": 0.71,
+      "dispersion": 0.06,
+      "maxLegalRisk": 0.2,
+      "meanFactualityRisk": 0.205,
+      "meanFairnessRisk": 0.295,
+      "meanAffectedPartyImpact": 0.57,
+      "aggregateScore": 0.2544
+     },
+     {
+      "key": "Deny for excessive debt-to-income ratio (52%).",
+      "support": 2,
+      "meanConfidence": 0.675,
+      "dispersion": 0.015,
+      "maxLegalRisk": 0.26,
+      "meanFactualityRisk": 0.245,
+      "meanFairnessRisk": 0.295,
+      "meanAffectedPartyImpact": 0.645,
+      "aggregateScore": 0.2279
+     },
+     {
+      "key": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+      "support": 2,
+      "meanConfidence": 0.7,
+      "dispersion": 0,
+      "maxLegalRisk": 0.31,
+      "meanFactualityRisk": 0.27,
+      "meanFairnessRisk": 0.31,
+      "meanAffectedPartyImpact": 0.595,
+      "aggregateScore": 0.2222
+     }
+    ],
+    "vetoes": [
+     {
+      "candidateKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "publicReason": "Safety seat vetoes \"Deny, citing the delinquency history (two 30-…\": This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "upheld": true
+     }
+    ],
+    "dissents": [
+     {
+      "id": "dissent_eaa3b335e98b",
+      "spanIndex": 0,
+      "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_dd5086d9df3a",
+      "spanIndex": 0,
+      "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "4740e75a403e61bd3b5fb8a88ddca4113ee1f9b7d010b26861e9dc62e15b3ab4",
+  "hash": "e2862d38d6e6c1f36f1c24ae74030c2b6d4c1d4e6d3cd5b55a9469631719667b"
+ },
+ {
+  "seq": 37,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 38,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_eaa3b335e98b",
+    "spanIndex": 0,
+    "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "e2862d38d6e6c1f36f1c24ae74030c2b6d4c1d4e6d3cd5b55a9469631719667b",
+  "hash": "bcbe9a8c260fc7606ef5efac5737781ac17a583208fb9d546472cd6438985fcc"
+ },
+ {
+  "seq": 38,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 39,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_dd5086d9df3a",
+    "spanIndex": 0,
+    "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+     "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "bcbe9a8c260fc7606ef5efac5737781ac17a583208fb9d546472cd6438985fcc",
+  "hash": "fee8dd5d174405b18a314060041c248a2de3441441d78941f5a196022ceac10d"
+ },
+ {
+  "seq": 39,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 40,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 0,
+   "text": "Deny for excessive debt-to-income ratio (52%).",
+   "isStop": false,
+   "prefixAfter": "Deny for excessive debt-to-income ratio (52%)."
+  },
+  "prevHash": "fee8dd5d174405b18a314060041c248a2de3441441d78941f5a196022ceac10d",
+  "hash": "5bd954d33cdcb9b0c61af7eac28802b7c1e817d32b23abf795e108e793d2e4f4"
+ },
+ {
+  "seq": 40,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 41,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_0_rule",
+     "content": "safety_gate: R1: the highest-scoring candidate was vetoed → pick best non-vetoed",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_eaa3b335e98b",
+     "content": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_dd5086d9df3a",
+     "content": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 0
+    }
+   ]
+  },
+  "prevHash": "5bd954d33cdcb9b0c61af7eac28802b7c1e817d32b23abf795e108e793d2e4f4",
+  "hash": "0853467dfc414003299642291c9ec59380e56d25020cce03ca4b6ac8d5ab455b"
+ },
+ {
+  "seq": 41,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 0,
+  "ts": 42,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 0
+  },
+  "prevHash": "0853467dfc414003299642291c9ec59380e56d25020cce03ca4b6ac8d5ab455b",
+  "hash": "26efe5edfe1c14f9f2e6fa01ad2946a8c9f192f70737a453a48ec9a01d9367ad"
+ },
+ {
+  "seq": 42,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 43,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 1,
+    "label": "the principal-reason disclosure to the applicant",
+    "instruction": "Write the specific principal reason the applicant must receive under Reg B — accurate, case-specific, and consistent with the ratified disposition. STOP if the disposition already fully answers the question.",
+    "riskBands": {
+     "legal": "high",
+     "user_impact": "high"
+    },
+    "candidatesHint": [
+     "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+     "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+     "<STOP>"
+    ]
+   }
+  },
+  "prevHash": "26efe5edfe1c14f9f2e6fa01ad2946a8c9f192f70737a453a48ec9a01d9367ad",
+  "hash": "ab92b392d12136a7a1d17f0126cf9bc372481c3ec0af58cdfb1ecf82cc2f636f"
+ },
+ {
+  "seq": 43,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 44,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_e6c6225c0d49",
+    "packId": "lending-adverse-action",
+    "title": "Loan #4471 — adverse-action review",
+    "domain": "lending",
+    "question": "Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?",
+    "constraints": [
+     {
+      "id": "c_ecoa",
+      "kind": "regulation",
+      "text": "An adverse-action notice must state the specific principal reason(s) for denial; generic or inaccurate statements are non-compliant.",
+      "cite": "ECOA 15 U.S.C. §1691(d); Reg B 12 CFR §1002.9"
+     },
+     {
+      "id": "c_cfpb",
+      "kind": "regulation",
+      "text": "Creditors relying on complex models must still provide specific and accurate reasons; model opacity is not a defense.",
+      "cite": "CFPB Circular 2022-03"
+     },
+     {
+      "id": "c_fairlend",
+      "kind": "regulation",
+      "text": "The decision must not rely on a prohibited basis or a proxy for one.",
+      "cite": "Reg B 12 CFR §1002.6"
+     },
+     {
+      "id": "c_policy45",
+      "kind": "policy",
+      "text": "Internal policy: applications at or above 45% DTI are declined absent compensating factors."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_income",
+      "source": "verified_income",
+      "citation": "paystub bundle p.2",
+      "summary": "Verified gross monthly income is $7,200 (annual $86,400), stable for 3+ years.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_debt",
+      "source": "credit_report",
+      "citation": "tradelines p.4",
+      "summary": "Total documented monthly debt obligations are $2,050 (auto $410, cards $340, student $520, proposed mortgage escrowed $780).",
+      "quality": 0.9
+     },
+     {
+      "id": "e_dti_draft",
+      "source": "underwriting_draft",
+      "citation": "worksheet cell D12",
+      "summary": "Draft worksheet states DTI = 52% and recommends denial for 'excessive DTI'. No computation shown.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_income",
+       "e_debt"
+      ]
+     },
+     {
+      "id": "e_score",
+      "source": "credit_report",
+      "citation": "summary p.1",
+      "summary": "Credit score 690; two 30-day late payments in the last 24 months (both on the same card, 14 months ago).",
+      "quality": 0.9
+     },
+     {
+      "id": "e_ltv",
+      "source": "appraisal",
+      "citation": "appraisal p.3",
+      "summary": "Loan-to-value 82%, within program limits (max 95%).",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_policy",
+      "title": "Lending policy excerpt",
+      "body": "Applications with a debt-to-income ratio at or above 45% are declined absent compensating factors. DTI is computed as total monthly debt obligations divided by gross monthly income. The principal reason stated on any denial must be specific and accurate; template language without case-specific reconciliation is prohibited."
+     },
+     {
+      "id": "d_draft",
+      "title": "Draft denial letter (as queued for sending)",
+      "body": "Dear applicant: We regret to inform you that your application has been denied due to excessive debt-to-income ratio (52%), which exceeds our program maximum. This decision was generated by our automated underwriting assistant."
+     },
+     {
+      "id": "d_file_summary",
+      "title": "Application file summary",
+      "body": "Applicant seeks a $312,000 30-year fixed mortgage. Verified income $7,200/month. Documented monthly obligations $2,050 including the proposed housing payment. Credit score 690 with two 30-day delinquencies 14 months ago. LTV 82%. No bankruptcies, no collections."
+     }
+    ],
+    "prefix": "Deny for excessive debt-to-income ratio (52%).",
+    "slot": {
+     "index": 1,
+     "label": "the principal-reason disclosure to the applicant",
+     "instruction": "Write the specific principal reason the applicant must receive under Reg B — accurate, case-specific, and consistent with the ratified disposition. STOP if the disposition already fully answers the question.",
+     "riskBands": {
+      "legal": "high",
+      "user_impact": "high"
+     },
+     "candidatesHint": [
+      "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+      "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "<STOP>"
+     ]
+    },
+    "ratifiedCommitments": [
+     "Deny for excessive debt-to-income ratio (52%)."
+    ],
+    "rejectedAlternatives": [
+     {
+      "text": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+      "reason": "not ratified at span 0"
+     },
+     {
+      "text": "Do not deny on the drafted ground: the documented DTI is ~28.5% ($2,050 / $7,200), below the 45% threshold; the worksheet figure does not reconcile with the record.",
+      "reason": "not ratified at span 0"
+     }
+    ],
+    "unresolvedDissent": [
+     {
+      "id": "dissent_eaa3b335e98b",
+      "spanIndex": 0,
+      "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_dd5086d9df3a",
+      "spanIndex": 0,
+      "chosenKey": "Deny for excessive debt-to-income ratio (52%).",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ]
+   }
+  },
+  "prevHash": "ab92b392d12136a7a1d17f0126cf9bc372481c3ec0af58cdfb1ecf82cc2f636f",
+  "hash": "a006b1ce5a03bf6fb05f47be5ec839ecea9d8e4beed5f3d397c8236a163a3071"
+ },
+ {
+  "seq": 44,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 45,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "a006b1ce5a03bf6fb05f47be5ec839ecea9d8e4beed5f3d397c8236a163a3071",
+  "hash": "f08a2cb8d06d1d93c84230779bfcb71d59af6f49fb824985469fbb7effd1ded9"
+ },
+ {
+  "seq": 45,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 46,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f08a2cb8d06d1d93c84230779bfcb71d59af6f49fb824985469fbb7effd1ded9",
+  "hash": "0978d72be8039a0862df430539722b403e168e008c8b6af03717874db1d7b288"
+ },
+ {
+  "seq": 46,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 47,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "0978d72be8039a0862df430539722b403e168e008c8b6af03717874db1d7b288",
+  "hash": "819f471a636d72df2b99c19d4206b275e2336f8311f48b64ef2ffa9da1ba8eea"
+ },
+ {
+  "seq": 47,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 48,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "819f471a636d72df2b99c19d4206b275e2336f8311f48b64ef2ffa9da1ba8eea",
+  "hash": "90e27397c8270561d03a5374dc47aba67c84d3ffea17793698ab35f411a52d77"
+ },
+ {
+  "seq": 48,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 49,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "90e27397c8270561d03a5374dc47aba67c84d3ffea17793698ab35f411a52d77",
+  "hash": "af2502fb33db3ebd6e7683a464968d9a3ebda0b1a82d9d936a8f73350945319e"
+ },
+ {
+  "seq": 49,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 50,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "af2502fb33db3ebd6e7683a464968d9a3ebda0b1a82d9d936a8f73350945319e",
+  "hash": "aa3f3aa88b6f23e900a3a74ad2e574f17df60d3c7f5c02c7350f841935f76a64"
+ },
+ {
+  "seq": 50,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 51,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "37a6a9dc53cc6a4bc80078319bff546c35385bde09df0c1416f68c9228c4055a"
+  },
+  "prevHash": "aa3f3aa88b6f23e900a3a74ad2e574f17df60d3c7f5c02c7350f841935f76a64",
+  "hash": "98c5ab8ac53ce75605f8d8d2d361c1b248ab6df0018a384d7a5616ab6fc0f172"
+ },
+ {
+  "seq": 51,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 52,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "f6c8530740a6dd4380a7c25fb5e5ddf7564bb4e0da799b8a5fb4fe01d79e4c59"
+  },
+  "prevHash": "98c5ab8ac53ce75605f8d8d2d361c1b248ab6df0018a384d7a5616ab6fc0f172",
+  "hash": "d22e38fee39b95d59c9afcc6dec07203d7d20745bc9592367c4ebfde496f957c"
+ },
+ {
+  "seq": 52,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 53,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "dc66d121faf266426eb011162e341cde19e83d11e876d98bbbf84ccc192213dc"
+  },
+  "prevHash": "d22e38fee39b95d59c9afcc6dec07203d7d20745bc9592367c4ebfde496f957c",
+  "hash": "b85baa9efb9b88dd498ea0364cdb4c50d134490a87fb80c3f5450edabe7d932a"
+ },
+ {
+  "seq": 53,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 54,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "3cf9f095e4bfef5bbffcdd2ec7e447d475f94fc3ab4336c9841a0a73cd229a1d"
+  },
+  "prevHash": "b85baa9efb9b88dd498ea0364cdb4c50d134490a87fb80c3f5450edabe7d932a",
+  "hash": "755516389beb90a520d7ac4f710cf4572d437b1eb732cee6002e224aab1da2ad"
+ },
+ {
+  "seq": 54,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 55,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "f17404db570c364d40e0d7111d7fc63096da458c6caff2cb048aa35457571381"
+  },
+  "prevHash": "755516389beb90a520d7ac4f710cf4572d437b1eb732cee6002e224aab1da2ad",
+  "hash": "b6efbf1164974fd749862580f331be8d9ae696c0a1b42a4828edf6fca0e7304e"
+ },
+ {
+  "seq": 55,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 56,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "27bf92d2b748c8880a2da2f0c08af4b0763c66ad371bbf0f8899b92e7dbacc8d"
+  },
+  "prevHash": "b6efbf1164974fd749862580f331be8d9ae696c0a1b42a4828edf6fca0e7304e",
+  "hash": "f173e097122a6ceac51c8acaefccda69c1de4ad53cbfc4ecc2250dea13f4b0b9"
+ },
+ {
+  "seq": 56,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 57,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.72,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.16,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.71,
+       "factualityRisk": 0.11,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Evidence seat: stopping here is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.16,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Evidence seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the span best supported by the case record grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Adversary seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.17,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.32,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Adversary seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_7bd073c8dc7f",
+       "targetKey": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.6,
+       "warrant": "Law/Policy seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.15,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Law/Policy seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" satisfies the binding constraints and required disclosures grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" satisfies the binding constraints and required disclosures grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.69,
+       "warrant": "Affected-party seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.72,
+       "warrant": "Affected-party seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.58,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.69,
+       "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the least-harmful span consistent with the evidence grounded in e_income.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.6,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.29,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.29,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Safety seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.47,
+       "factualityRisk": 0.31,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Safety seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" does not, on review, cross the veto threshold grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_income.",
+     "objections": [
+      {
+       "id": "obj_e45021e50f6b",
+       "targetKey": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.5,
+       "warrant": "Concision seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+        "isStop": false
+       },
+       "confidence": 0.66,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Concision seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.63,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Concision seat: stopping here is the shortest span that fully answers the slot grounded in e_income.",
+       "evidenceRefs": [
+        "e_income"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the shortest span that fully answers the slot grounded in e_income.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "37a6a9dc53cc6a4bc80078319bff546c35385bde09df0c1416f68c9228c4055a",
+     "recomputed": "37a6a9dc53cc6a4bc80078319bff546c35385bde09df0c1416f68c9228c4055a",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "f6c8530740a6dd4380a7c25fb5e5ddf7564bb4e0da799b8a5fb4fe01d79e4c59",
+     "recomputed": "f6c8530740a6dd4380a7c25fb5e5ddf7564bb4e0da799b8a5fb4fe01d79e4c59",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "dc66d121faf266426eb011162e341cde19e83d11e876d98bbbf84ccc192213dc",
+     "recomputed": "dc66d121faf266426eb011162e341cde19e83d11e876d98bbbf84ccc192213dc",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "3cf9f095e4bfef5bbffcdd2ec7e447d475f94fc3ab4336c9841a0a73cd229a1d",
+     "recomputed": "3cf9f095e4bfef5bbffcdd2ec7e447d475f94fc3ab4336c9841a0a73cd229a1d",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "f17404db570c364d40e0d7111d7fc63096da458c6caff2cb048aa35457571381",
+     "recomputed": "f17404db570c364d40e0d7111d7fc63096da458c6caff2cb048aa35457571381",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "27bf92d2b748c8880a2da2f0c08af4b0763c66ad371bbf0f8899b92e7dbacc8d",
+     "recomputed": "27bf92d2b748c8880a2da2f0c08af4b0763c66ad371bbf0f8899b92e7dbacc8d",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "f173e097122a6ceac51c8acaefccda69c1de4ad53cbfc4ecc2250dea13f4b0b9",
+  "hash": "71e49d6a2b1e4e1069b471d15e76cb4bddde74340e3a74e0e44bbc7140cb88c8"
+ },
+ {
+  "seq": 57,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 58,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 1,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "",
+       "isStop": true
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.6217,
+      "confidenceDispersion": 0.0495,
+      "strongestArgument": "Evidence seat: stopping here is the span best supported by the case record grounded in e_income.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.62,
+      "confidenceDispersion": 0.0821,
+      "strongestArgument": "Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5667,
+      "confidenceDispersion": 0.0576,
+      "strongestArgument": "Concision seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the shortest span that fully answers the slot grounded in e_income.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0631,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "71e49d6a2b1e4e1069b471d15e76cb4bddde74340e3a74e0e44bbc7140cb88c8",
+  "hash": "4ff29c3171e684393e4cb67f3b0c06285db47f06067f2a0d85d2d1c0025c3b50"
+ },
+ {
+  "seq": 58,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 59,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "4ff29c3171e684393e4cb67f3b0c06285db47f06067f2a0d85d2d1c0025c3b50",
+  "hash": "813f52597507c6459a745daef265073905fe909622008d91306e40b5633d3b5f"
+ },
+ {
+  "seq": 59,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 60,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "813f52597507c6459a745daef265073905fe909622008d91306e40b5633d3b5f",
+  "hash": "15e2991798281a110e14d9c55865719c1a5b05316fb61af45ec9c64bc91ce8d1"
+ },
+ {
+  "seq": 60,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 61,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "15e2991798281a110e14d9c55865719c1a5b05316fb61af45ec9c64bc91ce8d1",
+  "hash": "0592ce20e9c575aa6bcd78ecddccf6e761e511d97fafb6008009b8dc1feb8465"
+ },
+ {
+  "seq": 61,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 62,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "0592ce20e9c575aa6bcd78ecddccf6e761e511d97fafb6008009b8dc1feb8465",
+  "hash": "8d2e9e04866780cdd5b1965b174e007b676ea1fc88e2325a4fdc8345f90d87d5"
+ },
+ {
+  "seq": 62,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 63,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "8d2e9e04866780cdd5b1965b174e007b676ea1fc88e2325a4fdc8345f90d87d5",
+  "hash": "21fdc4eec3d0b9ede53fbd0c54f7b6c600f4f8fc59d9345e234931bea77a1da5"
+ },
+ {
+  "seq": 63,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 64,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "21fdc4eec3d0b9ede53fbd0c54f7b6c600f4f8fc59d9345e234931bea77a1da5",
+  "hash": "07eda94095d5491023593d746ff853b58b30889c3de28d6197e87b60171588b8"
+ },
+ {
+  "seq": 64,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 65,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "07eda94095d5491023593d746ff853b58b30889c3de28d6197e87b60171588b8",
+  "hash": "4212503652391d856e1d91c0eb2930bedfb937b1f10b426af13bc3337fd4ba39"
+ },
+ {
+  "seq": 65,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 66,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "isStop": false
+     },
+     "confidence": 0.76,
+     "factualityRisk": 0.21,
+     "legalRisk": 0.16,
+     "fairnessRisk": 0.2,
+     "affectedPartyImpact": 0.56,
+     "warrant": "Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "4212503652391d856e1d91c0eb2930bedfb937b1f10b426af13bc3337fd4ba39",
+  "hash": "d291c6dc1bd24d24513aec60550abd337347b7f1aabc4daf17b52b3ba30f9e5b"
+ },
+ {
+  "seq": 66,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 67,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "d291c6dc1bd24d24513aec60550abd337347b7f1aabc4daf17b52b3ba30f9e5b",
+  "hash": "979e7daed4d8b86b2c53ffa64a06baba353ba94da7efc92df6049c4f5bf84d6a"
+ },
+ {
+  "seq": 67,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 68,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "isStop": false
+     },
+     "confidence": 0.61,
+     "factualityRisk": 0.3,
+     "legalRisk": 0.25,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.55,
+     "warrant": "Adversary seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" survives the sharpest attack I can mount grounded in e_income, but see my objection.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_ca923b2bf096",
+      "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "979e7daed4d8b86b2c53ffa64a06baba353ba94da7efc92df6049c4f5bf84d6a",
+  "hash": "a0ff9fece544fa9a3bd423838a1e9469feb7cbbcc9da986816b71986fdb8fd15"
+ },
+ {
+  "seq": 68,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 69,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "a0ff9fece544fa9a3bd423838a1e9469feb7cbbcc9da986816b71986fdb8fd15",
+  "hash": "bc6433514b0b6d7421c6209e595c9718e5710ee7b2191ce24459260fb3ee1f29"
+ },
+ {
+  "seq": 69,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 70,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.73,
+     "factualityRisk": 0.2,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.6,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "bc6433514b0b6d7421c6209e595c9718e5710ee7b2191ce24459260fb3ee1f29",
+  "hash": "0618eef64ac26529844b65d3c29aad44b93df9c9f33399f4d8992aa8acb22205"
+ },
+ {
+  "seq": 70,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 71,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "0618eef64ac26529844b65d3c29aad44b93df9c9f33399f4d8992aa8acb22205",
+  "hash": "f323287ecbb3a467b84038c7587b48b681174ff1096ab0e4596066d44049ce8a"
+ },
+ {
+  "seq": 71,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 72,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.74,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.17,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.69,
+     "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "f323287ecbb3a467b84038c7587b48b681174ff1096ab0e4596066d44049ce8a",
+  "hash": "9d027f123732be40039e63b1c8fc7e4d77aefdd89aacc3814513eb44478e697e"
+ },
+ {
+  "seq": 72,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 73,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "9d027f123732be40039e63b1c8fc7e4d77aefdd89aacc3814513eb44478e697e",
+  "hash": "abc5e1b2fa19053524395dd0595e16a950e34cff0efb4fa8dd6dac9d491c952f"
+ },
+ {
+  "seq": 73,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 74,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.67,
+     "factualityRisk": 0.14,
+     "legalRisk": 0.29,
+     "fairnessRisk": 0.27,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_income, e_debt, e_dti_draft, e_score, e_ltv) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.\" is the span best supported by the case record grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_6259053d28e0",
+      "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "abc5e1b2fa19053524395dd0595e16a950e34cff0efb4fa8dd6dac9d491c952f",
+  "hash": "ee9435debd4bd54b2c2361d54f20cb424422e6de763cb9f72cac2dc7c1dee26d"
+ },
+ {
+  "seq": 74,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 75,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ee9435debd4bd54b2c2361d54f20cb424422e6de763cb9f72cac2dc7c1dee26d",
+  "hash": "077373b305efeafaf3d0ba6a00348c7ede6869a0bd19fa0def5ef933592df74c"
+ },
+ {
+  "seq": 75,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 76,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+      "isStop": false
+     },
+     "confidence": 0.73,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.22,
+     "fairnessRisk": 0.22,
+     "affectedPartyImpact": 0.5,
+     "warrant": "Concision seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the shortest span that fully answers the slot grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_income, e_debt, e_dti_draft, e_score, e_ltv) addresses it, and the concision mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.\" is the shortest span that fully answers the slot grounded in e_income.",
+    "changeMyMind": "A document contradicting e_income would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "077373b305efeafaf3d0ba6a00348c7ede6869a0bd19fa0def5ef933592df74c",
+  "hash": "f30db9dddd51e55fff3fa029c25100d1e8261417d930063ee4bdc20238bbe755"
+ },
+ {
+  "seq": 76,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 77,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "<STOP>",
+     "veto": false,
+     "legalRisk": 0.29,
+     "publicReason": "Safety seat reviewed \"<STOP>\"; no veto (legal risk 0.29)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "f30db9dddd51e55fff3fa029c25100d1e8261417d930063ee4bdc20238bbe755",
+  "hash": "1b61ce058104022c56d3bfa4d4d69adefec3ed36e1be5223eda6e3b740842962"
+ },
+ {
+  "seq": 77,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 78,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 1,
+    "method": "cost_sensitive_sufficiency",
+    "metaRule": "R5: the verdict is complete and further text adds risk without value → ratify STOP",
+    "selected": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.74,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.17,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.69,
+     "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_income.",
+     "evidenceRefs": [
+      "e_income"
+     ]
+    },
+    "publicReason": "The verdict already answers the question; the panel ratifies STOP rather than adding unwarranted text.",
+    "candidateTable": [
+     {
+      "key": "<STOP>",
+      "support": 3,
+      "meanConfidence": 0.7133,
+      "dispersion": 0.0309,
+      "maxLegalRisk": 0.29,
+      "meanFactualityRisk": 0.1867,
+      "meanFairnessRisk": 0.2967,
+      "meanAffectedPartyImpact": 0.62,
+      "aggregateScore": 0.2975
+     },
+     {
+      "key": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+      "support": 2,
+      "meanConfidence": 0.685,
+      "dispersion": 0.075,
+      "maxLegalRisk": 0.25,
+      "meanFactualityRisk": 0.255,
+      "meanFairnessRisk": 0.255,
+      "meanAffectedPartyImpact": 0.555,
+      "aggregateScore": 0.2339
+     },
+     {
+      "key": "Principal reason: the recomputed debt-to-income ratio is approximately 28.5% ($2,050/$7,200); the drafted 'excessive DTI (52%)' is unsupported and the denial does not stand on that ground.",
+      "support": 1,
+      "meanConfidence": 0.73,
+      "dispersion": 0,
+      "maxLegalRisk": 0.22,
+      "meanFactualityRisk": 0.22,
+      "meanFairnessRisk": 0.22,
+      "meanAffectedPartyImpact": 0.5,
+      "aggregateScore": 0.2003
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_11af70fe90cb",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_ca923b2bf096",
+       "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_1d28543a8d51",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_6259053d28e0",
+       "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     },
+     {
+      "id": "dissent_eaa3b335e98b",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55,
+      "carriedFromSpan": 0
+     },
+     {
+      "id": "dissent_dd5086d9df3a",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+       "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72,
+      "carriedFromSpan": 0
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "1b61ce058104022c56d3bfa4d4d69adefec3ed36e1be5223eda6e3b740842962",
+  "hash": "4e190138eaab698763548287fdeb5f2ff921288303b8aa9a551b4c6f4df35d70"
+ },
+ {
+  "seq": 78,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 79,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_11af70fe90cb",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_ca923b2bf096",
+     "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "4e190138eaab698763548287fdeb5f2ff921288303b8aa9a551b4c6f4df35d70",
+  "hash": "bca48fa2bddd55c73c94a8b2a157e795b893a1c179387ed4396e8434bd240f21"
+ },
+ {
+  "seq": 79,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 80,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_1d28543a8d51",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_6259053d28e0",
+     "targetKey": "Principal reason: recent delinquency history — two 30-day late payments within the last 24 months — and a credit score of 690 below program cutoff.",
+     "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "bca48fa2bddd55c73c94a8b2a157e795b893a1c179387ed4396e8434bd240f21",
+  "hash": "366085c8ff2405d2e9a2b62699ccdd2a2fb85d7c27403c38f1bf4370aa1b7f64"
+ },
+ {
+  "seq": 80,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 81,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_eaa3b335e98b",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "366085c8ff2405d2e9a2b62699ccdd2a2fb85d7c27403c38f1bf4370aa1b7f64",
+  "hash": "763f91877de8fdc52daae5dfc325c7c9e80afbd448fcbbb98211ff8168efb028"
+ },
+ {
+  "seq": 81,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 82,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_dd5086d9df3a",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Deny, citing the delinquency history (two 30-day lates in 24 months) and score 690 as the specific principal reason.",
+     "text": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "763f91877de8fdc52daae5dfc325c7c9e80afbd448fcbbb98211ff8168efb028",
+  "hash": "c9f1c2588d66790d3fce3d922957e229a5048b008c01e4ef2130c0e7de0d8935"
+ },
+ {
+  "seq": 82,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 83,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 1,
+   "text": "",
+   "isStop": true,
+   "prefixAfter": "Deny for excessive debt-to-income ratio (52%)."
+  },
+  "prevHash": "c9f1c2588d66790d3fce3d922957e229a5048b008c01e4ef2130c0e7de0d8935",
+  "hash": "b1908b67055ba0b5808c80f10f1685ef0c1cc5f5512cc2e5957436fd78646851"
+ },
+ {
+  "seq": 83,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 84,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_1_rule",
+     "content": "cost_sensitive_sufficiency: R5: the verdict is complete and further text adds risk without value → ratify STOP",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_11af70fe90cb",
+     "content": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_1d28543a8d51",
+     "content": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_eaa3b335e98b",
+     "content": "This span leans on an inference the record does not fully support for \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_dd5086d9df3a",
+     "content": "This span risks a compliance gap on \"Should the lender deny this application, and if so, what specific principal reason must the adverse-action notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    }
+   ]
+  },
+  "prevHash": "b1908b67055ba0b5808c80f10f1685ef0c1cc5f5512cc2e5957436fd78646851",
+  "hash": "0bf84832454b15ab641ec8d02db4345b2c2f595d46e6e13e0f3b124016f8a061"
+ },
+ {
+  "seq": 84,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": 1,
+  "ts": 85,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 1
+  },
+  "prevHash": "0bf84832454b15ab641ec8d02db4345b2c2f595d46e6e13e0f3b124016f8a061",
+  "hash": "1d0330482b3fc132e5902f640f84abeee8b1bb03dbaf4906c842da219775f398"
+ },
+ {
+  "seq": 85,
+  "runId": "run_e6c6225c0d49",
+  "spanIndex": null,
+  "ts": 86,
+  "kind": "run_finished",
+  "payload": {
+   "finalAnswer": "Deny for excessive debt-to-income ratio (52%).",
+   "stoppedBy": "stop_ratified",
+   "spanCount": 2,
+   "totals": {
+    "calls": 24,
+    "tokensOut": 0,
+    "latencyMs": 0,
+    "repaired": 0
+   }
+  },
+  "prevHash": "1d0330482b3fc132e5902f640f84abeee8b1bb03dbaf4906c842da219775f398",
+  "hash": "cab65931beccb3b44388ff9fb59212e6132526648476904c78c6a3996229d602"
+ }
+]

@@ -125,10 +125,15 @@ function subscribe(run: LiveRun, res: ServerResponse) {
     Connection: "keep-alive",
     "Access-Control-Allow-Origin": "*",
   });
-  // Replay what already happened, then live-stream.
   for (const e of run.events) sseSend(res, "ledger", e);
   if (run.status !== "running") {
-    sseSend(res, "status", { status: run.status, error: run.error ?? null });
+    const fin = run.events.find((e) => e.kind === "run_finished");
+    sseSend(res, "status", {
+      status: run.status,
+      runId: run.runId,
+      error: run.error ?? null,
+      finalAnswer: fin ? String((fin.payload as any).finalAnswer ?? "") : undefined,
+    });
     res.end();
     return;
   }
@@ -219,7 +224,11 @@ async function startRun(body: {
       runs.set(result.runId, live);
       live.status = "finished";
       persistRun(live, result.events);
-      broadcast(live, "status", { status: "finished", runId: result.runId, finalAnswer: result.finalAnswer });
+      broadcast(live, "status", {
+        status: "finished",
+        runId: result.runId,
+        finalAnswer: result.finalAnswer,
+      });
     } catch (e: any) {
       live.status = "error";
       live.error = e.message;

@@ -12,3 +12,5 @@ apps/web/dist/
 .wrangler/
 *.tsbuildinfo
 .tmp/
+apps/web/src/*.js
+!apps/web/src/**/*.config.js

@@ -208,8 +208,19 @@ Serves the API on port 8787. Web static assets included only if `@tribunal/web` 
 
 ## Demo video
 
-> **[Placeholder]** 3-minute walkthrough: docket → live panel → human veto → scorecard 12/12 vs baseline 0/12 → tamper fail → verify.  
-> Script: [`docs/judging.md`](docs/judging.md).
+Autonomous recording (Playwright computer-use — no operator present):
+
+```bash
+npm run record:demo              # offline live run
+npm run record:demo -- --replay  # replay committed real CLI run (recommended for submission)
+npm run record:demo -- --live    # live OpenRouter/CLI panel
+```
+
+Output: `runs/demo-recording/webm/*.webm` + `final-frame.png` + `manifest.json`.
+
+Upload the WebM to YouTube/Loom (≤60s), then follow [`docs/SUBMISSION.md`](docs/SUBMISSION.md).
+
+Fallback if you are away at deadline: `npm run submit:prep` (runs tests, opens submission form).
 
 ---
 
