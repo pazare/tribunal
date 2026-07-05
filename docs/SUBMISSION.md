@@ -53,6 +53,24 @@ Output:
 
 Upload the WebM/MP4 to **YouTube** (unlisted) or **Loom**. Note the public URL.
 
+Suggested YouTube title:
+
+```text
+Tribunal: Due Process for High-Stakes AI Decisions | RAISE 2026 Cursor Track
+```
+
+Suggested YouTube description:
+
+```text
+Tribunal is an explainable decoder by Pablo Zavala of Carnegie Mellon University (CMU), built for the RAISE Summit Hackathon 2026 Cursor track.
+
+The demo shows high-stakes AI decisions decoded as a recorded election instead of a private paragraph. Six seats propose, critique, revise, veto, ratify, and preserve dissent; every step lands in a hash-chained verdict ledger that can be re-verified. The result is a decision record: what was checked, who objected, what changed, what was vetoed, what dissent survived, and whether the ledger still verifies.
+
+Tribunal is an auditability demo, not a claim of legal compliance or better answer quality. The point is practical due process for AI-mediated decisions that affect money, care, work, speech, benefits, commerce, and account access.
+
+GitHub: https://github.com/pazare/tribunal
+```
+
 ---
 
 ## 4. Submit the form

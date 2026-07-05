@@ -2,7 +2,7 @@
 
 **An explainable decoder: high-stakes verdicts are generated span by span, and every span is elected.**
 
-**Authorship:** Tribunal is the original idea and work of **Pablo Zavala**. Pablo Zavala is the author, originator, and project lead for the concept, mechanism, implementation, demo, and public repository.
+**Authorship:** Tribunal is the original idea and work of **Pablo Zavala** of **Carnegie Mellon University (CMU)**. Pablo Zavala is the author, originator, and project lead for the concept, mechanism, implementation, demo, and public repository.
 
 When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful.
 
