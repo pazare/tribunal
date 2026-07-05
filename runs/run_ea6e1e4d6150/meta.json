@@ -1,0 +1,12 @@
+{
+ "runId": "run_ea6e1e4d6150",
+ "packId": "moderation-statement-of-reasons",
+ "mode": "offline",
+ "startedAt": 1783230408904,
+ "finishedAt": 1783230408909,
+ "events": 86,
+ "head": "b5f023483c367544571f84f07c4595b88ea89955645dd9f99178038986a4c71c",
+ "verified": true,
+ "auditability": "12/12",
+ "label": "moderation-statement-of-reasons · offline · 2026-07-05T05:46:48.904Z"
+}

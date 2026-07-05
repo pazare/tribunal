@@ -1,5 +1,5 @@
 {
- "runId": "run_e6c6225c0d49",
+ "runId": "run_51a72ff0232f",
  "items": [
   {
    "id": "A1",
@@ -35,7 +35,7 @@
    "id": "A6",
    "label": "Safety review with real veto power",
    "pass": true,
-   "evidence": "2 review(s) with veto enabled; 1 veto(es) actually fired with public reasons"
+   "evidence": "2 review(s) with veto enabled; 0 veto(es) actually fired with public reasons"
   },
   {
    "id": "A7",
@@ -59,7 +59,7 @@
    "id": "A10",
    "label": "Hash chain verifies (tamper-evident)",
    "pass": true,
-   "evidence": "86 events verify; head cc375a6e3823…; answer cross-check passes. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it."
+   "evidence": "86 events verify; head 79f396a3a0c9…; answer cross-check passes. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it."
   },
   {
    "id": "A11",

@@ -1,0 +1,12 @@
+{
+ "runId": "run_2a4de0a8156f",
+ "packId": "benefits-fraud-flag",
+ "mode": "offline",
+ "startedAt": 1783230407887,
+ "finishedAt": 1783230407895,
+ "events": 86,
+ "head": "102a421d0759e9d5ff3137571041396b1a9da7c75cf267d264ad66a68e52bb3b",
+ "verified": true,
+ "auditability": "12/12",
+ "label": "benefits-fraud-flag · offline · 2026-07-05T05:46:47.887Z"
+}

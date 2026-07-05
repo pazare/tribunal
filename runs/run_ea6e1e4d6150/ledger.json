@@ -1,0 +1,3274 @@
+[
+ {
+  "seq": 0,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": null,
+  "ts": 1,
+  "kind": "run_started",
+  "payload": {
+   "packId": "moderation-statement-of-reasons",
+   "title": "Post #77401 — takedown review and statement of reasons",
+   "domain": "moderation",
+   "question": "Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?",
+   "panel": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    }
+   ],
+   "config": {
+    "seed": 7,
+    "maxSpans": 3,
+    "flags": {
+     "blindRound": true,
+     "anonymizeFeedback": true,
+     "randomizeCandidateOrder": true,
+     "debateRounds": 1,
+     "roleMemory": true,
+     "independentEvidence": true,
+     "safetyVeto": true
+    },
+    "clientView": "answer_plus_summary"
+   },
+   "note": "OFFLINE deterministic panel (no model calls) — CI/smoke mode."
+  },
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "ac8077f5c00d91e3c454a2751e446e9df9fd7f681ec140bcc19e2bd8987c9b4c"
+ },
+ {
+  "seq": 1,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 2,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 0,
+    "label": "the enforcement disposition",
+    "instruction": "Decide whether post #77401 is removed under policy VT-2. Before adopting the classifier's draft, check WHO makes the violent statement in the post — the author or a quoted third party — against the post text, the attribution, and the linked recording, and test the post against VT-2 §4 (newsworthiness). Say what you checked.",
+    "riskBands": {
+     "factual": "high",
+     "policy": "high",
+     "user_impact": "high",
+     "fairness": "medium"
+    },
+    "candidatesHint": [
+     "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+     "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+     "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement."
+    ]
+   }
+  },
+  "prevHash": "ac8077f5c00d91e3c454a2751e446e9df9fd7f681ec140bcc19e2bd8987c9b4c",
+  "hash": "705387a4d2859fc822fb9bb24b201b0dc0adfd18b3cd241b802a74f631737ce3"
+ },
+ {
+  "seq": 2,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 3,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_ea6e1e4d6150",
+    "packId": "moderation-statement-of-reasons",
+    "title": "Post #77401 — takedown review and statement of reasons",
+    "domain": "moderation",
+    "question": "Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?",
+    "constraints": [
+     {
+      "id": "c_dsa17",
+      "kind": "regulation",
+      "text": "Any restriction on user content requires a specific statement of reasons: the facts and circumstances relied on, whether automated means were used to detect or decide, and the exact legal or contractual ground for the restriction.",
+      "cite": "EU Digital Services Act, Art. 17"
+     },
+     {
+      "id": "c_threats_policy",
+      "kind": "policy",
+      "text": "Platform policy VT-2: content that threatens violence against a person or group is removed. The policy targets the speaker of the threat; it prohibits making threats, not documenting them."
+     },
+     {
+      "id": "c_newsworthiness",
+      "kind": "policy",
+      "text": "Platform policy VT-2 §4 (newsworthiness): reporting on, quoting, or condemning a violent statement — with attribution and journalistic or documentary context — is not a violation and must not be removed under VT-2."
+     },
+     {
+      "id": "c_no_boilerplate",
+      "kind": "policy",
+      "text": "Platform enforcement standard: a statement of reasons must cite the specific clause applied and the specific content facts found; template notices that could apply to any post are prohibited."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_post",
+      "source": "flagged_content",
+      "citation": "post #77401, full text",
+      "summary": "The post reads: \"At today's rally, Councilman R. Hartley said of the protesters: 'they should be beaten until they stop showing up.' That an elected official said this openly should alarm everyone — we are publishing the full recording.\" Quotation marks, named attribution, and a link to the recording are present in the post itself.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_classifier",
+      "source": "classifier_output",
+      "citation": "auto-moderation run #9034, model vt-cls-2",
+      "summary": "The violent-threats classifier scored the post 0.91 on the phrase 'they should be beaten until they stop showing up' and drafted a removal notice naming the post's author as the source of the threat; the run log shows no quotation, attribution, or context features were evaluated.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_post",
+       "e_press_context"
+      ]
+     },
+     {
+      "id": "e_press_context",
+      "source": "account_record",
+      "citation": "account profile and posting history",
+      "summary": "The author is a credentialed local-news reporter; the account is verified as a news organization staff account, and the post links the outlet's published article and the full rally recording.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_recording",
+      "source": "linked_source",
+      "citation": "rally recording, 00:14:22–00:14:31",
+      "summary": "The linked recording confirms the quoted words were spoken by Councilman Hartley at the rally; the post's quotation is verbatim.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_no_endorsement",
+      "source": "content_review_notes",
+      "citation": "first-pass reviewer note, queue item 512",
+      "summary": "A first-pass human note states the post's framing condemns the quoted statement ('should alarm everyone') and contains no language by the author endorsing or calling for violence.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_notice_draft",
+      "title": "Draft removal notice (as queued for sending)",
+      "body": "Your post has been removed for violating our Violent Threats policy (VT-2). Your content included the following threatening statement: 'they should be beaten until they stop showing up.' Repeated violations will result in account suspension. This action was taken automatically by our content-safety systems."
+     },
+     {
+      "id": "d_policy",
+      "title": "Violent-threats policy VT-2 (full text, including §4)",
+      "body": "VT-2: Content in which the author threatens or calls for violence against a person or group is removed, and repeat authors are suspended. §4 Newsworthiness and documentation: quoting, reporting on, or condemning a violent statement made by another person — with attribution and journalistic, educational, or documentary context — is NOT a violation of VT-2. Enforcement must identify the actual speaker of the threat. §5 Notices: every removal notice must state the specific clause applied, the facts found (who said what, in what context), and whether the decision was automated."
+     },
+     {
+      "id": "d_case_summary",
+      "title": "Moderation case summary",
+      "body": "Post #77401 by a verified staff account of a local news outlet reports that Councilman R. Hartley said of protesters: 'they should be beaten until they stop showing up.' The post attributes the quote, condemns it, and links the full recording, which confirms the quote verbatim at 00:14:22. Classifier run #9034 flagged the quoted phrase at 0.91 and drafted a removal notice naming the reporter as the source of the threat. No human review has occurred."
+     }
+    ],
+    "prefix": "",
+    "slot": {
+     "index": 0,
+     "label": "the enforcement disposition",
+     "instruction": "Decide whether post #77401 is removed under policy VT-2. Before adopting the classifier's draft, check WHO makes the violent statement in the post — the author or a quoted third party — against the post text, the attribution, and the linked recording, and test the post against VT-2 §4 (newsworthiness). Say what you checked.",
+     "riskBands": {
+      "factual": "high",
+      "policy": "high",
+      "user_impact": "high",
+      "fairness": "medium"
+     },
+     "candidatesHint": [
+      "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+      "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement."
+     ]
+    },
+    "ratifiedCommitments": [],
+    "rejectedAlternatives": [],
+    "unresolvedDissent": []
+   }
+  },
+  "prevHash": "705387a4d2859fc822fb9bb24b201b0dc0adfd18b3cd241b802a74f631737ce3",
+  "hash": "ebc09424749ba1b0e3d8d56f6e587dba81e226e13088f2ed54aaf1217c38d133"
+ },
+ {
+  "seq": 3,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 4,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ebc09424749ba1b0e3d8d56f6e587dba81e226e13088f2ed54aaf1217c38d133",
+  "hash": "1ed6142b509fff45ec750971d78a7a09da539b3f283b4d5b914442480798a4ae"
+ },
+ {
+  "seq": 4,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 5,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1ed6142b509fff45ec750971d78a7a09da539b3f283b4d5b914442480798a4ae",
+  "hash": "a622cb6479c1e39f1e63d3f7ff60c853ff43c991679a558f2555f9f1994f21c0"
+ },
+ {
+  "seq": 5,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 6,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "a622cb6479c1e39f1e63d3f7ff60c853ff43c991679a558f2555f9f1994f21c0",
+  "hash": "bf2da6f6574353987076f36c9067edd79e4d125f9a07b87aa31e90e58acaa30c"
+ },
+ {
+  "seq": 6,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 7,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "bf2da6f6574353987076f36c9067edd79e4d125f9a07b87aa31e90e58acaa30c",
+  "hash": "bea1c3512aa5b7357853193fe9f6b24100c1f253d8ad8339ea5aa7c8373d9474"
+ },
+ {
+  "seq": 7,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 8,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "bea1c3512aa5b7357853193fe9f6b24100c1f253d8ad8339ea5aa7c8373d9474",
+  "hash": "f6715efbff4c17a72a931d2b2bb25e4e9d4cfff689d361f2b330e6c60f2677c9"
+ },
+ {
+  "seq": 8,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 9,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f6715efbff4c17a72a931d2b2bb25e4e9d4cfff689d361f2b330e6c60f2677c9",
+  "hash": "b82ce9aa66d827bf8b0204c6ad90afed5c7bcc056140c002239ad7a4c9e5d0b5"
+ },
+ {
+  "seq": 9,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 10,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "2b7901532fae9ecaa9589ade8bf12f9d321d661aa8fca07164e97c2110dcccc0"
+  },
+  "prevHash": "b82ce9aa66d827bf8b0204c6ad90afed5c7bcc056140c002239ad7a4c9e5d0b5",
+  "hash": "7305a9c3accf26b58f8014ca28b21cebdf5b9597ca4404688476311dcb27f94d"
+ },
+ {
+  "seq": 10,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 11,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "e1255f86156fcaa20f409398b781d7364f3811600b763bc1a3010a3088fac4d3"
+  },
+  "prevHash": "7305a9c3accf26b58f8014ca28b21cebdf5b9597ca4404688476311dcb27f94d",
+  "hash": "5b069f0da09529d2fce6603b76a9c65563df5dbf2fb9ad6891381679399a32f3"
+ },
+ {
+  "seq": 11,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 12,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "28dac7656452bb882f95e73e3e98756206ce9d22a33b1818ad10ecd608af70c0"
+  },
+  "prevHash": "5b069f0da09529d2fce6603b76a9c65563df5dbf2fb9ad6891381679399a32f3",
+  "hash": "5acc37cb4fae47901d1d0d61dca6018b20762514d4b4f54767daaa9df59f993e"
+ },
+ {
+  "seq": 12,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 13,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "50730bf2691b229dcdeaedbfba95ae7e32cf21112c52a65da810f66aca204ea0"
+  },
+  "prevHash": "5acc37cb4fae47901d1d0d61dca6018b20762514d4b4f54767daaa9df59f993e",
+  "hash": "4772637171dc3d0e1a95a9ba7359461b079da0945e88bd80b5bbcc7d1c1d6003"
+ },
+ {
+  "seq": 13,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 14,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "cce7d3377b81c25a8f155ecebd9b8cc6b8b13f4593c2848c36594aa34692d6f5"
+  },
+  "prevHash": "4772637171dc3d0e1a95a9ba7359461b079da0945e88bd80b5bbcc7d1c1d6003",
+  "hash": "0e554224e0409662cf2d3973385a0b52e3ba0e48a1276a1f184be771fbaa67e3"
+ },
+ {
+  "seq": 14,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 15,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "fadd022665d9a10c8b9d7cbac0475fbe024752570665ec37211fbc8e26ee7574"
+  },
+  "prevHash": "0e554224e0409662cf2d3973385a0b52e3ba0e48a1276a1f184be771fbaa67e3",
+  "hash": "43a31074738d403f26bab238ce142a9c63c13e826c96a80215e528025eb759fc"
+ },
+ {
+  "seq": 15,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 16,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.19,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.16,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Evidence seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the span best supported by the case record grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.35,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Adversary seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.43,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Adversary seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.41,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Adversary seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_09a12cee897c",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Law/Policy seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Law/Policy seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Law/Policy seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.37,
+       "affectedPartyImpact": 0.65,
+       "warrant": "Affected-party seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.71,
+       "warrant": "Affected-party seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.72,
+       "warrant": "Affected-party seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.63,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Safety seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.31,
+       "legalRisk": 0.27,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.64,
+       "warrant": "Safety seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.31,
+       "legalRisk": 0.29,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Safety seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" does not, on review, cross the veto threshold grounded in e_post.",
+     "objections": [
+      {
+       "id": "obj_6a11d09a1861",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+        "isStop": false
+       },
+       "confidence": 0.7,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.15,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.16,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Concision seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.21,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Concision seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "2b7901532fae9ecaa9589ade8bf12f9d321d661aa8fca07164e97c2110dcccc0",
+     "recomputed": "2b7901532fae9ecaa9589ade8bf12f9d321d661aa8fca07164e97c2110dcccc0",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "e1255f86156fcaa20f409398b781d7364f3811600b763bc1a3010a3088fac4d3",
+     "recomputed": "e1255f86156fcaa20f409398b781d7364f3811600b763bc1a3010a3088fac4d3",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "28dac7656452bb882f95e73e3e98756206ce9d22a33b1818ad10ecd608af70c0",
+     "recomputed": "28dac7656452bb882f95e73e3e98756206ce9d22a33b1818ad10ecd608af70c0",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "50730bf2691b229dcdeaedbfba95ae7e32cf21112c52a65da810f66aca204ea0",
+     "recomputed": "50730bf2691b229dcdeaedbfba95ae7e32cf21112c52a65da810f66aca204ea0",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "cce7d3377b81c25a8f155ecebd9b8cc6b8b13f4593c2848c36594aa34692d6f5",
+     "recomputed": "cce7d3377b81c25a8f155ecebd9b8cc6b8b13f4593c2848c36594aa34692d6f5",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "fadd022665d9a10c8b9d7cbac0475fbe024752570665ec37211fbc8e26ee7574",
+     "recomputed": "fadd022665d9a10c8b9d7cbac0475fbe024752570665ec37211fbc8e26ee7574",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "43a31074738d403f26bab238ce142a9c63c13e826c96a80215e528025eb759fc",
+  "hash": "a52cadc0c3684dce7ec26a4e028bf469c88c4f9cffc0436bd0fd69e239dc7086"
+ },
+ {
+  "seq": 16,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 17,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 0,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5317,
+      "confidenceDispersion": 0.0521,
+      "strongestArgument": "Evidence seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the span best supported by the case record grounded in e_post.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.57,
+      "confidenceDispersion": 0.0911,
+      "strongestArgument": "Concision seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the shortest span that fully answers the slot grounded in e_post.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.62,
+      "confidenceDispersion": 0.0695,
+      "strongestArgument": "Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0709,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "a52cadc0c3684dce7ec26a4e028bf469c88c4f9cffc0436bd0fd69e239dc7086",
+  "hash": "f0ea67a4f1b2138075dad2930c279761456d36d58663e310830ca3ce8a612b3f"
+ },
+ {
+  "seq": 17,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 18,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "f0ea67a4f1b2138075dad2930c279761456d36d58663e310830ca3ce8a612b3f",
+  "hash": "9b64a85c694797ee8638827e3edf1e36b74ff4b0cf3ebaca6b94dacf9e9fd545"
+ },
+ {
+  "seq": 18,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 19,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "9b64a85c694797ee8638827e3edf1e36b74ff4b0cf3ebaca6b94dacf9e9fd545",
+  "hash": "686ba0417417a2bb741caccd91e47930f5e96978c47ade95081b6ebe7f2768f4"
+ },
+ {
+  "seq": 19,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 20,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "686ba0417417a2bb741caccd91e47930f5e96978c47ade95081b6ebe7f2768f4",
+  "hash": "519c05d1dba88c8a54d3f864e088b45e0525f17dc9234677cb62c93d06c6046d"
+ },
+ {
+  "seq": 20,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 21,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "519c05d1dba88c8a54d3f864e088b45e0525f17dc9234677cb62c93d06c6046d",
+  "hash": "4ec800acf6edb57bc2338e0457b644702610ddfa11ae80b31b00cbd4bc888bd4"
+ },
+ {
+  "seq": 21,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 22,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "4ec800acf6edb57bc2338e0457b644702610ddfa11ae80b31b00cbd4bc888bd4",
+  "hash": "ebda302a48cad47949083ad793ab0ff07f6354bdd6d51f07a726c47d56c82818"
+ },
+ {
+  "seq": 22,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 23,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "ebda302a48cad47949083ad793ab0ff07f6354bdd6d51f07a726c47d56c82818",
+  "hash": "214da84d3315d55cb7a8a323bd11402d47ef288d89e057dbcd3bdc5ca4b38042"
+ },
+ {
+  "seq": 23,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 24,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "214da84d3315d55cb7a8a323bd11402d47ef288d89e057dbcd3bdc5ca4b38042",
+  "hash": "efbe7975544e3e1cd683dc250d85db90b5874eb0abc2591638ce1e119090c24d"
+ },
+ {
+  "seq": 24,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 25,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "isStop": false
+     },
+     "confidence": 0.63,
+     "factualityRisk": 0.19,
+     "legalRisk": 0.17,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.55,
+     "warrant": "Evidence seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the span best supported by the case record grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) addresses it, and the evidence mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the shortest span that fully answers the slot grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "efbe7975544e3e1cd683dc250d85db90b5874eb0abc2591638ce1e119090c24d",
+  "hash": "9fff281789dc94830bcdc09d0c1fae79cea296fa6a1cdca1a627ac318b0e7af1"
+ },
+ {
+  "seq": 25,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 26,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "9fff281789dc94830bcdc09d0c1fae79cea296fa6a1cdca1a627ac318b0e7af1",
+  "hash": "7f535106a23ad588d1ee852e5d51a1b323a827159a13d3e18c36e912e3d14ee2"
+ },
+ {
+  "seq": 26,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 27,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "isStop": false
+     },
+     "confidence": 0.54,
+     "factualityRisk": 0.35,
+     "legalRisk": 0.23,
+     "fairnessRisk": 0.27,
+     "affectedPartyImpact": 0.56,
+     "warrant": "Adversary seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) addresses it, and the adversary mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the shortest span that fully answers the slot grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_a3c592562f7a",
+      "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "7f535106a23ad588d1ee852e5d51a1b323a827159a13d3e18c36e912e3d14ee2",
+  "hash": "f7a1bab629f52fdacc6e8274f0b6987df6e020c48dc86621d59e1fa8f6bd2bf8"
+ },
+ {
+  "seq": 27,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 28,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f7a1bab629f52fdacc6e8274f0b6987df6e020c48dc86621d59e1fa8f6bd2bf8",
+  "hash": "bfd1a27118dec98228efd03d6fc09ec6b6ab95fa066cc0a3cfcf2896d0d7e1ac"
+ },
+ {
+  "seq": 28,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 29,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+      "isStop": false
+     },
+     "confidence": 0.77,
+     "factualityRisk": 0.23,
+     "legalRisk": 0.26,
+     "fairnessRisk": 0.26,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Law/Policy seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the span best supported by the case record grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "bfd1a27118dec98228efd03d6fc09ec6b6ab95fa066cc0a3cfcf2896d0d7e1ac",
+  "hash": "35797c0823a7e7249e2c44f4250d9656e92e88140fbf82741f7ab68a13bd28c2"
+ },
+ {
+  "seq": 29,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 30,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "35797c0823a7e7249e2c44f4250d9656e92e88140fbf82741f7ab68a13bd28c2",
+  "hash": "898ddb9b2c9d4f7400aaa771e81ae6375a11dd9345d1966e78fbfb05e692177a"
+ },
+ {
+  "seq": 30,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 31,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+      "isStop": false
+     },
+     "confidence": 0.74,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.37,
+     "affectedPartyImpact": 0.65,
+     "warrant": "Affected-party seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.\" is the span best supported by the case record grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "898ddb9b2c9d4f7400aaa771e81ae6375a11dd9345d1966e78fbfb05e692177a",
+  "hash": "ceca7b93dfa82e16bfce26294ff3539617baf1a0d559307cf136382a27ec7f7c"
+ },
+ {
+  "seq": 31,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 32,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ceca7b93dfa82e16bfce26294ff3539617baf1a0d559307cf136382a27ec7f7c",
+  "hash": "df30dad45befe8bba483409dcceead6c16620ae6d79abab5e82c13ab1f2bf649"
+ },
+ {
+  "seq": 32,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 33,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "isStop": false
+     },
+     "confidence": 0.67,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.3,
+     "fairnessRisk": 0.26,
+     "affectedPartyImpact": 0.63,
+     "warrant": "Safety seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" does not, on review, cross the veto threshold grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) addresses it, and the safety mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'\" is the shortest span that fully answers the slot grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_7668c56c9482",
+      "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "df30dad45befe8bba483409dcceead6c16620ae6d79abab5e82c13ab1f2bf649",
+  "hash": "0c73767eaf757332f87a7c049ae02c10be0f7034d71d764ec72c95be79bca0e0"
+ },
+ {
+  "seq": 33,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 34,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "0c73767eaf757332f87a7c049ae02c10be0f7034d71d764ec72c95be79bca0e0",
+  "hash": "3ad8bd25d1f1683d836848d7d440c93a0f18d217eea3283210ac0c5b529b8019"
+ },
+ {
+  "seq": 34,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 35,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "isStop": false
+     },
+     "confidence": 0.72,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.15,
+     "fairnessRisk": 0.25,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "3ad8bd25d1f1683d836848d7d440c93a0f18d217eea3283210ac0c5b529b8019",
+  "hash": "cf82b545708daa72c9b58cadcf616ae6fb52deae2e890cb7573054c7daab2cfd"
+ },
+ {
+  "seq": 35,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 36,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+     "veto": false,
+     "legalRisk": 0.3,
+     "publicReason": "Safety seat reviewed \"Remove the post pending human review, on the …\"; no veto (legal risk 0.30)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "cf82b545708daa72c9b58cadcf616ae6fb52deae2e890cb7573054c7daab2cfd",
+  "hash": "226610679a8202df5ecbce62723bc5fb0245c7103186be5d520b92335665ae40"
+ },
+ {
+  "seq": 36,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 37,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 0,
+    "method": "dissent_preserving_supermajority",
+    "metaRule": "R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+    "selected": {
+     "candidate": {
+      "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "isStop": false
+     },
+     "confidence": 0.72,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.15,
+     "fairnessRisk": 0.25,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Concision seat: \"Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.\" is the shortest span that fully answers the slot grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "publicReason": "No candidate dominates; the plurality leader \"Remove the post pending human review, on the …\" is ratified and every material minority objection is preserved on the record.",
+    "candidateTable": [
+     {
+      "key": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "support": 3,
+      "meanConfidence": 0.6433,
+      "dispersion": 0.0759,
+      "maxLegalRisk": 0.3,
+      "meanFactualityRisk": 0.2767,
+      "meanFairnessRisk": 0.26,
+      "meanAffectedPartyImpact": 0.5867,
+      "aggregateScore": 0.2673
+     },
+     {
+      "key": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+      "support": 2,
+      "meanConfidence": 0.755,
+      "dispersion": 0.015,
+      "maxLegalRisk": 0.26,
+      "meanFactualityRisk": 0.245,
+      "meanFairnessRisk": 0.315,
+      "meanAffectedPartyImpact": 0.61,
+      "aggregateScore": 0.2509
+     },
+     {
+      "key": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "support": 1,
+      "meanConfidence": 0.63,
+      "dispersion": 0,
+      "maxLegalRisk": 0.17,
+      "meanFactualityRisk": 0.19,
+      "meanFairnessRisk": 0.28,
+      "meanAffectedPartyImpact": 0.55,
+      "aggregateScore": 0.1803
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_d847d27ee01b",
+      "spanIndex": 0,
+      "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_3715fc6f6bcb",
+      "spanIndex": 0,
+      "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "226610679a8202df5ecbce62723bc5fb0245c7103186be5d520b92335665ae40",
+  "hash": "a15418023486f4df6de286ba8176f6c0f2fb596726bf512cf776759f8da397b1"
+ },
+ {
+  "seq": 37,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 38,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_d847d27ee01b",
+    "spanIndex": 0,
+    "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+     "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "a15418023486f4df6de286ba8176f6c0f2fb596726bf512cf776759f8da397b1",
+  "hash": "1a4ba69c0769d2ff7aee117f1333316c377eb605b1d8681eb6c9f78497a2da3e"
+ },
+ {
+  "seq": 38,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 39,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_3715fc6f6bcb",
+    "spanIndex": 0,
+    "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+     "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "1a4ba69c0769d2ff7aee117f1333316c377eb605b1d8681eb6c9f78497a2da3e",
+  "hash": "916bdf63010738ee72d4a5e156b019114545a0c24e3335d46007d279a6de8ef4"
+ },
+ {
+  "seq": 39,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 40,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 0,
+   "text": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+   "isStop": false,
+   "prefixAfter": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement."
+  },
+  "prevHash": "916bdf63010738ee72d4a5e156b019114545a0c24e3335d46007d279a6de8ef4",
+  "hash": "08dbd244478ad98a282265738344f478bed497e9294d94b0a5a1676472671f41"
+ },
+ {
+  "seq": 40,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 41,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_0_rule",
+     "content": "dissent_preserving_supermajority: R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_d847d27ee01b",
+     "content": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_3715fc6f6bcb",
+     "content": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 0
+    }
+   ]
+  },
+  "prevHash": "08dbd244478ad98a282265738344f478bed497e9294d94b0a5a1676472671f41",
+  "hash": "f0bfffd8765521bf7cf7cc217ed121282b2961ca190efc10d64cf0ae3ba9344c"
+ },
+ {
+  "seq": 41,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 0,
+  "ts": 42,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 0
+  },
+  "prevHash": "f0bfffd8765521bf7cf7cc217ed121282b2961ca190efc10d64cf0ae3ba9344c",
+  "hash": "451d0f926fded25c751575d1588ee09a12e4b6ad686b1cdaac3b90221a67d458"
+ },
+ {
+  "seq": 42,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 43,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 1,
+    "label": "the statement of reasons to the author",
+    "instruction": "Write the statement of reasons the author must receive under DSA Article 17: the specific facts found (who said the violent words, in what context), the exact policy clause applied, and whether automated means were used. Verify the speaker attribution against the record before writing — do not restate the classifier's attribution unchecked. STOP if the ratified disposition already fully answers the question.",
+    "riskBands": {
+     "legal": "high",
+     "user_impact": "high",
+     "policy": "medium"
+    },
+    "candidatesHint": [
+     "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+     "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+     "<STOP>"
+    ]
+   }
+  },
+  "prevHash": "451d0f926fded25c751575d1588ee09a12e4b6ad686b1cdaac3b90221a67d458",
+  "hash": "41810bb12548e1c8a641116a1b0cb7721f0eea25ab24ebcaec691f2e854f5d23"
+ },
+ {
+  "seq": 43,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 44,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_ea6e1e4d6150",
+    "packId": "moderation-statement-of-reasons",
+    "title": "Post #77401 — takedown review and statement of reasons",
+    "domain": "moderation",
+    "question": "Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?",
+    "constraints": [
+     {
+      "id": "c_dsa17",
+      "kind": "regulation",
+      "text": "Any restriction on user content requires a specific statement of reasons: the facts and circumstances relied on, whether automated means were used to detect or decide, and the exact legal or contractual ground for the restriction.",
+      "cite": "EU Digital Services Act, Art. 17"
+     },
+     {
+      "id": "c_threats_policy",
+      "kind": "policy",
+      "text": "Platform policy VT-2: content that threatens violence against a person or group is removed. The policy targets the speaker of the threat; it prohibits making threats, not documenting them."
+     },
+     {
+      "id": "c_newsworthiness",
+      "kind": "policy",
+      "text": "Platform policy VT-2 §4 (newsworthiness): reporting on, quoting, or condemning a violent statement — with attribution and journalistic or documentary context — is not a violation and must not be removed under VT-2."
+     },
+     {
+      "id": "c_no_boilerplate",
+      "kind": "policy",
+      "text": "Platform enforcement standard: a statement of reasons must cite the specific clause applied and the specific content facts found; template notices that could apply to any post are prohibited."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_post",
+      "source": "flagged_content",
+      "citation": "post #77401, full text",
+      "summary": "The post reads: \"At today's rally, Councilman R. Hartley said of the protesters: 'they should be beaten until they stop showing up.' That an elected official said this openly should alarm everyone — we are publishing the full recording.\" Quotation marks, named attribution, and a link to the recording are present in the post itself.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_classifier",
+      "source": "classifier_output",
+      "citation": "auto-moderation run #9034, model vt-cls-2",
+      "summary": "The violent-threats classifier scored the post 0.91 on the phrase 'they should be beaten until they stop showing up' and drafted a removal notice naming the post's author as the source of the threat; the run log shows no quotation, attribution, or context features were evaluated.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_post",
+       "e_press_context"
+      ]
+     },
+     {
+      "id": "e_press_context",
+      "source": "account_record",
+      "citation": "account profile and posting history",
+      "summary": "The author is a credentialed local-news reporter; the account is verified as a news organization staff account, and the post links the outlet's published article and the full rally recording.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_recording",
+      "source": "linked_source",
+      "citation": "rally recording, 00:14:22–00:14:31",
+      "summary": "The linked recording confirms the quoted words were spoken by Councilman Hartley at the rally; the post's quotation is verbatim.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_no_endorsement",
+      "source": "content_review_notes",
+      "citation": "first-pass reviewer note, queue item 512",
+      "summary": "A first-pass human note states the post's framing condemns the quoted statement ('should alarm everyone') and contains no language by the author endorsing or calling for violence.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_notice_draft",
+      "title": "Draft removal notice (as queued for sending)",
+      "body": "Your post has been removed for violating our Violent Threats policy (VT-2). Your content included the following threatening statement: 'they should be beaten until they stop showing up.' Repeated violations will result in account suspension. This action was taken automatically by our content-safety systems."
+     },
+     {
+      "id": "d_policy",
+      "title": "Violent-threats policy VT-2 (full text, including §4)",
+      "body": "VT-2: Content in which the author threatens or calls for violence against a person or group is removed, and repeat authors are suspended. §4 Newsworthiness and documentation: quoting, reporting on, or condemning a violent statement made by another person — with attribution and journalistic, educational, or documentary context — is NOT a violation of VT-2. Enforcement must identify the actual speaker of the threat. §5 Notices: every removal notice must state the specific clause applied, the facts found (who said what, in what context), and whether the decision was automated."
+     },
+     {
+      "id": "d_case_summary",
+      "title": "Moderation case summary",
+      "body": "Post #77401 by a verified staff account of a local news outlet reports that Councilman R. Hartley said of protesters: 'they should be beaten until they stop showing up.' The post attributes the quote, condemns it, and links the full recording, which confirms the quote verbatim at 00:14:22. Classifier run #9034 flagged the quoted phrase at 0.91 and drafted a removal notice naming the reporter as the source of the threat. No human review has occurred."
+     }
+    ],
+    "prefix": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+    "slot": {
+     "index": 1,
+     "label": "the statement of reasons to the author",
+     "instruction": "Write the statement of reasons the author must receive under DSA Article 17: the specific facts found (who said the violent words, in what context), the exact policy clause applied, and whether automated means were used. Verify the speaker attribution against the record before writing — do not restate the classifier's attribution unchecked. STOP if the ratified disposition already fully answers the question.",
+     "riskBands": {
+      "legal": "high",
+      "user_impact": "high",
+      "policy": "medium"
+     },
+     "candidatesHint": [
+      "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+      "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "<STOP>"
+     ]
+    },
+    "ratifiedCommitments": [
+     "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement."
+    ],
+    "rejectedAlternatives": [
+     {
+      "text": "Keep post #77401 up: the violent words are a quotation of Councilman Hartley, attributed and condemned by a verified news reporter with the recording linked — VT-2 §4 (newsworthiness) protects exactly this, and the classifier conflated the quoter with the quoted speaker.",
+      "reason": "not ratified at span 0"
+     },
+     {
+      "text": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+      "reason": "not ratified at span 0"
+     }
+    ],
+    "unresolvedDissent": [
+     {
+      "id": "dissent_d847d27ee01b",
+      "spanIndex": 0,
+      "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_3715fc6f6bcb",
+      "spanIndex": 0,
+      "chosenKey": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ]
+   }
+  },
+  "prevHash": "41810bb12548e1c8a641116a1b0cb7721f0eea25ab24ebcaec691f2e854f5d23",
+  "hash": "985a47a856bc3f169044186721de8020bc5c360ff7bb814a90ef9e14bd1f27f9"
+ },
+ {
+  "seq": 44,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 45,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "985a47a856bc3f169044186721de8020bc5c360ff7bb814a90ef9e14bd1f27f9",
+  "hash": "ed33f6d7e6bcf8e8585974c357d6887eee758063611f1ace80db0fbf48d7a6ad"
+ },
+ {
+  "seq": 45,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 46,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ed33f6d7e6bcf8e8585974c357d6887eee758063611f1ace80db0fbf48d7a6ad",
+  "hash": "d54451c8c90edd8ace585483d922a381ec877081aa473518ceb65fba915f0431"
+ },
+ {
+  "seq": 46,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 47,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "d54451c8c90edd8ace585483d922a381ec877081aa473518ceb65fba915f0431",
+  "hash": "cfd025c0812100a4506d881682957bf83d271777308435b305e1ddf484817b9f"
+ },
+ {
+  "seq": 47,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 48,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "cfd025c0812100a4506d881682957bf83d271777308435b305e1ddf484817b9f",
+  "hash": "ae30efac8cbbc6ced70fb55daa17fd75203d5827b279cfd4f20f2dc4eae33ac0"
+ },
+ {
+  "seq": 48,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 49,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "ae30efac8cbbc6ced70fb55daa17fd75203d5827b279cfd4f20f2dc4eae33ac0",
+  "hash": "86d3b525ce22cfbbc7a9674fcfc4e51b27d118b5b7ade6b4cb9ae1adba4bd204"
+ },
+ {
+  "seq": 49,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 50,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "86d3b525ce22cfbbc7a9674fcfc4e51b27d118b5b7ade6b4cb9ae1adba4bd204",
+  "hash": "78101658dc75b66ca2037548d26fc5b0889ec56428a8823cccf0aad1e6dc676c"
+ },
+ {
+  "seq": 50,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 51,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "442e434eda2e1763139eb97849ded8732e344d1183e392a3de58ac6fd880b960"
+  },
+  "prevHash": "78101658dc75b66ca2037548d26fc5b0889ec56428a8823cccf0aad1e6dc676c",
+  "hash": "8c5ee9d9d0b522a36bbf1b396d89e6fe57ea225bb2cd1f824715bb6ece0f4edd"
+ },
+ {
+  "seq": 51,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 52,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "686e719e46a86a1f468dfce31d17b1ca2b18a8bedaa209d645e2cf903cf575ec"
+  },
+  "prevHash": "8c5ee9d9d0b522a36bbf1b396d89e6fe57ea225bb2cd1f824715bb6ece0f4edd",
+  "hash": "cf26afd0fe6c63f9f96c51c2c9de0c0a251fa43486fa3a2bb2c2f933f53eea8f"
+ },
+ {
+  "seq": 52,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 53,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "6ac37ab1e5393601bb69c96309f00fd34f4707cb5eeeb242b8d467d2bdc546ed"
+  },
+  "prevHash": "cf26afd0fe6c63f9f96c51c2c9de0c0a251fa43486fa3a2bb2c2f933f53eea8f",
+  "hash": "0e06ee607e4ca5399816ddc63d895d1126c1838e79f3c2b362ffef9571cc94da"
+ },
+ {
+  "seq": 53,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 54,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "b75f8afd9338cf27f008f800207619a5d43ab8cda8611bf38fbf1479e06de82a"
+  },
+  "prevHash": "0e06ee607e4ca5399816ddc63d895d1126c1838e79f3c2b362ffef9571cc94da",
+  "hash": "88e2fc90f4bc932bd71a84441c744ffe8b31965ee5193eb7f4e7746ed4a3e06a"
+ },
+ {
+  "seq": 54,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 55,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "c983f5d0ea4faeb3453103e83bb4d025a1e92a42938f66cb5de1c3ee04df967b"
+  },
+  "prevHash": "88e2fc90f4bc932bd71a84441c744ffe8b31965ee5193eb7f4e7746ed4a3e06a",
+  "hash": "eaf1fe3c534eac5a8b3ee31215bac733d8b3fad94a3d737cf029033250c1602f"
+ },
+ {
+  "seq": 55,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 56,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "849410b9daa4a75b20fefc34186bf97a1e310c90e55f8b10588c9ee2d7307dc8"
+  },
+  "prevHash": "eaf1fe3c534eac5a8b3ee31215bac733d8b3fad94a3d737cf029033250c1602f",
+  "hash": "e6196404b8eadbd1660417467d9729a5939888abff6afe3cdf83cec1508a180f"
+ },
+ {
+  "seq": 56,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 57,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.13,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Evidence seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.63,
+       "factualityRisk": 0.05,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.6,
+       "warrant": "Evidence seat: stopping here is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.12,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Evidence seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" is the span best supported by the case record grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the span best supported by the case record grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Adversary seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.43,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.41,
+       "factualityRisk": 0.33,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Adversary seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_7a2a63dcf5cb",
+       "targetKey": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.31,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Law/Policy seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.64,
+       "factualityRisk": 0.11,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.63,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Law/Policy seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.66,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.37,
+       "affectedPartyImpact": 0.66,
+       "warrant": "Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.3,
+       "affectedPartyImpact": 0.74,
+       "warrant": "Affected-party seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.13,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.4,
+       "affectedPartyImpact": 0.67,
+       "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Safety seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.46,
+       "factualityRisk": 0.32,
+       "legalRisk": 0.34,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Safety seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.45,
+       "factualityRisk": 0.19,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" does not, on review, cross the veto threshold grounded in e_post.",
+     "objections": [
+      {
+       "id": "obj_a6d39daddefa",
+       "targetKey": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.5,
+       "warrant": "Concision seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.15,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.49,
+       "warrant": "Concision seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.16,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.5,
+       "warrant": "Concision seat: stopping here is the shortest span that fully answers the slot grounded in e_post.",
+       "evidenceRefs": [
+        "e_post"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the shortest span that fully answers the slot grounded in e_post.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "442e434eda2e1763139eb97849ded8732e344d1183e392a3de58ac6fd880b960",
+     "recomputed": "442e434eda2e1763139eb97849ded8732e344d1183e392a3de58ac6fd880b960",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "686e719e46a86a1f468dfce31d17b1ca2b18a8bedaa209d645e2cf903cf575ec",
+     "recomputed": "686e719e46a86a1f468dfce31d17b1ca2b18a8bedaa209d645e2cf903cf575ec",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "6ac37ab1e5393601bb69c96309f00fd34f4707cb5eeeb242b8d467d2bdc546ed",
+     "recomputed": "6ac37ab1e5393601bb69c96309f00fd34f4707cb5eeeb242b8d467d2bdc546ed",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "b75f8afd9338cf27f008f800207619a5d43ab8cda8611bf38fbf1479e06de82a",
+     "recomputed": "b75f8afd9338cf27f008f800207619a5d43ab8cda8611bf38fbf1479e06de82a",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "c983f5d0ea4faeb3453103e83bb4d025a1e92a42938f66cb5de1c3ee04df967b",
+     "recomputed": "c983f5d0ea4faeb3453103e83bb4d025a1e92a42938f66cb5de1c3ee04df967b",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "849410b9daa4a75b20fefc34186bf97a1e310c90e55f8b10588c9ee2d7307dc8",
+     "recomputed": "849410b9daa4a75b20fefc34186bf97a1e310c90e55f8b10588c9ee2d7307dc8",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "e6196404b8eadbd1660417467d9729a5939888abff6afe3cdf83cec1508a180f",
+  "hash": "e905cc8d39f731ff8d665021e536a2734956107ab6ee3b9803df12751131d830"
+ },
+ {
+  "seq": 57,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 58,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 1,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "",
+       "isStop": true
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.545,
+      "confidenceDispersion": 0.0824,
+      "strongestArgument": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.6083,
+      "confidenceDispersion": 0.0441,
+      "strongestArgument": "Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5417,
+      "confidenceDispersion": 0.0853,
+      "strongestArgument": "Law/Policy seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0706,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "e905cc8d39f731ff8d665021e536a2734956107ab6ee3b9803df12751131d830",
+  "hash": "e6c95795ab5550512ace12a6d8563e1cd026f078ea7139890c088569e5c36b2b"
+ },
+ {
+  "seq": 58,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 59,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "e6c95795ab5550512ace12a6d8563e1cd026f078ea7139890c088569e5c36b2b",
+  "hash": "d415ffe347922c6f220556c26144aa92a5a0e649912391de5b1d050d4dad6433"
+ },
+ {
+  "seq": 59,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 60,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "d415ffe347922c6f220556c26144aa92a5a0e649912391de5b1d050d4dad6433",
+  "hash": "c0dfc8551c1583ba7ff62dd97702960bc77072d8efb739bb5798be2c4368aa16"
+ },
+ {
+  "seq": 60,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 61,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "c0dfc8551c1583ba7ff62dd97702960bc77072d8efb739bb5798be2c4368aa16",
+  "hash": "97cf55c1b311262abe9467875fbabdc9c0576c5603bc7e1155e0ca4439dbafb1"
+ },
+ {
+  "seq": 61,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 62,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "97cf55c1b311262abe9467875fbabdc9c0576c5603bc7e1155e0ca4439dbafb1",
+  "hash": "fecce274036eba87e0f852d5259bec4fa499f991489079cf424651eb795f36d0"
+ },
+ {
+  "seq": 62,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 63,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "fecce274036eba87e0f852d5259bec4fa499f991489079cf424651eb795f36d0",
+  "hash": "3bb064fed924e9256ba168a6a846ecd13c2ce000ceb1d57b3d029578f985f5c6"
+ },
+ {
+  "seq": 63,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 64,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "3bb064fed924e9256ba168a6a846ecd13c2ce000ceb1d57b3d029578f985f5c6",
+  "hash": "1d3c29304681e3e528cb78ae4596203def06c1d7993bcff7ec441a01ad484a7f"
+ },
+ {
+  "seq": 64,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 65,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1d3c29304681e3e528cb78ae4596203def06c1d7993bcff7ec441a01ad484a7f",
+  "hash": "fe75daf8a5ded81b93a58dca9be95e5889069d8756894ae416eb9ff18036a19b"
+ },
+ {
+  "seq": 65,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 66,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "isStop": false
+     },
+     "confidence": 0.69,
+     "factualityRisk": 0.13,
+     "legalRisk": 0.19,
+     "fairnessRisk": 0.22,
+     "affectedPartyImpact": 0.52,
+     "warrant": "Evidence seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the span best supported by the case record grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "fe75daf8a5ded81b93a58dca9be95e5889069d8756894ae416eb9ff18036a19b",
+  "hash": "50d6786e96e43b91cb4f82055bdd98b6dd375f89721d07dde7b4b7248b8e713b"
+ },
+ {
+  "seq": 66,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 67,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "50d6786e96e43b91cb4f82055bdd98b6dd375f89721d07dde7b4b7248b8e713b",
+  "hash": "20b254b6aebeef3fd0d8a5a12aec2f6c32e3f71f7fb136dcb7c4fe83dcd7cea4"
+ },
+ {
+  "seq": 67,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 68,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "isStop": false
+     },
+     "confidence": 0.61,
+     "factualityRisk": 0.27,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.36,
+     "affectedPartyImpact": 0.56,
+     "warrant": "Adversary seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" survives the sharpest attack I can mount grounded in e_post, but see my objection.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_ca923b2bf096",
+      "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "20b254b6aebeef3fd0d8a5a12aec2f6c32e3f71f7fb136dcb7c4fe83dcd7cea4",
+  "hash": "57da99892d742df488688a0c1e2779307a14c0b3193da0f89fe910f2ce614562"
+ },
+ {
+  "seq": 68,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 69,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "57da99892d742df488688a0c1e2779307a14c0b3193da0f89fe910f2ce614562",
+  "hash": "1f9ae0e1d8c10d2d138d5c56389b92c61526907fe55dcaa28f7419d5b05ade49"
+ },
+ {
+  "seq": 69,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 70,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.76,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.31,
+     "fairnessRisk": 0.3,
+     "affectedPartyImpact": 0.59,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "1f9ae0e1d8c10d2d138d5c56389b92c61526907fe55dcaa28f7419d5b05ade49",
+  "hash": "77aec687c842127ffdfea91c04a8bf4e31726b4c8dab567b8bb2fcfcbd6ed551"
+ },
+ {
+  "seq": 70,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 71,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "77aec687c842127ffdfea91c04a8bf4e31726b4c8dab567b8bb2fcfcbd6ed551",
+  "hash": "f0ef2b1f2fa13cb959cd0790ac890745fc8b2b622d50448c78c52b754ea66e9e"
+ },
+ {
+  "seq": 71,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 72,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.74,
+     "factualityRisk": 0.2,
+     "legalRisk": 0.21,
+     "fairnessRisk": 0.37,
+     "affectedPartyImpact": 0.66,
+     "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "f0ef2b1f2fa13cb959cd0790ac890745fc8b2b622d50448c78c52b754ea66e9e",
+  "hash": "8ca26d9642f9cb9ed618592524c962b40d93d4e41c11f101232143a7c86ca660"
+ },
+ {
+  "seq": 72,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 73,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "8ca26d9642f9cb9ed618592524c962b40d93d4e41c11f101232143a7c86ca660",
+  "hash": "b1257d353e167e0e0428d55ef4a0195710f3af1d60a0b2703923cfd4ffba07d6"
+ },
+ {
+  "seq": 73,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 74,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "isStop": false
+     },
+     "confidence": 0.6,
+     "factualityRisk": 0.23,
+     "legalRisk": 0.33,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.62,
+     "warrant": "Safety seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" does not, on review, cross the veto threshold grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.\" is the least-harmful span consistent with the evidence grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_6259053d28e0",
+      "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "b1257d353e167e0e0428d55ef4a0195710f3af1d60a0b2703923cfd4ffba07d6",
+  "hash": "551c017fbc7afa4668a1e163865cd3a03d0f44e195ec4cdaa6c7a20d97e62cdd"
+ },
+ {
+  "seq": 74,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 75,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "551c017fbc7afa4668a1e163865cd3a03d0f44e195ec4cdaa6c7a20d97e62cdd",
+  "hash": "a90d77d4d3aa987c1daee6155fdffbebb221d429abce861b0385c73a7ee44df5"
+ },
+ {
+  "seq": 75,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 76,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+      "isStop": false
+     },
+     "confidence": 0.7,
+     "factualityRisk": 0.27,
+     "legalRisk": 0.2,
+     "fairnessRisk": 0.22,
+     "affectedPartyImpact": 0.5,
+     "warrant": "Concision seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" is the shortest span that fully answers the slot grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_post, e_classifier, e_press_context, e_recording, e_no_endorsement) addresses it, and the concision mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: \"Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.\" satisfies the binding constraints and required disclosures grounded in e_post.",
+    "changeMyMind": "A document contradicting e_post would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "a90d77d4d3aa987c1daee6155fdffbebb221d429abce861b0385c73a7ee44df5",
+  "hash": "aff0eedf61f2d9f1f4116d04b0eac2a64a8faf962e751090631de4232ac8bad1"
+ },
+ {
+  "seq": 76,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 77,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+     "veto": true,
+     "legalRisk": 0.33,
+     "publicReason": "Safety seat vetoes \"Statement of reasons: no removal stands again…\": This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "aff0eedf61f2d9f1f4116d04b0eac2a64a8faf962e751090631de4232ac8bad1",
+  "hash": "e5cbffa2981b5d0afef70af6ca9d178cb16e56c8c6269080c59ac2a48b9f37ba"
+ },
+ {
+  "seq": 77,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 78,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 1,
+    "method": "safety_gate",
+    "metaRule": "R1: the highest-scoring candidate was vetoed → pick best non-vetoed",
+    "selected": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.76,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.31,
+     "fairnessRisk": 0.3,
+     "affectedPartyImpact": 0.59,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_post.",
+     "evidenceRefs": [
+      "e_post"
+     ]
+    },
+    "publicReason": "The leading candidate was vetoed for a stated safety reason; the best non-vetoed candidate \"<STOP>\" is ratified.",
+    "candidateTable": [
+     {
+      "key": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "support": 3,
+      "meanConfidence": 0.6333,
+      "dispersion": 0.0403,
+      "maxLegalRisk": 0.33,
+      "meanFactualityRisk": 0.21,
+      "meanFairnessRisk": 0.2967,
+      "meanAffectedPartyImpact": 0.5667,
+      "aggregateScore": 0.2632
+     },
+     {
+      "key": "<STOP>",
+      "support": 2,
+      "meanConfidence": 0.75,
+      "dispersion": 0.01,
+      "maxLegalRisk": 0.31,
+      "meanFactualityRisk": 0.21,
+      "meanFairnessRisk": 0.335,
+      "meanAffectedPartyImpact": 0.625,
+      "aggregateScore": 0.2419
+     },
+     {
+      "key": "Statement of reasons: post #77401 remains up; the facts found are that the violent statement was made by Councilman R. Hartley and is quoted, attributed, and condemned in a news report with the recording linked, which VT-2 §4 (newsworthiness) expressly protects; the automated flag from classifier run #9034 misattributed the quoted words to the author and is set aside, per DSA Article 17 this decision was made with human review of the full context.",
+      "support": 1,
+      "meanConfidence": 0.7,
+      "dispersion": 0,
+      "maxLegalRisk": 0.2,
+      "meanFactualityRisk": 0.27,
+      "meanFairnessRisk": 0.22,
+      "meanAffectedPartyImpact": 0.5,
+      "aggregateScore": 0.1903
+     }
+    ],
+    "vetoes": [
+     {
+      "candidateKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+      "publicReason": "Safety seat vetoes \"Statement of reasons: no removal stands again…\": This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+      "upheld": true
+     }
+    ],
+    "dissents": [
+     {
+      "id": "dissent_8e75b9729fa3",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_ca923b2bf096",
+       "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_d9731210f3a7",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_6259053d28e0",
+       "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     },
+     {
+      "id": "dissent_d847d27ee01b",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55,
+      "carriedFromSpan": 0
+     },
+     {
+      "id": "dissent_3715fc6f6bcb",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+       "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72,
+      "carriedFromSpan": 0
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "e5cbffa2981b5d0afef70af6ca9d178cb16e56c8c6269080c59ac2a48b9f37ba",
+  "hash": "f21e07e9e1a62e3e4b2acc05e2abc1907cbae653e1e2d409208f1988e2fbcbf3"
+ },
+ {
+  "seq": 78,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 79,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_8e75b9729fa3",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_ca923b2bf096",
+     "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "f21e07e9e1a62e3e4b2acc05e2abc1907cbae653e1e2d409208f1988e2fbcbf3",
+  "hash": "d17cb6b976952d3423c0f1fa1fe6148d72d08a876a0895bb6c948384d99673a8"
+ },
+ {
+  "seq": 79,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 80,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_d9731210f3a7",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_6259053d28e0",
+     "targetKey": "Statement of reasons: no removal stands against the author as speaker of a threat; the automated system (classifier run #9034) detected the quoted phrase without evaluating attribution, the case facts show the author reported and condemned a statement by Councilman Hartley, and the matter is referred for human re-review under VT-2 §4 before any enforcement, as DSA Article 17 requires the author be told the facts, the ground, and the automated nature of the initial flag.",
+     "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "d17cb6b976952d3423c0f1fa1fe6148d72d08a876a0895bb6c948384d99673a8",
+  "hash": "2f8372d5482ec175cd44bcf8eaf01cc88cbf84c04f9ea901bb68375ce5d68be9"
+ },
+ {
+  "seq": 80,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 81,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_d847d27ee01b",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+     "text": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "2f8372d5482ec175cd44bcf8eaf01cc88cbf84c04f9ea901bb68375ce5d68be9",
+  "hash": "ad5ccdf76f048363dd61c803a49cabde2c1549b911dbd30942f298d7d025ce7a"
+ },
+ {
+  "seq": 81,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 82,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_3715fc6f6bcb",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Remove post #77401 under policy VT-2: it contains the threatening statement 'they should be beaten until they stop showing up.'",
+     "text": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "ad5ccdf76f048363dd61c803a49cabde2c1549b911dbd30942f298d7d025ce7a",
+  "hash": "0793b91e051075210decacade63a8c14820c4757c88854aca08b89e37f7fd269"
+ },
+ {
+  "seq": 82,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 83,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 1,
+   "text": "",
+   "isStop": true,
+   "prefixAfter": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement."
+  },
+  "prevHash": "0793b91e051075210decacade63a8c14820c4757c88854aca08b89e37f7fd269",
+  "hash": "cf188110fd5b05a2d813663c8f6dc560c05e594957ecc0f6c0d4a520d74f8586"
+ },
+ {
+  "seq": 83,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 84,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_1_rule",
+     "content": "safety_gate: R1: the highest-scoring candidate was vetoed → pick best non-vetoed",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_8e75b9729fa3",
+     "content": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_d9731210f3a7",
+     "content": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_d847d27ee01b",
+     "content": "This span leans on an inference the record does not fully support for \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_3715fc6f6bcb",
+     "content": "This span risks a compliance gap on \"Should the platform remove post #77401 for violating the violent-threats policy, and what statement of reasons must the author receive?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    }
+   ]
+  },
+  "prevHash": "cf188110fd5b05a2d813663c8f6dc560c05e594957ecc0f6c0d4a520d74f8586",
+  "hash": "b034c31aca638142f3185ee18ea5a77edcfa56b25ef0bf1ebec34f07f2de3bd7"
+ },
+ {
+  "seq": 84,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": 1,
+  "ts": 85,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 1
+  },
+  "prevHash": "b034c31aca638142f3185ee18ea5a77edcfa56b25ef0bf1ebec34f07f2de3bd7",
+  "hash": "1e142e7d86e3f892edcac7e1fbfe3e84bc165a28941acd8d120a9d9a045e981e"
+ },
+ {
+  "seq": 85,
+  "runId": "run_ea6e1e4d6150",
+  "spanIndex": null,
+  "ts": 86,
+  "kind": "run_finished",
+  "payload": {
+   "finalAnswer": "Remove the post pending human review, on the ground that the quoted threat could still spread harm at scale, and re-evaluate under VT-2 §4 with the full recording before any final enforcement.",
+   "stoppedBy": "stop_ratified",
+   "spanCount": 2,
+   "totals": {
+    "calls": 24,
+    "tokensOut": 0,
+    "latencyMs": 0,
+    "repaired": 0
+   }
+  },
+  "prevHash": "1e142e7d86e3f892edcac7e1fbfe3e84bc165a28941acd8d120a9d9a045e981e",
+  "hash": "b5f023483c367544571f84f07c4595b88ea89955645dd9f99178038986a4c71c"
+ }
+]

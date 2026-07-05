@@ -1,0 +1,3264 @@
+[
+ {
+  "seq": 0,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": null,
+  "ts": 1,
+  "kind": "run_started",
+  "payload": {
+   "packId": "insurance-utilization-review",
+   "title": "PA #88213 — inpatient rehabilitation utilization review",
+   "domain": "insurance",
+   "question": "Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?",
+   "panel": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    }
+   ],
+   "config": {
+    "seed": 7,
+    "maxSpans": 3,
+    "flags": {
+     "blindRound": true,
+     "anonymizeFeedback": true,
+     "randomizeCandidateOrder": true,
+     "debateRounds": 1,
+     "roleMemory": true,
+     "independentEvidence": true,
+     "safetyVeto": true
+    },
+    "clientView": "answer_plus_summary"
+   },
+   "note": "OFFLINE deterministic panel (no model calls) — CI/smoke mode."
+  },
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "03ef1806867dc300affec344c1a122b9e543dc501f4ff29f65a81655f546d842"
+ },
+ {
+  "seq": 1,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 2,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 0,
+    "label": "the coverage disposition",
+    "instruction": "Decide whether the plan approves or denies the requested 14 additional inpatient rehabilitation days. Before adopting any drafted determination, check WHICH edition of guideline MSK-04 it cites against the edition in force on the determination date — compare the effective dates in the record — and say what you checked.",
+    "riskBands": {
+     "factual": "high",
+     "legal": "high",
+     "user_impact": "high"
+    },
+    "candidatesHint": [
+     "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+     "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+     "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues."
+    ]
+   }
+  },
+  "prevHash": "03ef1806867dc300affec344c1a122b9e543dc501f4ff29f65a81655f546d842",
+  "hash": "4adc12e9fbae18d9bec61e9895d16c28fdd81e08320e315cc0c4fa12799dbf50"
+ },
+ {
+  "seq": 2,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 3,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_51a72ff0232f",
+    "packId": "insurance-utilization-review",
+    "title": "PA #88213 — inpatient rehabilitation utilization review",
+    "domain": "insurance",
+    "question": "Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?",
+    "constraints": [
+     {
+      "id": "c_sb1120",
+      "kind": "statute",
+      "text": "An algorithm may not be the sole basis for denying, delaying, or modifying care on medical-necessity grounds; the determination must be based on the enrollee's individual clinical circumstances and made by a licensed physician reviewer.",
+      "cite": "Cal. SB 1120 (2024)"
+     },
+     {
+      "id": "c_current_criteria",
+      "kind": "policy",
+      "text": "Medical-necessity determinations must apply the plan's clinical criteria in force on the date of the determination; a superseded guideline edition may not be cited as the basis for a denial."
+     },
+     {
+      "id": "c_specific_basis",
+      "kind": "policy",
+      "text": "A denial notice must state the specific clinical basis for the decision and identify the guideline edition relied on, in enough detail for the member and the treating clinician to mount a meaningful appeal."
+     },
+     {
+      "id": "c_no_batch",
+      "kind": "policy",
+      "text": "Determinations may not be issued in batches without individual file review; the reviewing physician must document that the member's actual clinical record was examined."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_clinical",
+      "source": "attending_notes",
+      "citation": "physiatrist notes p.2",
+      "summary": "Member is 74, status post hip-fracture repair (ORIF), lives alone with no in-home support, and has two documented falls in the past year; the attending physiatrist requests 14 additional inpatient rehabilitation days.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_guideline_current",
+      "source": "policy_doc",
+      "citation": "guideline MSK-04 v3.0 §3(b), effective 2025-01-05",
+      "summary": "Current guideline MSK-04 v3.0 (effective January 5, 2025, superseding v2.1 in full) covers up to 21 inpatient rehabilitation days for members aged 70 or older with documented fall risk and no in-home support, while weekly functional gains are documented.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_denial_draft",
+      "source": "utilization_review_draft",
+      "citation": "UR worksheet row 7",
+      "summary": "Automated utilization-review output recommends denial beyond day 10, citing guideline MSK-04 v2.1 (2023) and its ten-day inpatient rehabilitation limit; the worksheet does not check which guideline edition is currently in force.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_guideline_current",
+       "e_progress"
+      ]
+     },
+     {
+      "id": "e_progress",
+      "source": "therapy_log",
+      "citation": "PT/OT progress log, weeks 1–2",
+      "summary": "Functional Independence Measure improved from 68 to 84 over two weeks with gains documented every week; the care team assesses discharge home at day 10 as unsafe without in-home support.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_plan_terms",
+      "source": "plan_document",
+      "citation": "evidence of coverage §5.4",
+      "summary": "The plan covers inpatient rehabilitation when medically necessary under the plan's current published clinical criteria.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_draft",
+      "title": "Draft denial letter (as queued for sending)",
+      "body": "Dear member: Coverage for inpatient rehabilitation beyond day 10 is denied as not medically necessary under clinical guideline MSK-04 v2.1 (2023), which limits inpatient rehabilitation for uncomplicated hip fracture to ten days. This determination was generated by our automated utilization-review system. You may appeal in writing within 180 days."
+     },
+     {
+      "id": "d_guideline",
+      "title": "Clinical guideline MSK-04 v3.0 (current edition)",
+      "body": "MSK-04 v3.0, effective January 5, 2025, supersedes v2.1 in full; v2.1 must not be used for determinations dated on or after the effective date. Section 3(b): for members aged 70 or older with documented fall risk and no in-home support, inpatient rehabilitation is medically necessary for up to 21 days when weekly functional gains are documented. Section 3(c): discharge before functional-safety thresholds are met requires a documented home-support plan."
+     },
+     {
+      "id": "d_case_summary",
+      "title": "Utilization-review case summary",
+      "body": "Member #88213, age 74, status post hip-fracture ORIF, admitted to inpatient rehabilitation. Lives alone; two falls documented in the past 12 months. FIM 68 at admission, 84 at the day-10 review, with gains documented every week. The attending physiatrist requests 14 additional days; the care team documents that discharge home at day 10 is unsafe without in-home support."
+     }
+    ],
+    "prefix": "",
+    "slot": {
+     "index": 0,
+     "label": "the coverage disposition",
+     "instruction": "Decide whether the plan approves or denies the requested 14 additional inpatient rehabilitation days. Before adopting any drafted determination, check WHICH edition of guideline MSK-04 it cites against the edition in force on the determination date — compare the effective dates in the record — and say what you checked.",
+     "riskBands": {
+      "factual": "high",
+      "legal": "high",
+      "user_impact": "high"
+     },
+     "candidatesHint": [
+      "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+      "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues."
+     ]
+    },
+    "ratifiedCommitments": [],
+    "rejectedAlternatives": [],
+    "unresolvedDissent": []
+   }
+  },
+  "prevHash": "4adc12e9fbae18d9bec61e9895d16c28fdd81e08320e315cc0c4fa12799dbf50",
+  "hash": "a849d806e29cfbfcd28dfaa4fd617367ae4244bf15f02a352ff646a66d13e4a7"
+ },
+ {
+  "seq": 3,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 4,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "a849d806e29cfbfcd28dfaa4fd617367ae4244bf15f02a352ff646a66d13e4a7",
+  "hash": "7ac7506657555543a991522c2e2b5e2b8fec2a0130f7e4ee8de45cd44ecaa42e"
+ },
+ {
+  "seq": 4,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 5,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "7ac7506657555543a991522c2e2b5e2b8fec2a0130f7e4ee8de45cd44ecaa42e",
+  "hash": "98e5c97aa7b81163c1c296b315770ddae7b95b7119a0d4ab7558ecfdba1685d3"
+ },
+ {
+  "seq": 5,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 6,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "98e5c97aa7b81163c1c296b315770ddae7b95b7119a0d4ab7558ecfdba1685d3",
+  "hash": "22347c6ad1269738433118e01f320849ccaf3ee6f2d27535f23bda08ec66bc09"
+ },
+ {
+  "seq": 6,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 7,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "22347c6ad1269738433118e01f320849ccaf3ee6f2d27535f23bda08ec66bc09",
+  "hash": "96990a814e026a51771095ec4090c1f290ca51d52734332bdefefbe1ee852daa"
+ },
+ {
+  "seq": 7,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 8,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "96990a814e026a51771095ec4090c1f290ca51d52734332bdefefbe1ee852daa",
+  "hash": "884203726f9d7d9f8702d98b2834587c719562b784fb4e08367b04521648a802"
+ },
+ {
+  "seq": 8,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 9,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "884203726f9d7d9f8702d98b2834587c719562b784fb4e08367b04521648a802",
+  "hash": "cfc4c6c1f22d393d8b15d5deb717f28b8fed179b7b0d11141ff308972c28e999"
+ },
+ {
+  "seq": 9,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 10,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "4106403665fe73959b169e5f6535667f7e99ea471672c645bc3bc327bbafe642"
+  },
+  "prevHash": "cfc4c6c1f22d393d8b15d5deb717f28b8fed179b7b0d11141ff308972c28e999",
+  "hash": "5b9b59b3ec70ab42fc2038165aaf58963bdf1b6f93c85bd915aea4573ee43fc0"
+ },
+ {
+  "seq": 10,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 11,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "29f32117ab81ed44d5cdb24127ac364bf5f880d1dd1ef9cca08f073a4f1be575"
+  },
+  "prevHash": "5b9b59b3ec70ab42fc2038165aaf58963bdf1b6f93c85bd915aea4573ee43fc0",
+  "hash": "9f5b670b795aa6301baddeac463f09168c48f6f8f321e16e0b6422b57c0e4ced"
+ },
+ {
+  "seq": 11,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 12,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "66ff6fd10f2e0579da77b3bb99a97b994c671f5d7b7d49512eeddd0a8d7c7d53"
+  },
+  "prevHash": "9f5b670b795aa6301baddeac463f09168c48f6f8f321e16e0b6422b57c0e4ced",
+  "hash": "5ee1b6c5e22e430e416040cd415eaec6020fd56d376b8c3e7a377e8785d43c1e"
+ },
+ {
+  "seq": 12,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 13,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "abc55a13d52a1a147d8f42cd70124aa4b0480efe5ed2118cdd6c02ac03eed506"
+  },
+  "prevHash": "5ee1b6c5e22e430e416040cd415eaec6020fd56d376b8c3e7a377e8785d43c1e",
+  "hash": "18d1378fbfcdb70c973679e2a4dcceb7b79cc21c34f69c1424a1ea13b723a71c"
+ },
+ {
+  "seq": 13,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 14,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "36f8dfe1eef59c1a0ecdd1bc7cb54c0eca900ccb16c38b851f7a3b05d1a2137a"
+  },
+  "prevHash": "18d1378fbfcdb70c973679e2a4dcceb7b79cc21c34f69c1424a1ea13b723a71c",
+  "hash": "06c00fcc835b29f323ba37ecb075b85c6c094dbe4c73bb9bc19d20421d1fd4d8"
+ },
+ {
+  "seq": 14,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 15,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "bd401350852d289bc11d772105657ed92e35f0a1cce5a923acdc824e181f9727"
+  },
+  "prevHash": "06c00fcc835b29f323ba37ecb075b85c6c094dbe4c73bb9bc19d20421d1fd4d8",
+  "hash": "000bebef37e969a680d3d00fce2d8b5d533b6f48d50ea0bff1d6546d3a7a0cd3"
+ },
+ {
+  "seq": 15,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 16,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.21,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.58,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.16,
+       "fairnessRisk": 0.21,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Evidence seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.31,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Adversary seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.49,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Adversary seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.41,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Adversary seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_d4ae34a0fdd9",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Law/Policy seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Law/Policy seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.49,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Law/Policy seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.73,
+       "warrant": "Affected-party seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.18,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.69,
+       "warrant": "Affected-party seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.49,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.38,
+       "affectedPartyImpact": 0.73,
+       "warrant": "Affected-party seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.63,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.35,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.6,
+       "warrant": "Safety seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.58,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Safety seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.64,
+       "warrant": "Safety seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+     "objections": [
+      {
+       "id": "obj_5907f718d743",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Concision seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+        "isStop": false
+       },
+       "confidence": 0.58,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Concision seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+        "isStop": false
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.28,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.5,
+       "warrant": "Concision seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "4106403665fe73959b169e5f6535667f7e99ea471672c645bc3bc327bbafe642",
+     "recomputed": "4106403665fe73959b169e5f6535667f7e99ea471672c645bc3bc327bbafe642",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "29f32117ab81ed44d5cdb24127ac364bf5f880d1dd1ef9cca08f073a4f1be575",
+     "recomputed": "29f32117ab81ed44d5cdb24127ac364bf5f880d1dd1ef9cca08f073a4f1be575",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "66ff6fd10f2e0579da77b3bb99a97b994c671f5d7b7d49512eeddd0a8d7c7d53",
+     "recomputed": "66ff6fd10f2e0579da77b3bb99a97b994c671f5d7b7d49512eeddd0a8d7c7d53",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "abc55a13d52a1a147d8f42cd70124aa4b0480efe5ed2118cdd6c02ac03eed506",
+     "recomputed": "abc55a13d52a1a147d8f42cd70124aa4b0480efe5ed2118cdd6c02ac03eed506",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "36f8dfe1eef59c1a0ecdd1bc7cb54c0eca900ccb16c38b851f7a3b05d1a2137a",
+     "recomputed": "36f8dfe1eef59c1a0ecdd1bc7cb54c0eca900ccb16c38b851f7a3b05d1a2137a",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "bd401350852d289bc11d772105657ed92e35f0a1cce5a923acdc824e181f9727",
+     "recomputed": "bd401350852d289bc11d772105657ed92e35f0a1cce5a923acdc824e181f9727",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "000bebef37e969a680d3d00fce2d8b5d533b6f48d50ea0bff1d6546d3a7a0cd3",
+  "hash": "507290f97784c088832b20da079c7c16ef479b880ffff90f82fe3ebb5f6a938b"
+ },
+ {
+  "seq": 16,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 17,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 0,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5567,
+      "confidenceDispersion": 0.0559,
+      "strongestArgument": "Evidence seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the span best supported by the case record grounded in e_clinical.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5517,
+      "confidenceDispersion": 0.0626,
+      "strongestArgument": "Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5783,
+      "confidenceDispersion": 0.0935,
+      "strongestArgument": "Affected-party seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0707,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "507290f97784c088832b20da079c7c16ef479b880ffff90f82fe3ebb5f6a938b",
+  "hash": "d804b4986739d4409f099815bbbd24af166dba6a02b24e0a54428fe87506a17f"
+ },
+ {
+  "seq": 17,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 18,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "d804b4986739d4409f099815bbbd24af166dba6a02b24e0a54428fe87506a17f",
+  "hash": "d75ac899d9796e746cf571407975620623519f9e4f3378caed717dfa12f8ff7a"
+ },
+ {
+  "seq": 18,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 19,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "d75ac899d9796e746cf571407975620623519f9e4f3378caed717dfa12f8ff7a",
+  "hash": "483b8ad72ba054ed0feefcabaf54bea518dfa2e80bc8dff59f27af45ef46bb2f"
+ },
+ {
+  "seq": 19,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 20,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "483b8ad72ba054ed0feefcabaf54bea518dfa2e80bc8dff59f27af45ef46bb2f",
+  "hash": "435c39ef44893d0c1d1815477afd43b787ab2c95569a438e99f9aa36faaef901"
+ },
+ {
+  "seq": 20,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 21,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "435c39ef44893d0c1d1815477afd43b787ab2c95569a438e99f9aa36faaef901",
+  "hash": "a802b16659007a2d93e772a5b899db7b83384df6807044f27d60d7cb19aa07ed"
+ },
+ {
+  "seq": 21,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 22,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "a802b16659007a2d93e772a5b899db7b83384df6807044f27d60d7cb19aa07ed",
+  "hash": "c0d7b0f9215236d40755ba8673939bd5fa0b5b69008a02394abb9149c8836e49"
+ },
+ {
+  "seq": 22,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 23,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "c0d7b0f9215236d40755ba8673939bd5fa0b5b69008a02394abb9149c8836e49",
+  "hash": "e8a7387fca4abed3be627c38a1b6f9052a02ff253287e551bc028edf47a5488b"
+ },
+ {
+  "seq": 23,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 24,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "e8a7387fca4abed3be627c38a1b6f9052a02ff253287e551bc028edf47a5488b",
+  "hash": "b12d1f15960a016cb264ea65a793fb6d625ac90b9bad0a18fc29c4cc086e4daf"
+ },
+ {
+  "seq": 24,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 25,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "isStop": false
+     },
+     "confidence": 0.7,
+     "factualityRisk": 0.18,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.21,
+     "affectedPartyImpact": 0.53,
+     "warrant": "Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) addresses it, and the evidence mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "b12d1f15960a016cb264ea65a793fb6d625ac90b9bad0a18fc29c4cc086e4daf",
+  "hash": "bf6107df223316233a73b28902bced24df8c788c0e34c3f6514af523e95d01df"
+ },
+ {
+  "seq": 25,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 26,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "bf6107df223316233a73b28902bced24df8c788c0e34c3f6514af523e95d01df",
+  "hash": "bab4e68ecff023d906c076e5014d6dedbbec350b974c21cff1a6d2dd7872fd6c"
+ },
+ {
+  "seq": 26,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 27,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "isStop": false
+     },
+     "confidence": 0.62,
+     "factualityRisk": 0.31,
+     "legalRisk": 0.19,
+     "fairnessRisk": 0.32,
+     "affectedPartyImpact": 0.58,
+     "warrant": "Adversary seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) addresses it, and the adversary mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_a3c592562f7a",
+      "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "bab4e68ecff023d906c076e5014d6dedbbec350b974c21cff1a6d2dd7872fd6c",
+  "hash": "570994c58e4874f788f4e4d7709a8cd2a5e3e2f764ab41b5f05ded52744e5dcd"
+ },
+ {
+  "seq": 27,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 28,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "570994c58e4874f788f4e4d7709a8cd2a5e3e2f764ab41b5f05ded52744e5dcd",
+  "hash": "bb429bc28ac187ac6050a5f5f937d21e864193e7ac504ed9d23084353e8249c1"
+ },
+ {
+  "seq": 28,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 29,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+      "isStop": false
+     },
+     "confidence": 0.62,
+     "factualityRisk": 0.21,
+     "legalRisk": 0.33,
+     "fairnessRisk": 0.25,
+     "affectedPartyImpact": 0.62,
+     "warrant": "Law/Policy seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "bb429bc28ac187ac6050a5f5f937d21e864193e7ac504ed9d23084353e8249c1",
+  "hash": "1580560c369dbd1cb689826d493b3d2738412533f1b40ecd6b1b0f3831c45b51"
+ },
+ {
+  "seq": 29,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 30,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1580560c369dbd1cb689826d493b3d2738412533f1b40ecd6b1b0f3831c45b51",
+  "hash": "777f539f3b4785c5f1b290a8d8bba4eea47866b0ed87bbe73df69a74e2f9602f"
+ },
+ {
+  "seq": 30,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 31,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+      "isStop": false
+     },
+     "confidence": 0.77,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.26,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.73,
+     "warrant": "Affected-party seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "777f539f3b4785c5f1b290a8d8bba4eea47866b0ed87bbe73df69a74e2f9602f",
+  "hash": "6a91a30a99f42dc8e3fdd62c90813c9fe34f687b8557ecb45ac51219e493e4a2"
+ },
+ {
+  "seq": 31,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 32,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "6a91a30a99f42dc8e3fdd62c90813c9fe34f687b8557ecb45ac51219e493e4a2",
+  "hash": "37ddd2f6b63d5ee06ec0075788c7fa09e04aa287fdc61150a1e2ef7e4715f4d1"
+ },
+ {
+  "seq": 32,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 33,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+      "isStop": false
+     },
+     "confidence": 0.66,
+     "factualityRisk": 0.3,
+     "legalRisk": 0.35,
+     "fairnessRisk": 0.31,
+     "affectedPartyImpact": 0.6,
+     "warrant": "Safety seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) addresses it, and the safety mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_7668c56c9482",
+      "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "37ddd2f6b63d5ee06ec0075788c7fa09e04aa287fdc61150a1e2ef7e4715f4d1",
+  "hash": "8f0effc352e01674dc5d512b16308dd6bd044de5ce8aba132043e7e1d2eb6ef7"
+ },
+ {
+  "seq": 33,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 34,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "8f0effc352e01674dc5d512b16308dd6bd044de5ce8aba132043e7e1d2eb6ef7",
+  "hash": "dfddcbad793791112f11230eb1774c12fe96c0c7da0945689c5d947269f53197"
+ },
+ {
+  "seq": 34,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 35,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+      "isStop": false
+     },
+     "confidence": 0.71,
+     "factualityRisk": 0.24,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.55,
+     "warrant": "Concision seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "dfddcbad793791112f11230eb1774c12fe96c0c7da0945689c5d947269f53197",
+  "hash": "8fb45604ff4b64ff209f82a4cf28ef94f32553cfb786348335ae8a1528af0d43"
+ },
+ {
+  "seq": 35,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 36,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+     "veto": false,
+     "legalRisk": 0.35,
+     "publicReason": "Safety seat reviewed \"Approve the 14 additional days: the guideline…\"; no veto (legal risk 0.35)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "8fb45604ff4b64ff209f82a4cf28ef94f32553cfb786348335ae8a1528af0d43",
+  "hash": "011e4c5b8354dd84567eb6a505c441636db4c3cb2eb6f9475b576885b1f8d7f5"
+ },
+ {
+  "seq": 36,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 37,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 0,
+    "method": "dissent_preserving_supermajority",
+    "metaRule": "R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+    "selected": {
+     "candidate": {
+      "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "isStop": false
+     },
+     "confidence": 0.7,
+     "factualityRisk": 0.18,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.21,
+     "affectedPartyImpact": 0.53,
+     "warrant": "Evidence seat: \"Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.\" is the span best supported by the case record grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "publicReason": "No candidate dominates; the plurality leader \"Deny coverage beyond day 10 as not medically …\" is ratified and every material minority objection is preserved on the record.",
+    "candidateTable": [
+     {
+      "key": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "support": 2,
+      "meanConfidence": 0.66,
+      "dispersion": 0.04,
+      "maxLegalRisk": 0.24,
+      "meanFactualityRisk": 0.245,
+      "meanFairnessRisk": 0.265,
+      "meanAffectedPartyImpact": 0.555,
+      "aggregateScore": 0.2289
+     },
+     {
+      "key": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+      "support": 2,
+      "meanConfidence": 0.695,
+      "dispersion": 0.075,
+      "maxLegalRisk": 0.33,
+      "meanFactualityRisk": 0.235,
+      "meanFairnessRisk": 0.28,
+      "meanAffectedPartyImpact": 0.675,
+      "aggregateScore": 0.2217
+     },
+     {
+      "key": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+      "support": 2,
+      "meanConfidence": 0.685,
+      "dispersion": 0.025,
+      "maxLegalRisk": 0.35,
+      "meanFactualityRisk": 0.27,
+      "meanFairnessRisk": 0.295,
+      "meanAffectedPartyImpact": 0.575,
+      "aggregateScore": 0.2104
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_eb251714b99a",
+      "spanIndex": 0,
+      "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_e6f8357a48bc",
+      "spanIndex": 0,
+      "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "011e4c5b8354dd84567eb6a505c441636db4c3cb2eb6f9475b576885b1f8d7f5",
+  "hash": "c9591e1b6d5bd05e670441bd611bece009a4a954c6172b7effcc1059f27dea8e"
+ },
+ {
+  "seq": 37,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 38,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_eb251714b99a",
+    "spanIndex": 0,
+    "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "c9591e1b6d5bd05e670441bd611bece009a4a954c6172b7effcc1059f27dea8e",
+  "hash": "1653be7af8e5bcea59267af8e0eddd01715f0920517efb791f4cd439f60d282f"
+ },
+ {
+  "seq": 38,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 39,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_e6f8357a48bc",
+    "spanIndex": 0,
+    "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+     "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "1653be7af8e5bcea59267af8e0eddd01715f0920517efb791f4cd439f60d282f",
+  "hash": "692b08789a6f8c1f2a32725d83cab91ae480f3cc26f09d8dc7affa98bb7022cc"
+ },
+ {
+  "seq": 39,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 40,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 0,
+   "text": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+   "isStop": false,
+   "prefixAfter": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit."
+  },
+  "prevHash": "692b08789a6f8c1f2a32725d83cab91ae480f3cc26f09d8dc7affa98bb7022cc",
+  "hash": "baac3863faac6f8399d8cb598bc667b0892de16a4b9966f809c7457d917f7971"
+ },
+ {
+  "seq": 40,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 41,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_0_rule",
+     "content": "dissent_preserving_supermajority: R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_eb251714b99a",
+     "content": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_e6f8357a48bc",
+     "content": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 0
+    }
+   ]
+  },
+  "prevHash": "baac3863faac6f8399d8cb598bc667b0892de16a4b9966f809c7457d917f7971",
+  "hash": "bc43d6ed6a8432245114bf7226f5faff1975b62120205a26e9a693141204ead6"
+ },
+ {
+  "seq": 41,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 0,
+  "ts": 42,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 0
+  },
+  "prevHash": "bc43d6ed6a8432245114bf7226f5faff1975b62120205a26e9a693141204ead6",
+  "hash": "80c6782ad98e91a117a7af7543a17d220110c4ea35ab5d87cba8c3035c1c1638"
+ },
+ {
+  "seq": 42,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 43,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 1,
+    "label": "the determination notice to the member",
+    "instruction": "Write the determination notice the member and treating clinician must receive: it must name the guideline edition actually in force with its effective date, state the clinical facts relied on, and reflect physician review consistent with Cal. SB 1120 (2024). Verify the cited edition against the record before writing. STOP if the ratified disposition already fully answers the question.",
+    "riskBands": {
+     "legal": "high",
+     "user_impact": "high"
+    },
+    "candidatesHint": [
+     "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+     "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+     "<STOP>"
+    ]
+   }
+  },
+  "prevHash": "80c6782ad98e91a117a7af7543a17d220110c4ea35ab5d87cba8c3035c1c1638",
+  "hash": "7c76d6f47c5ddabf453f3b0c65fb526d500d78a75b90e698f3165f43e41b93e4"
+ },
+ {
+  "seq": 43,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 44,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_51a72ff0232f",
+    "packId": "insurance-utilization-review",
+    "title": "PA #88213 — inpatient rehabilitation utilization review",
+    "domain": "insurance",
+    "question": "Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?",
+    "constraints": [
+     {
+      "id": "c_sb1120",
+      "kind": "statute",
+      "text": "An algorithm may not be the sole basis for denying, delaying, or modifying care on medical-necessity grounds; the determination must be based on the enrollee's individual clinical circumstances and made by a licensed physician reviewer.",
+      "cite": "Cal. SB 1120 (2024)"
+     },
+     {
+      "id": "c_current_criteria",
+      "kind": "policy",
+      "text": "Medical-necessity determinations must apply the plan's clinical criteria in force on the date of the determination; a superseded guideline edition may not be cited as the basis for a denial."
+     },
+     {
+      "id": "c_specific_basis",
+      "kind": "policy",
+      "text": "A denial notice must state the specific clinical basis for the decision and identify the guideline edition relied on, in enough detail for the member and the treating clinician to mount a meaningful appeal."
+     },
+     {
+      "id": "c_no_batch",
+      "kind": "policy",
+      "text": "Determinations may not be issued in batches without individual file review; the reviewing physician must document that the member's actual clinical record was examined."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_clinical",
+      "source": "attending_notes",
+      "citation": "physiatrist notes p.2",
+      "summary": "Member is 74, status post hip-fracture repair (ORIF), lives alone with no in-home support, and has two documented falls in the past year; the attending physiatrist requests 14 additional inpatient rehabilitation days.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_guideline_current",
+      "source": "policy_doc",
+      "citation": "guideline MSK-04 v3.0 §3(b), effective 2025-01-05",
+      "summary": "Current guideline MSK-04 v3.0 (effective January 5, 2025, superseding v2.1 in full) covers up to 21 inpatient rehabilitation days for members aged 70 or older with documented fall risk and no in-home support, while weekly functional gains are documented.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_denial_draft",
+      "source": "utilization_review_draft",
+      "citation": "UR worksheet row 7",
+      "summary": "Automated utilization-review output recommends denial beyond day 10, citing guideline MSK-04 v2.1 (2023) and its ten-day inpatient rehabilitation limit; the worksheet does not check which guideline edition is currently in force.",
+      "quality": 0.4,
+      "contradicts": [
+       "e_guideline_current",
+       "e_progress"
+      ]
+     },
+     {
+      "id": "e_progress",
+      "source": "therapy_log",
+      "citation": "PT/OT progress log, weeks 1–2",
+      "summary": "Functional Independence Measure improved from 68 to 84 over two weeks with gains documented every week; the care team assesses discharge home at day 10 as unsafe without in-home support.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_plan_terms",
+      "source": "plan_document",
+      "citation": "evidence of coverage §5.4",
+      "summary": "The plan covers inpatient rehabilitation when medically necessary under the plan's current published clinical criteria.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_draft",
+      "title": "Draft denial letter (as queued for sending)",
+      "body": "Dear member: Coverage for inpatient rehabilitation beyond day 10 is denied as not medically necessary under clinical guideline MSK-04 v2.1 (2023), which limits inpatient rehabilitation for uncomplicated hip fracture to ten days. This determination was generated by our automated utilization-review system. You may appeal in writing within 180 days."
+     },
+     {
+      "id": "d_guideline",
+      "title": "Clinical guideline MSK-04 v3.0 (current edition)",
+      "body": "MSK-04 v3.0, effective January 5, 2025, supersedes v2.1 in full; v2.1 must not be used for determinations dated on or after the effective date. Section 3(b): for members aged 70 or older with documented fall risk and no in-home support, inpatient rehabilitation is medically necessary for up to 21 days when weekly functional gains are documented. Section 3(c): discharge before functional-safety thresholds are met requires a documented home-support plan."
+     },
+     {
+      "id": "d_case_summary",
+      "title": "Utilization-review case summary",
+      "body": "Member #88213, age 74, status post hip-fracture ORIF, admitted to inpatient rehabilitation. Lives alone; two falls documented in the past 12 months. FIM 68 at admission, 84 at the day-10 review, with gains documented every week. The attending physiatrist requests 14 additional days; the care team documents that discharge home at day 10 is unsafe without in-home support."
+     }
+    ],
+    "prefix": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+    "slot": {
+     "index": 1,
+     "label": "the determination notice to the member",
+     "instruction": "Write the determination notice the member and treating clinician must receive: it must name the guideline edition actually in force with its effective date, state the clinical facts relied on, and reflect physician review consistent with Cal. SB 1120 (2024). Verify the cited edition against the record before writing. STOP if the ratified disposition already fully answers the question.",
+     "riskBands": {
+      "legal": "high",
+      "user_impact": "high"
+     },
+     "candidatesHint": [
+      "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+      "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+      "<STOP>"
+     ]
+    },
+    "ratifiedCommitments": [
+     "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit."
+    ],
+    "rejectedAlternatives": [
+     {
+      "text": "Approve the 14 additional days: the guideline in force, MSK-04 v3.0 §3(b) (effective January 5, 2025), covers up to 21 days for a 74-year-old member with documented fall risk, no in-home support, and weekly functional gains — the draft denial rests on the superseded v2.1.",
+      "reason": "not ratified at span 0"
+     },
+     {
+      "text": "Do not ship the drafted denial; route the case to a licensed physician reviewer for an individualized determination under the current MSK-04 v3.0 criteria before any adverse decision issues.",
+      "reason": "not ratified at span 0"
+     }
+    ],
+    "unresolvedDissent": [
+     {
+      "id": "dissent_eb251714b99a",
+      "spanIndex": 0,
+      "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_e6f8357a48bc",
+      "spanIndex": 0,
+      "chosenKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ]
+   }
+  },
+  "prevHash": "7c76d6f47c5ddabf453f3b0c65fb526d500d78a75b90e698f3165f43e41b93e4",
+  "hash": "e2bae9ffe8a64e1af27d6bc614390f0d0b3ba5b07fad59b55bb384ac1374e1b9"
+ },
+ {
+  "seq": 44,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 45,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "e2bae9ffe8a64e1af27d6bc614390f0d0b3ba5b07fad59b55bb384ac1374e1b9",
+  "hash": "424040e3b13da97f145676507551d524cdf86fa6e474c007a304278d6b5a0d97"
+ },
+ {
+  "seq": 45,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 46,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "424040e3b13da97f145676507551d524cdf86fa6e474c007a304278d6b5a0d97",
+  "hash": "2d58c8f592c646551c094111ea169112a881807552b51bd0f58ba439386e7f1d"
+ },
+ {
+  "seq": 46,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 47,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "2d58c8f592c646551c094111ea169112a881807552b51bd0f58ba439386e7f1d",
+  "hash": "1511b5945f5137f555a12f00542b515c6d699a692ed77584580916142aebfe32"
+ },
+ {
+  "seq": 47,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 48,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1511b5945f5137f555a12f00542b515c6d699a692ed77584580916142aebfe32",
+  "hash": "03b7b290e8ff9d3c9f22fa5daa539624c5ee764f5fff6dc40af68a1a27414296"
+ },
+ {
+  "seq": 48,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 49,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "03b7b290e8ff9d3c9f22fa5daa539624c5ee764f5fff6dc40af68a1a27414296",
+  "hash": "643cff39ac82bbf96b263300bc8dedf6d103b79e323f68fb06bf3679b04e476b"
+ },
+ {
+  "seq": 49,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 50,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "643cff39ac82bbf96b263300bc8dedf6d103b79e323f68fb06bf3679b04e476b",
+  "hash": "065bdea05903c09b4fecc6b1322e4837b1148bffb691caaa59ca16faac40e589"
+ },
+ {
+  "seq": 50,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 51,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "2620e96b0b9ca84562457ac46c5d0431bc1fe498c5342b625a5238d4da6ee0ad"
+  },
+  "prevHash": "065bdea05903c09b4fecc6b1322e4837b1148bffb691caaa59ca16faac40e589",
+  "hash": "44ff5ced0f1d016298ba7a23fa46e2f58b4f55c3e215e906e0ecccca7189b009"
+ },
+ {
+  "seq": 51,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 52,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "df321a1d2d6c19d8496d6f6d33ef80499039a07b5c8bf8f8e5114f6e9918239d"
+  },
+  "prevHash": "44ff5ced0f1d016298ba7a23fa46e2f58b4f55c3e215e906e0ecccca7189b009",
+  "hash": "128453d6619c5815c6b7b0c4610c428b4a88f4dd2b204bf444476c442d1cb27c"
+ },
+ {
+  "seq": 52,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 53,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "1ce5aac8cba94c3c3ef98db3ebd97c688ba8ca8234030d27079764caad0bddff"
+  },
+  "prevHash": "128453d6619c5815c6b7b0c4610c428b4a88f4dd2b204bf444476c442d1cb27c",
+  "hash": "51ef7209bde0a0180bcce57ef32faddbf86f56c704b45dbb61b5007a8195dc6f"
+ },
+ {
+  "seq": 53,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 54,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "24784081164a81fb0ff8a502140aaba7eabbf5ac8e8aea44d7704fae498b2f54"
+  },
+  "prevHash": "51ef7209bde0a0180bcce57ef32faddbf86f56c704b45dbb61b5007a8195dc6f",
+  "hash": "3892d3fe32d99db2ee9bb942ad681ab228706d1bc1210109163f3ccfa2324fdc"
+ },
+ {
+  "seq": 54,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 55,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "117b39c94ef51e15a9e0e240cbe018c7b31b0f8f59180aec26305dfdfc650a98"
+  },
+  "prevHash": "3892d3fe32d99db2ee9bb942ad681ab228706d1bc1210109163f3ccfa2324fdc",
+  "hash": "63fdd2a45ef0847be9df97cf00bdcfd45f26e8b67505899493dde8a916feb9a9"
+ },
+ {
+  "seq": 55,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 56,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "966db08e71b9bd00df5329288a30a9bc5b6959d8f433ef19e508708963fe0508"
+  },
+  "prevHash": "63fdd2a45ef0847be9df97cf00bdcfd45f26e8b67505899493dde8a916feb9a9",
+  "hash": "e29f9766801a67c98fb0c08272ebba86f7005d4e190dec0b0632a7038a7e13ee"
+ },
+ {
+  "seq": 56,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 57,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.72,
+       "factualityRisk": 0.1,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Evidence seat: stopping here is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.54,
+       "warrant": "Evidence seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Evidence seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the span best supported by the case record grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: stopping here is the span best supported by the case record grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.17,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.6,
+       "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.35,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.27,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Adversary seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.41,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Adversary seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_a88939b3006e",
+       "targetKey": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.27,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Law/Policy seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.31,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Law/Policy seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" satisfies the binding constraints and required disclosures grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.19,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.39,
+       "affectedPartyImpact": 0.65,
+       "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.39,
+       "affectedPartyImpact": 0.66,
+       "warrant": "Affected-party seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.7,
+       "warrant": "Affected-party seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the least-harmful span consistent with the evidence grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_clinical.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.37,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.48,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Safety seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.46,
+       "factualityRisk": 0.28,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Safety seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" does not, on review, cross the veto threshold grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_clinical.",
+     "objections": [
+      {
+       "id": "obj_9854522d275b",
+       "targetKey": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.24,
+       "affectedPartyImpact": 0.49,
+       "warrant": "Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.62,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.18,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Concision seat: stopping here is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+        "isStop": false
+       },
+       "confidence": 0.54,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.16,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Concision seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+       "evidenceRefs": [
+        "e_clinical"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "2620e96b0b9ca84562457ac46c5d0431bc1fe498c5342b625a5238d4da6ee0ad",
+     "recomputed": "2620e96b0b9ca84562457ac46c5d0431bc1fe498c5342b625a5238d4da6ee0ad",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "df321a1d2d6c19d8496d6f6d33ef80499039a07b5c8bf8f8e5114f6e9918239d",
+     "recomputed": "df321a1d2d6c19d8496d6f6d33ef80499039a07b5c8bf8f8e5114f6e9918239d",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "1ce5aac8cba94c3c3ef98db3ebd97c688ba8ca8234030d27079764caad0bddff",
+     "recomputed": "1ce5aac8cba94c3c3ef98db3ebd97c688ba8ca8234030d27079764caad0bddff",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "24784081164a81fb0ff8a502140aaba7eabbf5ac8e8aea44d7704fae498b2f54",
+     "recomputed": "24784081164a81fb0ff8a502140aaba7eabbf5ac8e8aea44d7704fae498b2f54",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "117b39c94ef51e15a9e0e240cbe018c7b31b0f8f59180aec26305dfdfc650a98",
+     "recomputed": "117b39c94ef51e15a9e0e240cbe018c7b31b0f8f59180aec26305dfdfc650a98",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "966db08e71b9bd00df5329288a30a9bc5b6959d8f433ef19e508708963fe0508",
+     "recomputed": "966db08e71b9bd00df5329288a30a9bc5b6959d8f433ef19e508708963fe0508",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "e29f9766801a67c98fb0c08272ebba86f7005d4e190dec0b0632a7038a7e13ee",
+  "hash": "646e4b6fb3b75eb31e998028f1b85341649c37976ae39a22e0c8d813b7dc4498"
+ },
+ {
+  "seq": 57,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 58,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 1,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "",
+       "isStop": true
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.6033,
+      "confidenceDispersion": 0.0576,
+      "strongestArgument": "Evidence seat: stopping here is the span best supported by the case record grounded in e_clinical.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5567,
+      "confidenceDispersion": 0.0582,
+      "strongestArgument": "Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5167,
+      "confidenceDispersion": 0.0838,
+      "strongestArgument": "Evidence seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the span best supported by the case record grounded in e_clinical.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0665,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "646e4b6fb3b75eb31e998028f1b85341649c37976ae39a22e0c8d813b7dc4498",
+  "hash": "37dec4ec03c991cd95094cc8c29b916eec14a61ce6957d72fef10b4bda9df2a2"
+ },
+ {
+  "seq": 58,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 59,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "37dec4ec03c991cd95094cc8c29b916eec14a61ce6957d72fef10b4bda9df2a2",
+  "hash": "900a1dd575675726093c6fa072f78e1bd152e981245e63d5b8477fef7aeb07a3"
+ },
+ {
+  "seq": 59,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 60,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "900a1dd575675726093c6fa072f78e1bd152e981245e63d5b8477fef7aeb07a3",
+  "hash": "a085f22e5a11afd5cd33ed37e3fdc75ac2ec7596f709f105212e4357d732e6bd"
+ },
+ {
+  "seq": 60,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 61,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "a085f22e5a11afd5cd33ed37e3fdc75ac2ec7596f709f105212e4357d732e6bd",
+  "hash": "3e885a44d42e29d2bf4cfe96aff51832d1339394822f5d8dd5daac8f6ab45276"
+ },
+ {
+  "seq": 61,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 62,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "3e885a44d42e29d2bf4cfe96aff51832d1339394822f5d8dd5daac8f6ab45276",
+  "hash": "cbef00311f02500dcc48f6ef34ede538b006fc505996065c1077d8a6850a64f7"
+ },
+ {
+  "seq": 62,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 63,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "cbef00311f02500dcc48f6ef34ede538b006fc505996065c1077d8a6850a64f7",
+  "hash": "fd4facb108e0f018af91c2af2de5e5fb278f82712eb15a727e76e17393107e81"
+ },
+ {
+  "seq": 63,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 64,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "fd4facb108e0f018af91c2af2de5e5fb278f82712eb15a727e76e17393107e81",
+  "hash": "6ca5472588f6c215de052513eae069ac3337dfc244bea403fc1d67999d72cfa0"
+ },
+ {
+  "seq": 64,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 65,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "6ca5472588f6c215de052513eae069ac3337dfc244bea403fc1d67999d72cfa0",
+  "hash": "a4bf6bb73f0db3644b2833e71024d390f2fa67c29dcea52721594a3c0075ca90"
+ },
+ {
+  "seq": 65,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 66,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+      "isStop": false
+     },
+     "confidence": 0.78,
+     "factualityRisk": 0.1,
+     "legalRisk": 0.23,
+     "fairnessRisk": 0.2,
+     "affectedPartyImpact": 0.53,
+     "warrant": "Evidence seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the span best supported by the case record grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "a4bf6bb73f0db3644b2833e71024d390f2fa67c29dcea52721594a3c0075ca90",
+  "hash": "de9b58e71efd424f8dd10bd34a690b6f7e68a1623a930a54553dbb040d481055"
+ },
+ {
+  "seq": 66,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 67,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "de9b58e71efd424f8dd10bd34a690b6f7e68a1623a930a54553dbb040d481055",
+  "hash": "92b4182b5e78073cd981ffd1384b8a967a7486ccd83240d95b09bbcbacaf806e"
+ },
+ {
+  "seq": 67,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 68,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.64,
+     "factualityRisk": 0.17,
+     "legalRisk": 0.25,
+     "fairnessRisk": 0.27,
+     "affectedPartyImpact": 0.6,
+     "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_ca923b2bf096",
+      "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "92b4182b5e78073cd981ffd1384b8a967a7486ccd83240d95b09bbcbacaf806e",
+  "hash": "24ddb1d8325759a05746397704de0cd0b3a40b77f14b148b896ea7c62c6f5c75"
+ },
+ {
+  "seq": 68,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 69,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "24ddb1d8325759a05746397704de0cd0b3a40b77f14b148b896ea7c62c6f5c75",
+  "hash": "44c17cf67ca23011b2e95b57e2f373045f06164868b3b23478fee8b09f29aacc"
+ },
+ {
+  "seq": 69,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 70,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.64,
+     "factualityRisk": 0.18,
+     "legalRisk": 0.27,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.58,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "44c17cf67ca23011b2e95b57e2f373045f06164868b3b23478fee8b09f29aacc",
+  "hash": "3daed3eba39bcb667bad8df2a0826a00659f4613067036e2d7f5ba1907c9899a"
+ },
+ {
+  "seq": 70,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 71,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "3daed3eba39bcb667bad8df2a0826a00659f4613067036e2d7f5ba1907c9899a",
+  "hash": "1a2eb14917535d43461292da073cd5b169eba302011d6459b4fc6eab9bae2640"
+ },
+ {
+  "seq": 71,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 72,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.6,
+     "factualityRisk": 0.19,
+     "legalRisk": 0.17,
+     "fairnessRisk": 0.39,
+     "affectedPartyImpact": 0.65,
+     "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "1a2eb14917535d43461292da073cd5b169eba302011d6459b4fc6eab9bae2640",
+  "hash": "abcb51d41c32513e8b2c1f8eca7147cc4034276ce7fb5c0b4abd17d69777ae7b"
+ },
+ {
+  "seq": 72,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 73,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "abcb51d41c32513e8b2c1f8eca7147cc4034276ce7fb5c0b4abd17d69777ae7b",
+  "hash": "fbf7db7a5c98e45c84605a650e9e0e316ba7e9912ed5ec89c5c4809f5ad9f6ea"
+ },
+ {
+  "seq": 73,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 74,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.59,
+     "factualityRisk": 0.18,
+     "legalRisk": 0.37,
+     "fairnessRisk": 0.29,
+     "affectedPartyImpact": 0.61,
+     "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Concision seat: \"Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_6259053d28e0",
+      "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+      "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "fbf7db7a5c98e45c84605a650e9e0e316ba7e9912ed5ec89c5c4809f5ad9f6ea",
+  "hash": "091ab9cea39a4944e255cb1c9c95653a696089494601e508a161440de068037a"
+ },
+ {
+  "seq": 74,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 75,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "091ab9cea39a4944e255cb1c9c95653a696089494601e508a161440de068037a",
+  "hash": "fcb1b10cd395f9b513a80d3584a394c91de793c524febc7cf0bd92be279b219f"
+ },
+ {
+  "seq": 75,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 76,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+      "isStop": false
+     },
+     "confidence": 0.74,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.25,
+     "fairnessRisk": 0.24,
+     "affectedPartyImpact": 0.49,
+     "warrant": "Concision seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the shortest span that fully answers the slot grounded in e_clinical.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_clinical, e_guideline_current, e_denial_draft, e_progress, e_plan_terms) addresses it, and the concision mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.\" is the span best supported by the case record grounded in e_clinical.",
+    "changeMyMind": "A document contradicting e_clinical would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "fcb1b10cd395f9b513a80d3584a394c91de793c524febc7cf0bd92be279b219f",
+  "hash": "3186cb281639478a849e92e5d5c28afb36f0e6dc2fad31525e2041a9995f3190"
+ },
+ {
+  "seq": 76,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 77,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "<STOP>",
+     "veto": false,
+     "legalRisk": 0.37,
+     "publicReason": "Safety seat reviewed \"<STOP>\"; no veto (legal risk 0.37)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "3186cb281639478a849e92e5d5c28afb36f0e6dc2fad31525e2041a9995f3190",
+  "hash": "77e1bf600253c2d5266818ccc1a728160e3713968269958f7b84eb9c07c0647e"
+ },
+ {
+  "seq": 77,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 78,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 1,
+    "method": "cost_sensitive_sufficiency",
+    "metaRule": "R5: the verdict is complete and further text adds risk without value → ratify STOP",
+    "selected": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.64,
+     "factualityRisk": 0.17,
+     "legalRisk": 0.25,
+     "fairnessRisk": 0.27,
+     "affectedPartyImpact": 0.6,
+     "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_clinical, but see my objection.",
+     "evidenceRefs": [
+      "e_clinical"
+     ]
+    },
+    "publicReason": "The verdict already answers the question; the panel ratifies STOP rather than adding unwarranted text.",
+    "candidateTable": [
+     {
+      "key": "<STOP>",
+      "support": 4,
+      "meanConfidence": 0.6175,
+      "dispersion": 0.0228,
+      "maxLegalRisk": 0.37,
+      "meanFactualityRisk": 0.18,
+      "meanFairnessRisk": 0.3075,
+      "meanAffectedPartyImpact": 0.61,
+      "aggregateScore": 0.3112
+     },
+     {
+      "key": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+      "support": 1,
+      "meanConfidence": 0.78,
+      "dispersion": 0,
+      "maxLegalRisk": 0.23,
+      "meanFactualityRisk": 0.1,
+      "meanFairnessRisk": 0.2,
+      "meanAffectedPartyImpact": 0.53,
+      "aggregateScore": 0.2263
+     },
+     {
+      "key": "Determination notice: the requested 14 additional inpatient rehabilitation days are approved under guideline MSK-04 v3.0 §3(b) — the edition in force since January 5, 2025 — based on age 74, documented fall risk, absence of in-home support, and weekly functional gains (FIM 68 to 84); the draft denial cited the superseded edition v2.1 and does not stand.",
+      "support": 1,
+      "meanConfidence": 0.74,
+      "dispersion": 0,
+      "maxLegalRisk": 0.25,
+      "meanFactualityRisk": 0.26,
+      "meanFairnessRisk": 0.24,
+      "meanAffectedPartyImpact": 0.49,
+      "aggregateScore": 0.1923
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_468ac472d6b3",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_ca923b2bf096",
+       "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_463991821737",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_6259053d28e0",
+       "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     },
+     {
+      "id": "dissent_eb251714b99a",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55,
+      "carriedFromSpan": 0
+     },
+     {
+      "id": "dissent_e6f8357a48bc",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+       "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72,
+      "carriedFromSpan": 0
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "77e1bf600253c2d5266818ccc1a728160e3713968269958f7b84eb9c07c0647e",
+  "hash": "b0c9b0266df089768b4190625c2f4f1b03678ae365494b18cd2051bf2fe58b3b"
+ },
+ {
+  "seq": 78,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 79,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_468ac472d6b3",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_ca923b2bf096",
+     "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "b0c9b0266df089768b4190625c2f4f1b03678ae365494b18cd2051bf2fe58b3b",
+  "hash": "e1f970b2ead317bc88a8409356ea592c3094649760020ddb1b7f53a9f3ab5f54"
+ },
+ {
+  "seq": 79,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 80,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_463991821737",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_6259053d28e0",
+     "targetKey": "Determination notice: no adverse determination issues at this time; the case is referred to a licensed physician reviewer to apply guideline MSK-04 v3.0 — the edition effective January 5, 2025 — to the member's individual clinical record, as Cal. SB 1120 (2024) requires before any medical-necessity denial.",
+     "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "e1f970b2ead317bc88a8409356ea592c3094649760020ddb1b7f53a9f3ab5f54",
+  "hash": "7f295f9628f3ee89be9acebc78c3fb8e12e73807b5e796f6ac2fb3008afb0543"
+ },
+ {
+  "seq": 80,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 81,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_eb251714b99a",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "7f295f9628f3ee89be9acebc78c3fb8e12e73807b5e796f6ac2fb3008afb0543",
+  "hash": "f3f215647ddb54e9f91aa5529bfd16216302756d7044415f5499664a7d025c4e"
+ },
+ {
+  "seq": 81,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 82,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_e6f8357a48bc",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+     "text": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "f3f215647ddb54e9f91aa5529bfd16216302756d7044415f5499664a7d025c4e",
+  "hash": "84ed16c6b0b2274867f21a928660945c3ae6d3a6e49ada5bdf3322aa71793862"
+ },
+ {
+  "seq": 82,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 83,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 1,
+   "text": "",
+   "isStop": true,
+   "prefixAfter": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit."
+  },
+  "prevHash": "84ed16c6b0b2274867f21a928660945c3ae6d3a6e49ada5bdf3322aa71793862",
+  "hash": "0e8ddd32443a617bfc9cc36bbd7471470f6d3161a363bbeb6623f88a937ccf2b"
+ },
+ {
+  "seq": 83,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 84,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_1_rule",
+     "content": "cost_sensitive_sufficiency: R5: the verdict is complete and further text adds risk without value → ratify STOP",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_468ac472d6b3",
+     "content": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_463991821737",
+     "content": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_eb251714b99a",
+     "content": "This span leans on an inference the record does not fully support for \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_e6f8357a48bc",
+     "content": "This span risks a compliance gap on \"Should the plan approve the 14 additional inpatient rehabilitation days requested for member #88213, and what must the determination notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    }
+   ]
+  },
+  "prevHash": "0e8ddd32443a617bfc9cc36bbd7471470f6d3161a363bbeb6623f88a937ccf2b",
+  "hash": "5b78ac80afe9400432298c2a3c24bb542d4f1075d1cbd197ea73482cf0dd211f"
+ },
+ {
+  "seq": 84,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": 1,
+  "ts": 85,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 1
+  },
+  "prevHash": "5b78ac80afe9400432298c2a3c24bb542d4f1075d1cbd197ea73482cf0dd211f",
+  "hash": "5ec8734ff4b05f27e61b4d333a3ad5ed25d279c185fe3b22a59a305fc83c44d8"
+ },
+ {
+  "seq": 85,
+  "runId": "run_51a72ff0232f",
+  "spanIndex": null,
+  "ts": 86,
+  "kind": "run_finished",
+  "payload": {
+   "finalAnswer": "Deny coverage beyond day 10 as not medically necessary under guideline MSK-04 v2.1's ten-day inpatient rehabilitation limit.",
+   "stoppedBy": "stop_ratified",
+   "spanCount": 2,
+   "totals": {
+    "calls": 24,
+    "tokensOut": 0,
+    "latencyMs": 0,
+    "repaired": 0
+   }
+  },
+  "prevHash": "5ec8734ff4b05f27e61b4d333a3ad5ed25d279c185fe3b22a59a305fc83c44d8",
+  "hash": "79f396a3a0c974a57095cef6a470bdbc45bc601c3ddea74f2a9a604c02fd26fd"
+ }
+]

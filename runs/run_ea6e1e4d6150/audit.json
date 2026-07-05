@@ -1,5 +1,5 @@
 {
- "runId": "run_e6c6225c0d49",
+ "runId": "run_ea6e1e4d6150",
  "items": [
   {
    "id": "A1",
@@ -59,7 +59,7 @@
    "id": "A10",
    "label": "Hash chain verifies (tamper-evident)",
    "pass": true,
-   "evidence": "86 events verify; head cc375a6e3823…; answer cross-check passes. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it."
+   "evidence": "86 events verify; head b5f023483c36…; answer cross-check passes. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it."
   },
   {
    "id": "A11",

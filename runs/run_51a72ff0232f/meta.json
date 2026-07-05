@@ -1,0 +1,12 @@
+{
+ "runId": "run_51a72ff0232f",
+ "packId": "insurance-utilization-review",
+ "mode": "offline",
+ "startedAt": 1783230406864,
+ "finishedAt": 1783230406873,
+ "events": 86,
+ "head": "79f396a3a0c974a57095cef6a470bdbc45bc601c3ddea74f2a9a604c02fd26fd",
+ "verified": true,
+ "auditability": "12/12",
+ "label": "insurance-utilization-review · offline · 2026-07-05T05:46:46.864Z"
+}
