@@ -26,6 +26,7 @@ import type {
  */
 export class OfflinePanelClient implements PanelClient {
   readonly transport = "offline" as const;
+  readonly modelSource = "scripted" as const;
   constructor(
     readonly seatId: string,
     readonly society: Society,
@@ -34,6 +35,7 @@ export class OfflinePanelClient implements PanelClient {
   ) {}
 
   async propose(req: ProposeRequest): Promise<ProposeResult> {
+    req.signal?.throwIfAborted();
     const { view, seed } = req;
     const slot = view.case.slot;
     const rng = mulberry32(hashOf([this.society, view.case.runId, slot.index, seed]));
@@ -70,7 +72,7 @@ export class OfflinePanelClient implements PanelClient {
 
     return {
       repaired: 0,
-      usage: { provider: this.provider, model: this.model, status: "ok", transport: "offline" },
+      usage: { provider: this.provider, model: this.model, modelSource: this.modelSource, status: "ok", transport: "offline" },
       proposal: {
         seatId: this.seatId,
         society: this.society,
@@ -88,6 +90,7 @@ export class OfflinePanelClient implements PanelClient {
   }
 
   async revise(req: ReviseRequest): Promise<ReviseResult> {
+    req.signal?.throwIfAborted();
     const { view, ownRound1, feedback, guidance, seed } = req;
     const rng = mulberry32(hashOf([this.society, "revise", view.case.runId, view.case.slot.index, seed]));
     // Move toward the highest-support candidate unless this seat is the adversary
@@ -125,7 +128,7 @@ export class OfflinePanelClient implements PanelClient {
 
     return {
       repaired: 0,
-      usage: { provider: this.provider, model: this.model, status: "ok", transport: "offline" },
+      usage: { provider: this.provider, model: this.model, modelSource: this.modelSource, status: "ok", transport: "offline" },
       revision: {
         seatId: this.seatId,
         society: this.society,

@@ -11,6 +11,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
 | Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
 | Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
+| Safe cancellation | A stop seals `run_finished.stoppedBy=cancelled` with actor, reason, time, and exact IDs for queued interventions that never applied; it is never labeled a verdict |
 | A1–A12 scorecard | Twelve checklist items scored only from the run's own artifacts, with anti-spoof guards |
 | Independent verify | Anyone can re-run `verifyLedger()` on exported events (`POST /api/verify`, `npm run demo`, or the Cloudflare Worker) |
 
@@ -35,6 +36,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 6. Anonymization removes identity fields, not writing style.
 7. Back-filled or trivial rationale **fails** scorecard items even when structure passes.
 8. If kernel ledger logic changes, update `apps/worker/src/index.ts` in the same change.
+9. Cancellation preserves already-ratified spans, records aborted calls as `cancelled`, and never implies that queued interventions applied.
 
 ## Scorecard honesty
 

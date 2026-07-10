@@ -12,6 +12,7 @@ export interface SeatInfo {
   society: string;
   provider: string;
   model: string;
+  modelSource?: "response" | "requested" | "cli_config" | "scripted";
 }
 
 export type SeatPhase =
@@ -21,6 +22,7 @@ export type SeatPhase =
   | "revealed"
   | "revising"
   | "revised"
+  | "cancelled"
   | "done";
 
 export interface SeatState {
@@ -93,6 +95,14 @@ export interface DeliberationView {
   committedSpans: { text: string; isStop: boolean }[];
   liveNote: string | null;
   escalated: boolean;
+  stoppedBy: string | null;
+  cancellation: {
+    actor: string;
+    reason: string;
+    requestedAt: number;
+    unappliedInterventions: number;
+    unappliedInterventionIds: string[];
+  } | null;
 }
 
 const PHASE_OF_KIND: Record<string, RunPhaseId> = {
@@ -127,6 +137,8 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
   let finalAnswer: string | null = null;
   let liveNote: string | null = null;
   let escalated = false;
+  let stoppedBy: string | null = null;
+  let cancellation: DeliberationView["cancellation"] = null;
   const committedSpans: { text: string; isStop: boolean }[] = [];
   const dissents: DissentView[] = [];
   const humans: { actor: string; kind: string; text: string }[] = [];
@@ -160,7 +172,7 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
 
   for (const e of events) {
     const p = e.payload as any;
-    const mapped = PHASE_OF_KIND[e.kind];
+    const mapped = e.kind === "run_finished" && p.stoppedBy === "cancelled" ? undefined : PHASE_OF_KIND[e.kind];
     if (mapped) phase = mapped;
     if (typeof e.spanIndex === "number" && e.spanIndex !== spanIndex) {
       // A new decision slot opened: reset the candidate board.
@@ -317,7 +329,15 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
       }
       case "run_finished": {
         finalAnswer = p.finalAnswer ?? "";
-        phase = "done";
+        stoppedBy = p.stoppedBy ?? null;
+        cancellation = p.cancellation ?? null;
+        if (stoppedBy === "cancelled") {
+          for (const seat of seatsById.values()) {
+            if (seat.phase !== "done") seat.phase = "cancelled";
+          }
+        } else {
+          phase = "done";
+        }
         break;
       }
     }
@@ -356,6 +376,8 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
     committedSpans,
     liveNote,
     escalated,
+    stoppedBy,
+    cancellation,
   };
 }
 

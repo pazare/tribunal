@@ -31,7 +31,7 @@ export interface PanelBuildOptions {
  * CLI assignment: spread the six seats across the three locally-authenticated
  * providers so the panel is genuinely cross-provider (two seats per vendor).
  */
-const CLI_DEFAULT: Record<Society, Provider> = {
+export const CLI_DEFAULT_ASSIGNMENT: Record<Society, Provider> = {
   evidence: "openai",
   adversary: "xai",
   law_policy: "anthropic",
@@ -41,9 +41,9 @@ const CLI_DEFAULT: Record<Society, Provider> = {
 };
 
 /** OpenRouter assignment: one key, five sponsors' models on the panel. */
-const OPENROUTER_DEFAULT: Record<Society, { provider: Provider; model: string }> = {
+export const OPENROUTER_DEFAULT_ASSIGNMENT: Record<Society, { provider: Provider; model: string }> = {
   evidence: { provider: "microsoft", model: "microsoft/phi-4" },
-  adversary: { provider: "nvidia", model: "nvidia/llama-3.1-nemotron-70b-instruct" },
+  adversary: { provider: "nvidia", model: "nvidia/nemotron-3-super-120b-a12b" },
   law_policy: { provider: "meta", model: "meta-llama/llama-3.3-70b-instruct" },
   affected_party: { provider: "deepseek", model: "deepseek/deepseek-chat" },
   safety: { provider: "mistral", model: "mistralai/mistral-large" },
@@ -71,7 +71,7 @@ export function buildPanelFromProviders(
             modelLabel: opts.models?.[provider],
           })
         : new OpenRouterPanelClient(seatId, society, provider, {
-            model: opts.models?.[provider] ?? OPENROUTER_DEFAULT[society].model,
+            model: opts.models?.[provider] ?? OPENROUTER_DEFAULT_ASSIGNMENT[society].model,
           });
     return { seatId, client };
   });
@@ -84,13 +84,13 @@ export function buildPanel(opts: PanelBuildOptions): PanelSeat[] {
     if (opts.mode === "offline") {
       client = new OfflinePanelClient(seatId, society);
     } else if (opts.mode === "cli") {
-      const provider = opts.assignment?.[society]?.provider ?? CLI_DEFAULT[society];
+      const provider = opts.assignment?.[society]?.provider ?? CLI_DEFAULT_ASSIGNMENT[society];
       client = new CliPanelClient(seatId, society, provider, {
         timeoutMs: opts.cliTimeoutMs,
         modelLabel: opts.assignment?.[society]?.model,
       });
     } else {
-      const def = OPENROUTER_DEFAULT[society];
+      const def = OPENROUTER_DEFAULT_ASSIGNMENT[society];
       const provider = opts.assignment?.[society]?.provider ?? def.provider;
       const model = opts.assignment?.[society]?.model ?? def.model;
       client = new OpenRouterPanelClient(seatId, society, provider, { model });

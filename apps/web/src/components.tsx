@@ -66,6 +66,7 @@ const SEAT_PHASE_BADGE: Record<SeatState["phase"], { label: string; cls: string;
   revealed: { label: "revealed", cls: "bg-zinc-700/60 text-zinc-300" },
   revising: { label: "weighing critique", cls: "bg-violet-500/15 text-violet-300", pulse: true },
   revised: { label: "final position", cls: "bg-emerald-500/15 text-emerald-300" },
+  cancelled: { label: "stopped", cls: "bg-rose-500/15 text-rose-300" },
   done: { label: "ratified", cls: "bg-tribunal-gold/15 text-tribunal-gold" },
 };
 
@@ -268,10 +269,13 @@ function CandidateRow({ c, method }: { c: CandidateState; method: string | null 
 export function VerdictStrip({ view }: { view: DeliberationView }) {
   if (view.committedSpans.length === 0 && !view.finalAnswer) return null;
   const decided = view.committedSpans.filter((s) => !s.isStop).length;
+  const cancelled = view.stoppedBy === "cancelled";
   return (
     <motion.div layout className="glass p-4 border-l-2 border-tribunal-gold" data-testid="verdict-strip">
       <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">
-        {view.finalAnswer !== null
+        {cancelled
+          ? "Partial ratified record — run cancelled"
+          : view.finalAnswer !== null
           ? "Ratified verdict — decoded span by span"
           : `Verdict under construction · ${decided} span${decided === 1 ? "" : "s"} elected so far`}
       </p>
@@ -291,13 +295,43 @@ export function VerdictStrip({ view }: { view: DeliberationView }) {
           <span className="font-mono text-sm text-emerald-300 ml-2">▣ STOP ratified</span>
         )}
       </p>
-      {view.finalAnswer !== null && (
+      {view.finalAnswer !== null && !cancelled && (
         <p className="text-[10px] text-zinc-500 mt-2">
           No token of this verdict came from a single model sampling in the dark: every span above was elected under a
           named rule, and every losing argument is preserved below. Nothing off the record.
         </p>
       )}
     </motion.div>
+  );
+}
+
+export function CancellationPanel({ view }: { view: DeliberationView }) {
+  if (view.stoppedBy !== "cancelled") return null;
+  const receipt = view.cancellation;
+  return (
+    <section className="glass p-4 border-l-2 border-rose-400" data-testid="cancellation-record">
+      <p className="eyebrow text-rose-300">Proceeding stopped safely</p>
+      <h2 className="font-serif text-2xl text-zinc-100 mt-2">No final verdict was issued.</h2>
+      <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
+        Any spans ratified before the stop remain part of the verified record. In-flight work was cancelled, and queued
+        interventions that did not reach a checkpoint are named below rather than implied to have applied.
+      </p>
+      {receipt && (
+        <dl className="grid sm:grid-cols-2 gap-3 mt-4 text-xs">
+          <div><dt className="field-label">Requested by</dt><dd className="text-zinc-200 mt-1">{receipt.actor}</dd></div>
+          <div><dt className="field-label">Requested at</dt><dd className="text-zinc-200 mt-1">{new Date(receipt.requestedAt).toLocaleString()}</dd></div>
+          <div className="sm:col-span-2"><dt className="field-label">Reason</dt><dd className="text-zinc-200 mt-1">{receipt.reason}</dd></div>
+          <div className="sm:col-span-2">
+            <dt className="field-label">Not applied</dt>
+            <dd className="font-mono text-[11px] text-zinc-400 mt-1 break-all">
+              {receipt.unappliedInterventionIds.length
+                ? receipt.unappliedInterventionIds.join(", ")
+                : "No queued interventions were left unapplied."}
+            </dd>
+          </div>
+        </dl>
+      )}
+    </section>
   );
 }
 

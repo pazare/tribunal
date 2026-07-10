@@ -4,13 +4,32 @@
 
 :root {
   color-scheme: dark;
+  font-synthesis: none;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   @apply bg-tribunal-bg text-zinc-100 font-sans antialiased min-h-screen;
+  margin: 0;
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 169, 98, 0.08), transparent),
     radial-gradient(ellipse 60% 40% at 100% 100%, rgba(94, 234, 212, 0.04), transparent);
+}
+
+button,
+input,
+select,
+textarea,
+summary,
+a {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tribunal-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tribunal-bg;
+}
+
+button:disabled {
+  @apply cursor-not-allowed;
 }
 
 .glass {
@@ -40,4 +59,146 @@ body {
 .courtroom-bg {
   background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   background-size: 100% 32px;
+}
+
+.app-header {
+  @apply sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-tribunal-border/70 bg-tribunal-bg/90 px-4 py-3 backdrop-blur-xl md:px-6;
+}
+
+.eyebrow,
+.field-label {
+  @apply text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-500;
+}
+
+.field-help {
+  @apply text-[11px] leading-relaxed text-zinc-500;
+}
+
+.nav-button {
+  @apply min-h-9 whitespace-nowrap rounded-lg px-3 text-xs capitalize text-zinc-400 transition hover:bg-zinc-800/70 hover:text-zinc-100 disabled:text-zinc-700 disabled:hover:bg-transparent;
+}
+
+.nav-button-active {
+  @apply bg-tribunal-gold/15 text-tribunal-gold;
+}
+
+.segmented-button {
+  @apply min-h-10 rounded-lg border border-zinc-800 bg-zinc-950/30 px-2.5 text-xs text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200 disabled:opacity-35;
+}
+
+.segmented-button-active {
+  @apply border-tribunal-gold/50 bg-tribunal-gold/10 text-tribunal-gold;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.text-button {
+  @apply inline-flex min-h-10 items-center justify-center rounded-lg px-3 text-xs font-medium transition disabled:opacity-40;
+}
+
+.primary-button {
+  @apply bg-tribunal-gold text-zinc-950 shadow-lg shadow-tribunal-gold/10 hover:bg-amber-300;
+}
+
+.secondary-button {
+  @apply border border-tribunal-gold/35 bg-tribunal-gold/10 text-tribunal-gold hover:border-tribunal-gold/60 hover:bg-tribunal-gold/15;
+}
+
+.danger-button {
+  @apply border border-rose-400/30 bg-rose-500/10 text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/15;
+}
+
+.text-button {
+  @apply text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100;
+}
+
+.status-chip {
+  @apply inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em];
+}
+
+.status-chip-neutral {
+  @apply border-zinc-700/80 bg-zinc-800/60 text-zinc-400;
+}
+
+.status-chip-live {
+  @apply border-emerald-400/25 bg-emerald-400/10 text-emerald-300;
+}
+
+.status-chip-warn {
+  @apply border-amber-400/25 bg-amber-400/10 text-amber-200;
+}
+
+.status-chip-error {
+  @apply border-rose-400/25 bg-rose-400/10 text-rose-300;
+}
+
+.live-dot {
+  @apply inline-block h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse;
+}
+
+.case-card {
+  @apply min-h-48 rounded-xl border border-tribunal-border bg-tribunal-panel/70 p-4 text-left transition hover:-translate-y-0.5 hover:border-zinc-600 hover:bg-tribunal-panel;
+}
+
+.case-card-selected {
+  @apply border-tribunal-gold/60 bg-tribunal-gold/[0.06] shadow-lg shadow-tribunal-gold/[0.04];
+}
+
+.switch-track {
+  @apply relative mt-0.5 inline-flex h-5 w-9 shrink-0 rounded-full bg-zinc-700 p-0.5 transition;
+}
+
+.switch-track-on {
+  @apply bg-tribunal-gold/70;
+}
+
+.switch-thumb {
+  @apply block h-4 w-4 rounded-full bg-white shadow transition-transform;
+}
+
+.notice {
+  @apply flex min-h-10 items-center justify-between gap-3 rounded-lg border px-3 py-2 text-xs;
+}
+
+.notice-neutral {
+  @apply border-sky-400/20 bg-sky-400/[0.06] text-sky-200;
+}
+
+.notice-warn {
+  @apply border-amber-400/20 bg-amber-400/[0.06] text-amber-200;
+}
+
+.notice-error {
+  @apply border-rose-400/25 bg-rose-400/[0.07] text-rose-200;
+}
+
+.notice-success {
+  @apply border-emerald-400/25 bg-emerald-400/[0.07] text-emerald-200;
+}
+
+.audit-mark {
+  @apply inline-flex h-6 min-w-12 shrink-0 items-center justify-center rounded border px-1.5 font-mono text-[9px] font-bold;
+}
+
+.audit-mark-pass {
+  @apply border-emerald-400/30 bg-emerald-400/10 text-emerald-300;
+}
+
+.audit-mark-fail {
+  @apply border-rose-400/30 bg-rose-400/10 text-rose-300;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -63,7 +63,7 @@ export type Provider =
   | "cursor"
   | "offline"; // deterministic scripted panel — CI/tests only, never in a live demo
 
-export type TurnStatus = "ok" | "refusal" | "incomplete" | "error";
+export type TurnStatus = "ok" | "refusal" | "incomplete" | "cancelled" | "error";
 
 export type DissentStatus = "preserved" | "resolved" | "escalated";
 
@@ -334,7 +334,13 @@ export interface MemoryExtract {
 
 export interface UsageRecord {
   provider: Provider;
+  /** Model reported by the serving API, or the configured model label for non-reporting transports. */
   model: string;
+  modelSource?: "response" | "requested" | "cli_config" | "scripted";
+  /** Requested model when an API reports a different resolved/served model. */
+  requestedModel?: string;
+  /** Serving host reported by a router, when available. */
+  servingProvider?: string;
   tokensIn?: number;
   tokensOut?: number;
   latencyMs?: number;
@@ -348,6 +354,8 @@ export interface UsageRecord {
 // ---------------------------------------------------------------------------
 
 export interface HumanIntervention {
+  /** Server-issued receipt id used to prove a queued action reached the ledger. */
+  interventionId?: string;
   spanIndex: number;
   actor: string; // display name / role of the human auditor
   kind: "objection" | "veto" | "question" | "affirm";
@@ -355,6 +363,14 @@ export interface HumanIntervention {
   text: string;
   /** For veto: the candidate the human blocks. */
   targetKey?: string;
+}
+
+export interface CancellationReceipt {
+  actor: string;
+  reason: string;
+  requestedAt: number;
+  unappliedInterventions: number;
+  unappliedInterventionIds: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -387,7 +403,7 @@ export interface EventPayloadMap {
     title: string;
     domain: string;
     question: string;
-    panel: { seatId: string; society: Society; provider: Provider; model: string }[];
+    panel: { seatId: string; society: Society; provider: Provider; model: string; modelSource?: UsageRecord["modelSource"] }[];
     config: RunConfig;
     note: string;
   };
@@ -409,9 +425,12 @@ export interface EventPayloadMap {
   decision_closed: { spanIndex: number };
   run_finished: {
     finalAnswer: string;
-    stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted";
+    stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "cancelled";
     spanCount: number;
     totals: Record<string, number>;
+    cancellation?: CancellationReceipt;
+    /** Server-issued queue receipts that never reached a ratification checkpoint. */
+    unappliedInterventionIds?: string[];
   };
 }
 
@@ -455,7 +474,7 @@ export const DEFAULT_FLAGS: ControlFlags = {
 export interface RunConfig {
   seed: number;
   /** Provider assignment per seat. If omitted, the engine picks a default panel. */
-  panel?: { society: Society; provider: Provider; model?: string }[];
+  panel?: { society: Society; provider: Provider; model?: string; modelSource?: UsageRecord["modelSource"] }[];
   maxSpans: number;
   flags: ControlFlags;
   /** "answer_only" hides deliberation from the *client* view (still ledgered). */
@@ -466,7 +485,7 @@ export interface RunResult {
   runId: string;
   packId: string;
   finalAnswer: string;
-  stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted";
+  stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "cancelled";
   spanCount: number;
   events: LedgerEvent[];
   usageTotals: Record<string, number>;

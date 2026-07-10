@@ -12,7 +12,7 @@ Tribunal replaces sampling with **election**. The output is decoded in atomic su
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point). Three committed live runs score an honest **11/12** — the panel refused to ratify STOP, and [the ledger shows exactly why](docs/honesty.md#the-scorecard-fails-our-own-live-runs--on-purpose).
 
-Tests: **19** kernel · **10** scorecard · **2** packs (`npm test`).
+Tests: **30** kernel · **14** scorecard · **2** packs (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -96,7 +96,8 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 19 kernel + 2 packs + 10 scorecard tests
+npm test                 # 30 kernel + 2 packs + 14 scorecard tests
+npm run smoke --workspace @tribunal/web  # isolated offline UI/API browser gate
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
 ```
@@ -137,18 +138,18 @@ export OPENROUTER_API_KEY=sk-or-...
 # POST /api/run  { "packId": "lending-adverse-action", "mode": "openrouter" }
 ```
 
-Default model slugs (override per seat in code via `packages/kernel/src/panel.ts`):
+Default model slugs (override every seat in the operator UI or `assignment{}` API field):
 
 | Seat society | Provider label | OpenRouter model slug |
 |--------------|----------------|------------------------|
 | evidence | microsoft | `microsoft/phi-4` |
-| adversary | nvidia | `nvidia/llama-3.1-nemotron-70b-instruct` |
+| adversary | nvidia | `nvidia/nemotron-3-super-120b-a12b` |
 | law_policy | meta | `meta-llama/llama-3.3-70b-instruct` |
 | affected_party | deepseek | `deepseek/deepseek-chat` |
 | safety | mistral | `mistralai/mistral-large` |
 | concision | microsoft | `microsoft/phi-4` |
 
-Meta models are often served via Nebius on OpenRouter; the ledger records the vendor label, not the host.
+The ledger records the selected model vendor and requested slug. When OpenRouter reports a resolved model or serving host, `provider_call.usage` records those too.
 
 ### Offline mode (CI / tests only)
 
@@ -196,6 +197,7 @@ Checks performed:
 | Safety veto and preserved dissent on the record | Perfect peer anonymization (identity fields removed, not style) |
 | A1–A12 scorecard from real artifacts | Legal/regulatory compliance |
 | Human auditor interventions as ledger events | Anchored provenance without publishing the head hash |
+| Exact six-seat assignment plus receipt-bearing stop and queue control | That cancellation erases earlier ratified spans or proves answer quality |
 
 Details: [`docs/honesty.md`](docs/honesty.md).
 
@@ -208,7 +210,7 @@ Details: [`docs/honesty.md`](docs/honesty.md).
 | `packages/kernel` | Engine, ledger, panel adapters, `verifyLedger()` |
 | `packages/scorecard` | A1–A12 checklist + baseline 0/12 |
 | `packages/packs` | Four live domain cases: lending, insurance, benefits, moderation — each with a planted trap |
-| `apps/server` | Node SSE API, human intervention, persistence |
+| `apps/server` | Node SSE API, exact seating, intervention queue, safe cancellation, persistence |
 | `apps/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker verify endpoint (ready to deploy) |
 | `runs/` | Replayable real-run ledgers + head hashes for anchoring |

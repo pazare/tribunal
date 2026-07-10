@@ -6,6 +6,7 @@ import { ratify } from "./ratify.js";
 import type { PanelClient } from "./providers/base.js";
 import type {
   CaseFile,
+  CancellationReceipt,
   DecisionSlot,
   DissentRecord,
   EvidenceItem,
@@ -63,6 +64,10 @@ export interface RunOptions {
    * UI can inject typed/voice objections and vetoes into THIS run in real time.
    */
   pullHumanInterventions?: (spanIndex: number) => HumanIntervention[] | Promise<HumanIntervention[]>;
+  /** Drains queued interventions that never reached a checkpoint so terminal disposition is explicit. */
+  drainHumanInterventions?: () => HumanIntervention[] | Promise<HumanIntervention[]>;
+  /** Stops new work and aborts in-flight provider calls; run_finished is still ledgered. */
+  signal?: AbortSignal;
   /** "logical" gives byte-deterministic timestamps (offline/tests). */
   clock?: "logical" | "wall";
 }
@@ -111,6 +116,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
       society: s.client.society,
       provider: s.client.provider,
       model: s.client.model,
+      modelSource: s.client.modelSource,
     })),
     config,
     note:
@@ -124,6 +130,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   const rejectedAlternatives: CaseFile["rejectedAlternatives"] = [];
   let carriedDissent: DissentRecord[] = [];
   const memory: MemoryExtract[] = [];
+  const cancelled = () => Boolean(opts.signal?.aborted);
   let stoppedBy: RunResult["stoppedBy"] = "max_spans";
   let spanCount = 0;
 
@@ -152,6 +159,10 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   const slotQueue: DecisionSlot[] = [...pack.slots, completionSlot];
   let completionRetried = false;
   for (let qi = 0; qi < slotQueue.length; qi++) {
+    if (cancelled()) {
+      stoppedBy = "cancelled";
+      break;
+    }
     const slot = slotQueue[qi];
     if (spanCount >= config.maxSpans) {
       stoppedBy = "max_spans";
@@ -180,7 +191,11 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     const proposeResults = await Promise.all(
       seats.map((s) =>
         s.client
-          .propose({ view: viewFor(baseCase, s, config), seed: config.seed })
+          .propose({
+            view: viewFor(baseCase, s, config, memory, pack.evidenceBySociety),
+            seed: config.seed,
+            signal: opts.signal,
+          })
           .then((r) => ({ seat: s, ...r }))
           .catch((err) => ({ seat: s, error: err as Error })),
       ),
@@ -189,15 +204,21 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     const proposals: Proposal[] = [];
     for (const r of proposeResults) {
       if ("error" in r) {
+        const usage = errUsage(r.seat.client, r.error, cancelled());
+        recordUsage(usageTotals, usage, 0);
         append("provider_call", slot.index, {
           seatId: r.seat.seatId,
-          usage: errUsage(r.seat.client, r.error),
+          usage,
         });
         continue;
       }
       proposals.push(r.proposal);
       recordUsage(usageTotals, r.usage, r.repaired);
       append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
+    }
+    if (cancelled()) {
+      stoppedBy = "cancelled";
+      break;
     }
     if (proposals.length === 0) {
       stoppedBy = "halted";
@@ -260,11 +281,12 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
           const ordered = applyOrder(packet.summaries, order);
           return seat.client
             .revise({
-              view: viewFor(baseCase, seat, config),
+              view: viewFor(baseCase, seat, config, memory, pack.evidenceBySociety),
               ownRound1: p.candidates,
               feedback: ordered,
               guidance: packet.guidance,
               seed: config.seed,
+              signal: opts.signal,
             })
             .then((r) => ({ seat, ...r }))
             .catch((err) => ({ seat, error: err as Error }));
@@ -273,13 +295,19 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
       revisions = [];
       for (const r of reviseResults) {
         if ("error" in r) {
-          append("provider_call", slot.index, { seatId: r.seat.seatId, usage: errUsage(r.seat.client, r.error) });
+          const usage = errUsage(r.seat.client, r.error, cancelled());
+          recordUsage(usageTotals, usage, 0);
+          append("provider_call", slot.index, { seatId: r.seat.seatId, usage });
           continue;
         }
         revisions.push(r.revision);
         recordUsage(usageTotals, r.usage, r.repaired);
         append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
         append("revision_received", slot.index, { revision: r.revision });
+      }
+      if (cancelled()) {
+        stoppedBy = "cancelled";
+        break;
       }
       if (revisions.length === 0) revisions = synthesizeFinals(proposals);
     } else {
@@ -293,10 +321,16 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
 
     // ---- Human intervention (auditor in the loop) ------------------------
     const pulled = opts.pullHumanInterventions ? await opts.pullHumanInterventions(slot.index) : [];
+    if (cancelled()) {
+      stoppedBy = "cancelled";
+      break;
+    }
     const humans = [...(humanBySpan.get(slot.index) ?? []), ...pulled];
+    let humanVetoPresent = false;
     for (const h of humans) {
       append("human_intervention", slot.index, h);
       if (h.kind === "veto" && h.targetKey) {
+        humanVetoPresent = true;
         safety.push({
           candidateKey: h.targetKey,
           veto: true,
@@ -305,13 +339,16 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
         });
       }
     }
+    // The safetyVeto flag ablates the AI safety seat, not the named human
+    // auditor. A human veto remains binding and attributed under every ablation.
+    const effectiveVetoEnabled = config.flags.safetyVeto || humanVetoPresent;
 
     // ---- Constitutional ratification -------------------------------------
     let decision = ratify({
       spanIndex: slot.index,
       revisions,
       safety,
-      vetoEnabled: config.flags.safetyVeto,
+      vetoEnabled: effectiveVetoEnabled,
       carriedDissent,
       escalationRoundsDone: 0,
     });
@@ -336,23 +373,34 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
           const order = orders.get(prev.seatId) ?? packet2.summaries.map((_, i) => i);
           return seat.client
             .revise({
-              view: viewFor(baseCase, seat, config),
+              view: viewFor(baseCase, seat, config, memory, pack.evidenceBySociety),
               ownRound1: [prev.final],
               feedback: applyOrder(packet2.summaries, order),
               guidance: packet2.guidance,
               seed: config.seed + 1,
+              signal: opts.signal,
             })
             .then((r) => ({ seat, ...r }))
-            .catch(() => null);
+            .catch((error) => ({ seat, error: error as Error }));
         }),
       );
       const revisions2: Revision[] = [];
       for (const r of revised2) {
         if (!r) continue;
+        if ("error" in r) {
+          const usage = errUsage(r.seat.client, r.error, cancelled());
+          recordUsage(usageTotals, usage, 0);
+          append("provider_call", slot.index, { seatId: r.seat.seatId, usage });
+          continue;
+        }
         revisions2.push(r.revision);
         recordUsage(usageTotals, r.usage, r.repaired);
         append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
         append("revision_received", slot.index, { revision: r.revision });
+      }
+      if (cancelled()) {
+        stoppedBy = "cancelled";
+        break;
       }
       if (revisions2.length > 0) revisions = revisions2;
       const safety2 = computeSafety(revisions, leadingCandidateKey(revisions), config.flags.safetyVeto);
@@ -361,7 +409,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
         spanIndex: slot.index,
         revisions,
         safety: [...safety2, ...safety.filter((s) => s.veto)],
-        vetoEnabled: config.flags.safetyVeto,
+        vetoEnabled: effectiveVetoEnabled,
         carriedDissent,
         escalationRoundsDone: 1,
       });
@@ -437,11 +485,19 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   }
 
   const finalAnswer = prefix.trim();
+  const cancellation = stoppedBy === "cancelled" ? cancellationReceipt(opts.signal?.reason) : undefined;
+  const remainingInterventions = opts.drainHumanInterventions ? await opts.drainHumanInterventions() : [];
+  const unappliedInterventionIds = [...new Set([
+    ...(cancellation?.unappliedInterventionIds ?? []),
+    ...remainingInterventions.map((item) => item.interventionId).filter((id): id is string => Boolean(id)),
+  ])];
   append("run_finished", null, {
     finalAnswer,
     stoppedBy,
     spanCount,
     totals: usageTotals,
+    ...(cancellation ? { cancellation } : {}),
+    ...(unappliedInterventionIds.length ? { unappliedInterventionIds } : {}),
   });
 
   return {
@@ -456,21 +512,55 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   };
 }
 
+function cancellationReceipt(reason: unknown): CancellationReceipt {
+  const value = reason && typeof reason === "object" ? (reason as Partial<CancellationReceipt>) : {};
+  const unappliedInterventionIds = Array.isArray(value.unappliedInterventionIds)
+    ? [...new Set(value.unappliedInterventionIds.filter((id): id is string => typeof id === "string" && id.length > 0))]
+    : [];
+  return {
+    actor: typeof value.actor === "string" && value.actor.trim() ? value.actor.trim() : "Operator",
+    reason: typeof value.reason === "string" && value.reason.trim() ? value.reason.trim() : "Run cancelled",
+    requestedAt: Number.isFinite(value.requestedAt) ? Number(value.requestedAt) : 0,
+    unappliedInterventions: unappliedInterventionIds.length,
+    unappliedInterventionIds,
+  };
+}
+
 // --- helpers ----------------------------------------------------------------
 
-function viewFor(base: CaseFile, seat: PanelSeat, config: RunConfig) {
+function viewFor(
+  base: CaseFile,
+  seat: PanelSeat,
+  config: RunConfig,
+  memory: MemoryExtract[],
+  evidenceBySociety?: Partial<Record<string, string[]>>,
+) {
   const society = seat.client.society;
   let evidence = base.evidence;
   if (config.flags.independentEvidence) {
-    // Each seat gets its own bundle: its assigned ids, else a rotating slice.
-    evidence = base.evidence; // full record available; assignment is packs' concern
+    // Each seat gets its own evidence bundle. Packs may name exact ids; otherwise
+    // use a deterministic overlapping rotation so every seat has substantive
+    // material while no two mandates receive an identical default bundle.
+    const assigned = evidenceBySociety?.[society];
+    if (assigned?.length) {
+      const ids = new Set(assigned);
+      evidence = base.evidence.filter((item) => ids.has(item.id));
+    } else if (base.evidence.length > 1) {
+      const societies = ["evidence", "adversary", "law_policy", "affected_party", "safety", "concision"];
+      const offset = Math.max(0, societies.indexOf(society));
+      const width = Math.min(base.evidence.length, Math.max(2, Math.ceil(base.evidence.length * 0.6)));
+      evidence = Array.from(
+        { length: width },
+        (_, index) => base.evidence[(offset + index) % base.evidence.length],
+      );
+    }
   }
   return {
     case: base,
     seatId: seat.seatId,
     society,
     evidence,
-    memory: [] as MemoryExtract[],
+    memory: config.flags.roleMemory ? memory.slice() : [],
   };
 }
 
@@ -536,11 +626,15 @@ function recordUsage(totals: Record<string, number>, usage: UsageRecord, repaire
   totals.repaired += repaired;
 }
 
-function errUsage(client: PanelClient, err: Error): UsageRecord {
+function errUsage(client: PanelClient, err: unknown, signalAborted = false): UsageRecord {
+  const name = err instanceof Error ? err.name : "";
+  const message = err instanceof Error ? err.message : String(err ?? "");
+  const wasCancelled = signalAborted || name === "AbortError" || /cancel|abort/i.test(message);
   return {
     provider: client.provider,
     model: client.model,
-    status: /refus/i.test(err.message) ? "refusal" : "error",
+    modelSource: client.modelSource,
+    status: wasCancelled ? "cancelled" : /refus/i.test(message) ? "refusal" : "error",
     transport: client.transport,
   };
 }

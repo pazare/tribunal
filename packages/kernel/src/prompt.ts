@@ -32,6 +32,9 @@ export function proposePrompt(view: PanelistCaseView): { system: string; user: s
   const carried = c.unresolvedDissent
     .map((d) => `  - carried dissent on "${d.chosenKey}": ${d.objection.text}`)
     .join("\n");
+  const memory = view.memory
+    .map((m) => `  - [${m.layer}:${m.key}] ${m.content}`)
+    .join("\n");
 
   const system = `You are the ${charterText(view.society)}
 You sit on an independent decision panel. Other seats are staffed by models from
@@ -55,6 +58,7 @@ ${evidence || "  (none assigned to your seat)"}
 CASE DOCUMENTS:
 ${docs || "(none)"}
 ${carried ? `\nUNRESOLVED DISSENT CARRIED FORWARD:\n${carried}` : ""}
+${memory ? `\nPUBLIC DELIBERATION MEMORY FROM EARLIER SPANS:\n${memory}` : ""}
 
 Propose 1-3 candidate spans for THIS span only. On a completion span, make your
 FIRST candidate STOP (text "", isStop true) unless you identify a specific legally
@@ -107,6 +111,9 @@ export function revisePrompt(
   const own = ownRound1
     .map((sc) => `  - "${sc.candidate.isStop ? "<STOP>" : sc.candidate.text}" (conf ${sc.confidence})`)
     .join("\n");
+  const memory = view.memory
+    .map((m) => `  - [${m.layer}:${m.key}] ${m.content}`)
+    .join("\n");
 
   const system = `You are the ${charterText(view.society)}
 This is the revision round. You received ANONYMIZED feedback about all candidates
@@ -116,6 +123,7 @@ it, (c) steelman the best rival, and (d) state what would change your mind.${JSO
 
   const user = `DECISION: ${view.case.title}
 SPAN #${view.case.slot.index}: ${view.case.slot.label}
+${memory ? `\nPUBLIC DELIBERATION MEMORY FROM EARLIER SPANS:\n${memory}\n` : ""}
 
 YOUR ROUND-1 CANDIDATES:
 ${own || "  (none)"}
