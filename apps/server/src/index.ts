@@ -25,6 +25,7 @@ import {
   DEFAULT_FLAGS,
   DEFAULT_SOCIETIES,
   OPENROUTER_DEFAULT_ASSIGNMENT,
+  makeDefaultDecoderClients,
   type ControlFlags,
   type CancellationReceipt,
   type HumanIntervention,
@@ -36,6 +37,11 @@ import {
 } from "@tribunal/kernel";
 import { computeAuditability, baselineReport } from "@tribunal/scorecard";
 import { PACKS } from "@tribunal/packs";
+import { createDecoderService, DecoderServiceError } from "./decoder-service.js";
+import {
+  assertDecoderNetworkPolicy,
+  decoderOperatorAuthorized,
+} from "./decoder-auth.js";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 // Node 20.12+ can load the documented repo-local .env file without another
@@ -53,10 +59,25 @@ const PORT = Number(process.env.PORT ?? 8787);
 // CLIs and spend API keys, so it must never listen on all interfaces unless
 // the operator explicitly opts in (e.g. HOST=0.0.0.0 inside a container).
 const HOST = process.env.HOST ?? "127.0.0.1";
+const DECODER_OPERATOR_TOKEN = process.env.TRIBUNAL_DECODER_OPERATOR_TOKEN?.trim() || undefined;
+assertDecoderNetworkPolicy(HOST, DECODER_OPERATOR_TOKEN);
 // Resolve repository assets from this file, not process.cwd(). Workspace npm
 // scripts launch with apps/server as cwd; tying paths to cwd made both persisted
 // runs and the production web build disappear under that supported entrypoint.
 const RUNS_DIR = resolve(REPO_ROOT, process.env.TRIBUNAL_RUNS_DIR ?? "runs");
+
+// The live two-agent explainable decoder (Codex gpt-5.6-sol + Claude Opus 4.8).
+// Operator policy (decided by the user over a genuine slow-but-real vs. hung
+// call trade-off): latency is free, but a call that never returns must not hang
+// the run forever. We apply a generous finite backstop per call so a hung or
+// unreachable provider ends as an *invalid run* (status "timeout" -> failed),
+// never a fabricated STOP, while a slow-but-real deliberation finishes untouched.
+// The kernel default stays deadline-free; this is layered on at the service edge.
+const DECODER_CALL_BACKSTOP_MS = Number(process.env.TRIBUNAL_DECODER_TIMEOUT_MS ?? 30 * 60_000);
+const decoderService = createDecoderService({
+  runsDir: resolve(RUNS_DIR, "decoder"),
+  createClients: () => makeDefaultDecoderClients({ timeoutMs: DECODER_CALL_BACKSTOP_MS }),
+});
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const CLI_PROVIDERS: Provider[] = ["openai", "xai", "anthropic", "cursor"];
 const OPENROUTER_PROVIDERS: Provider[] = [
@@ -90,7 +111,14 @@ class HttpError extends Error {
 function corsOriginFor(req: IncomingMessage): string | null {
   const origin = req.headers.origin;
   if (!origin) return null;
-  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ? origin : null;
+  try {
+    const parsed = new URL(origin);
+    const sameHost = Boolean(req.headers.host) && parsed.host === req.headers.host;
+    const localHost = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(parsed.host);
+    return ["http:", "https:"].includes(parsed.protocol) && (sameHost || localHost) ? origin : null;
+  } catch {
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -628,7 +656,10 @@ const server = createServer(async (req, res) => {
   if (origin) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Tribunal-Operator-Token",
+    );
     res.setHeader("Vary", "Origin");
   }
 
@@ -783,6 +814,52 @@ const server = createServer(async (req, res) => {
       const body = await readBody(req);
       const out = await startRun(body);
       return json(res, "error" in out ? 400 : 200, out);
+    }
+
+    // --- Live explainable decoder (two-agent, one elected surface unit/round) ---
+    if (
+      (path === "/api/decoder" || path.startsWith("/api/decoder/")) &&
+      !decoderOperatorAuthorized(req.headers, DECODER_OPERATOR_TOKEN)
+    ) {
+      res.setHeader("WWW-Authenticate", 'Bearer realm="tribunal-decoder"');
+      return json(res, 401, { error: "decoder operator authorization required" });
+    }
+    try {
+      if (req.method === "GET" && path === "/api/decoder/health") {
+        return json(res, 200, { ...(await decoderService.health()), checkedAt: Date.now() });
+      }
+      if (req.method === "GET" && path === "/api/decoder/runs") {
+        return json(res, 200, decoderService.list());
+      }
+      if (req.method === "POST" && path === "/api/decoder/runs") {
+        const body = await readBody(req);
+        return json(res, 200, await decoderService.start(body));
+      }
+      const decEvents = path.match(/^\/api\/decoder\/runs\/([^/]+)\/events$/);
+      if (req.method === "GET" && decEvents) {
+        const rawAfterSeq = url.searchParams.get("afterSeq");
+        const afterSeq = rawAfterSeq == null ? -1 : Number(rawAfterSeq);
+        return decoderService.subscribe(decodeURIComponent(decEvents[1]), res, afterSeq);
+      }
+      const decCancel = path.match(/^\/api\/decoder\/runs\/([^/]+)\/cancel$/);
+      if (req.method === "POST" && decCancel) {
+        const body = await readBody(req);
+        return json(res, 200, decoderService.cancel(decodeURIComponent(decCancel[1]), body));
+      }
+      const decDetail = path.match(/^\/api\/decoder\/runs\/([^/]+)$/);
+      if (req.method === "GET" && decDetail) {
+        return json(res, 200, decoderService.detail(decodeURIComponent(decDetail[1])));
+      }
+      if (req.method === "POST" && path === "/api/decoder/verify") {
+        const body = await readBody(req);
+        const result = decoderService.verify(body);
+        return json(res, 200, { ok: result.ok, verify: result });
+      }
+    } catch (decoderError) {
+      if (decoderError instanceof DecoderServiceError) {
+        return json(res, decoderError.statusCode, { error: decoderError.message });
+      }
+      throw decoderError;
     }
 
     const evMatch = path.match(/^\/api\/runs\/([^/]+)\/events$/);
@@ -1026,6 +1103,7 @@ async function shutdown(signal: NodeJS.Signals) {
   const active = [...new Set(runs.values())].filter(
     (run) => run.status === "running" || run.status === "cancelling",
   );
+  decoderService.shutdown("Tribunal server", `${signal} shutdown`);
   for (const run of active) {
     if (run.status === "running") {
       beginCancellation(run, "Tribunal server", `${signal} shutdown`);
@@ -1034,11 +1112,14 @@ async function shutdown(signal: NodeJS.Signals) {
   const deadline = Date.now() + 5_000;
   while (
     Date.now() < deadline &&
-    active.some((run) => run.status === "running" || run.status === "cancelling")
+    (active.some((run) => run.status === "running" || run.status === "cancelling") ||
+      decoderService.activeCount() > 0)
   ) {
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 50));
   }
-  const incomplete = active.some((run) => run.status === "running" || run.status === "cancelling");
+  const incomplete =
+    active.some((run) => run.status === "running" || run.status === "cancelling") ||
+    decoderService.activeCount() > 0;
   if (incomplete) console.error("shutdown grace expired before every live ledger was sealed");
   process.exit(incomplete ? 1 : 0);
 }

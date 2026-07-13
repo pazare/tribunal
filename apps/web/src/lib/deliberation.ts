@@ -146,6 +146,10 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
   // Candidate bookkeeping for the CURRENT span only (board resets per span).
   let table = new Map<string, CandidateState>();
   const textOf = new Map<string, { text: string; isStop: boolean }>();
+  // Running confidence sums per candidate key, so meanConfidence is a true
+  // arithmetic mean over the seats that proposed it — order-independent, and a
+  // genuine leading confidence of 0 is not mistaken for "unset".
+  const confSum = new Map<string, number>();
 
   const ensureCandidate = (key: string): CandidateState => {
     let c = table.get(key);
@@ -179,6 +183,7 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
       spanIndex = e.spanIndex;
       table = new Map();
       textOf.clear();
+      confSum.clear();
       ratifiedMethod = null;
       ratifiedReason = null;
     }
@@ -242,7 +247,9 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
             textOf.set(key, { text: sc.candidate.text, isStop: sc.candidate.isStop });
             const c = ensureCandidate(key);
             c.support += 1;
-            c.meanConfidence = c.meanConfidence === 0 ? sc.confidence : (c.meanConfidence + sc.confidence) / 2;
+            const nextConfSum = (confSum.get(key) ?? 0) + (sc.confidence ?? 0);
+            confSum.set(key, nextConfSum);
+            c.meanConfidence = nextConfSum / c.support;
             c.maxLegalRisk = Math.max(c.maxLegalRisk, sc.legalRisk ?? 0);
           }
         }

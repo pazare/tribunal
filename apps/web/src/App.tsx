@@ -54,8 +54,9 @@ import {
   type OperatorConfig,
   validatePanelConfig,
 } from "./operator-components";
+import { DecoderLab } from "./decoder-components";
 
-type View = "docket" | "chamber" | "audit" | "runs";
+type View = "decoder" | "docket" | "chamber" | "audit" | "runs";
 type RunSource = "new" | "live" | "recorded" | "imported" | null;
 type InterventionQueueItem = QueuedIntervention & {
   state: "queued" | "processing" | "applied" | "not_applied";
@@ -75,6 +76,17 @@ const DEFAULT_FLAGS = {
 function initialPanelChoice(): OperatorConfig["panelChoice"] {
   const mode = new URLSearchParams(window.location.search).get("mode");
   return mode === "offline" || mode === "cli" || mode === "openrouter" ? mode : "auto";
+}
+
+function initialView(): View {
+  const params = new URLSearchParams(window.location.search);
+  const requested = params.get("view");
+  if (["decoder", "docket", "chamber", "audit", "runs"].includes(requested ?? "")) {
+    return requested as View;
+  }
+  // Preserve explicit legacy panel-mode links while making the live decoder
+  // the default entry point for an unqualified visit.
+  return params.has("mode") ? "docket" : "decoder";
 }
 
 function storageKey(run: RunMeta): string {
@@ -116,7 +128,7 @@ function assignmentForRequest(
 }
 
 export default function App() {
-  const [view, setView] = useState<View>("docket");
+  const [view, setView] = useState<View>(initialView);
   const [packs, setPacks] = useState<PackSummary[]>([]);
   const [selectedPackId, setSelectedPackId] = useState("");
   const [panel, setPanel] = useState<PanelHealth | null>(null);
@@ -154,6 +166,10 @@ export default function App() {
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const reconcileRef = useRef<number | null>(null);
+  // Highest ledger sequence delivered by the active stream. Used so streamed
+  // events only advance the inspected event when the user is still "following
+  // the head" — a manual selection during a live/replay run is not clobbered.
+  const headSeqRef = useRef<number | null>(null);
 
   const selectedPack = useMemo(
     () => packs.find((pack) => pack.id === selectedPackId) ?? null,
@@ -301,7 +317,19 @@ export default function App() {
         ];
         setInterventionQueue((current) => {
           const merged = new Map(current.map((item) => [item.interventionId, item]));
-          for (const item of serverItems) merged.set(item.interventionId, { ...merged.get(item.interventionId), ...item });
+          for (const item of serverItems) {
+            const existing = merged.get(item.interventionId);
+            // A stale in-flight poll must not revert a client-terminal state
+            // (applied via ledger receipt, or not_applied via cancel/stop) back
+            // to queued/processing; keep the terminal state and its checkpoint.
+            const terminal = existing?.state === "applied" || existing?.state === "not_applied";
+            merged.set(item.interventionId, {
+              ...existing,
+              ...item,
+              state: terminal ? existing!.state : item.state,
+              willApplyAtSpan: existing?.willApplyAtSpan ?? item.willApplyAtSpan,
+            });
+          }
           return [...merged.values()];
         });
       } catch {
@@ -354,6 +382,7 @@ export default function App() {
       options: { source: Exclude<RunSource, null | "imported">; mode: PanelMode; pace?: number },
     ) => {
       clearConnection();
+      headSeqRef.current = null;
       setActiveRunKey(key);
       setSource(options.source);
       setMode(options.mode);
@@ -377,7 +406,14 @@ export default function App() {
         (event) => {
           setStreamNotice("");
           setEvents((current) => mergeLedgerEvent(current, event));
-          setSelectedSeq(event.seq);
+          // Only follow the head for genuinely new events, and only if the user
+          // has not clicked an earlier event to inspect it (prev at the old head
+          // or unset). Replayed/out-of-order events never move the selection.
+          const priorHead = headSeqRef.current;
+          if (priorHead == null || event.seq > priorHead) {
+            headSeqRef.current = event.seq;
+            setSelectedSeq((prev) => (prev == null || prev === priorHead ? event.seq : prev));
+          }
           if (event.kind === "run_started") {
             const eventView = event.payload?.config?.clientView;
             if (eventView === "answer_only") setOperatorRecordOpen(false);
@@ -416,7 +452,11 @@ export default function App() {
         },
       );
 
-      if (options.source !== "recorded") {
+      // Paced runs (the instant offline panel replayed at 90ms/event) are
+      // server-local and stream every event reliably; the run_finished event
+      // closes the stream on its own. Skip reconciliation there so a 4s poll
+      // cannot flood the whole ledger at once and cut the animation short.
+      if (options.source !== "recorded" && !options.pace) {
         reconcileRef.current = window.setInterval(async () => {
           try {
             const details = await fetchRun(key);
@@ -676,15 +716,16 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col courtroom-bg" data-testid="tribunal-app">
       <header className="app-header">
-        <button type="button" className="text-left" onClick={() => setView("docket")} aria-label="Open Tribunal docket">
-          <span className="font-serif text-3xl text-tribunal-gold tracking-tight">Tribunal</span>
+        <button type="button" className="text-left min-w-0 shrink" onClick={() => setView("docket")} aria-label="Open Tribunal docket">
+          <span className="font-serif text-2xl md:text-3xl text-tribunal-gold tracking-tight">Tribunal</span>
           <span className="hidden md:block text-[10px] uppercase tracking-[0.18em] text-zinc-500 mt-0.5">
             due-process operator console
           </span>
         </button>
         <nav className="flex items-center gap-1 overflow-x-auto" aria-label="Primary navigation">
-          {(["docket", "chamber", "audit", "runs"] as View[]).map((item) => {
+          {(["decoder", "docket", "chamber", "audit", "runs"] as View[]).map((item) => {
             const enabled =
+              item === "decoder" ||
               item === "docket" ||
               item === "runs" ||
               (item === "chamber" ? events.length > 0 || streamActive : Boolean(verifyResult));
@@ -693,6 +734,7 @@ export default function App() {
                 key={item}
                 type="button"
                 disabled={!enabled}
+                title={!enabled ? "Available after a run is convened" : undefined}
                 aria-current={view === item ? "page" : undefined}
                 onClick={() => setView(item)}
                 className={`nav-button ${view === item ? "nav-button-active" : ""}`}
@@ -717,12 +759,20 @@ export default function App() {
             </div>
           )}
           {!error && streamNotice && <div className="notice notice-warn">{streamNotice}</div>}
-          {!error && !streamNotice && actionNotice && <div className="notice notice-neutral">{actionNotice}</div>}
+          {!error && !streamNotice && actionNotice && (
+            <div className="notice notice-neutral">
+              <span>{actionNotice}</span>
+              <button type="button" onClick={() => setActionNotice("")} className="text-button">Dismiss</button>
+            </div>
+          )}
         </div>
       )}
 
       <main className="flex-1 w-full max-w-[1480px] mx-auto p-4 md:p-6">
         <div>
+          <div hidden={view !== "decoder"}>
+            <DecoderLab />
+          </div>
           {view === "docket" && (
             <motion.div key="docket" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
               <section className="grid lg:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
@@ -743,9 +793,15 @@ export default function App() {
                         <p className="eyebrow">Case packs</p>
                         <h2 id="choose-case-title" className="font-serif text-2xl mt-1">Choose the docket</h2>
                       </div>
-                      <span className="text-xs text-zinc-500">{packs.length} governed domains</span>
+                      <span className="text-xs text-zinc-400">
+                        {packs.length ? `${packs.length} governed domains` : "loading…"}
+                      </span>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-3">
+                      {packs.length === 0 && !error &&
+                        Array.from({ length: 4 }).map((_, i) => (
+                          <div key={`pack-skeleton-${i}`} className="case-card animate-pulse opacity-40" aria-hidden="true" />
+                        ))}
                       {packs.map((pack) => {
                         const selected = pack.id === selectedPackId;
                         return (
@@ -759,7 +815,7 @@ export default function App() {
                           >
                             <span className="flex items-center justify-between gap-2">
                               <span className="status-chip status-chip-neutral capitalize">{pack.domain}</span>
-                              <span className="font-mono text-[10px] text-zinc-600">{pack.slots.length} slots</span>
+                              <span className="font-mono text-[10px] text-zinc-400">{pack.slots.length} slots</span>
                             </span>
                             <span className="block font-serif text-xl text-zinc-100 mt-3">{pack.title}</span>
                             <span className="block text-xs text-zinc-500 mt-2 leading-relaxed">{pack.tagline}</span>
@@ -818,7 +874,7 @@ export default function App() {
                     <h1 className="font-serif text-3xl text-zinc-100 mt-3">{selectedPack?.title ?? "Imported proceeding"}</h1>
                     <p className="text-sm text-zinc-500 mt-1">{selectedPack?.question ?? "Inspecting an external Tribunal ledger."}</p>
                     {telemetry.ledgerRunId && (
-                      <p className="font-mono text-[10px] text-zinc-600 mt-2" title={telemetry.ledgerRunId}>
+                      <p className="font-mono text-[10px] text-zinc-400 mt-2" title={telemetry.ledgerRunId}>
                         ledger {compactRunId(telemetry.ledgerRunId)}
                         {activeRunKey && activeRunKey !== telemetry.ledgerRunId ? ` · artifact ${activeRunKey}` : ""}
                       </p>
@@ -1015,7 +1071,7 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="border-t border-tribunal-border/60 px-4 md:px-6 py-4 text-center text-[10px] text-zinc-600 font-mono">
+      <footer className="border-t border-tribunal-border/60 px-4 md:px-6 py-4 text-center text-[10px] text-zinc-400 font-mono">
         Tribunal records due process; it does not certify answer quality or legal compliance. ·{" "}
         <a href="https://github.com/pazare/tribunal" className="text-zinc-500 hover:text-tribunal-gold focus-visible:text-tribunal-gold">
           source repository

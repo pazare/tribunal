@@ -26,6 +26,23 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Offline panel as AI | Deterministic offline mode is scripted for CI/tests and is always labeled |
 | Stored credentials | Keys and CLI auth are read from the environment at call time only |
 
+## Live decoder claim boundary
+
+Decoder Lab may say **complete observed public provider exchange** when its
+ledger contains every prompt sent by the decoder and every public CLI response
+and process receipt received. It must not shorten that to "complete reasoning"
+or "full chain-of-thought." Provider-hidden reasoning, system text, policies,
+logits, and internal execution traces are unavailable. Public warrants and
+critiques are auditable statements produced for the protocol, not measurements
+of hidden cognition.
+
+The live decoder also distinguishes requested configuration from served-model
+evidence. `gpt-5.6-sol` / `medium` and `claude-opus-4-8` / `medium` are command
+pins. A binary version probe proves only local availability. Served identity is
+reported only when the CLI itself supplies it in the live receipt; any reported
+model outside the pinned pair is rejected from quorum and left visible as a
+failed attempt.
+
 ## Invariants (copy-paste for contributors)
 
 1. Never claim answer-quality improvement. The claim is auditability.

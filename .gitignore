@@ -16,3 +16,4 @@ apps/web/src/*.js
 !apps/web/src/**/*.config.js
 HANDOFF.md
 runs/demo-recording/webm/
+runs/decoder/

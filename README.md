@@ -12,7 +12,7 @@ Tribunal replaces sampling with **election**. The output is decoded in atomic su
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point). Three committed live runs score an honest **11/12** — the panel refused to ratify STOP, and [the ledger shows exactly why](docs/honesty.md#the-scorecard-fails-our-own-live-runs--on-purpose).
 
-Tests: **30** kernel · **14** scorecard · **2** packs (`npm test`).
+Tests: **52** kernel · **6** decoder server · **7** decoder UI · **14** scorecard · **2** packs (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -96,7 +96,7 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 30 kernel + 2 packs + 14 scorecard tests
+npm test                 # 52 kernel + 6 server + 7 web + 2 packs + 14 scorecard tests
 npm run smoke --workspace @tribunal/web  # isolated offline UI/API browser gate
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
@@ -105,6 +105,45 @@ npm run dev              # API :8787 + web UI :5173
 `npm run demo` ends with `VERIFY: OK` and a tamper demo that **must** fail verification.
 
 Copy [`.env.example`](.env.example) to `.env` when you need live panels.
+
+---
+
+## Run the live two-agent decoder
+
+The default UI at `http://localhost:5173/` accepts an arbitrary prompt and
+decodes its answer one exact surface unit per fresh deliberation round. This
+path uses exactly:
+
+- Codex `gpt-5.6-sol`, effort `medium`, through `codex exec`;
+- Claude `claude-opus-4-8`, effort `medium`, through `claude -p`.
+
+Claude Code's small/fast auxiliary-model setting is pinned to the same Opus 4.8
+model and nonessential traffic is disabled; the ledger still shows every model
+name reported by the CLI.
+
+Both locally authenticated CLIs must be present. There is no scripted or
+one-provider fallback. Every prompt, public CLI response, validation result,
+ballot, dissent, selected unit, and raw stdout/stderr receipt streams into the
+Decoder Lab. That is the complete observed public exchange, not private
+chain-of-thought or hidden provider internals.
+
+The decoder server binds to loopback by default, admits one two-agent run at a
+time, and stores private decoder artifacts under ignored, owner-only
+`runs/decoder/` paths.
+
+```bash
+npm run dev
+
+curl -s -X POST http://localhost:8787/api/decoder/runs \
+  -H 'Content-Type: application/json' \
+  -d '{"userPrompt":"Respond with exactly OK and then STOP.","maxRounds":2}'
+```
+
+Latency is not used to select or skip work: each unit always receives two
+proposals, two cross-revisions, and, when needed, two judge ballots. Exact
+provider calls have no wall-clock deadline and wait for completion or explicit
+operator cancellation. Exact protocol and honesty boundaries:
+[`docs/decoder-design.md`](docs/decoder-design.md).
 
 ---
 

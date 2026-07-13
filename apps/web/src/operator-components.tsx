@@ -525,7 +525,7 @@ export function RunConfigurator({
                   <span className="status-chip status-chip-neutral capitalize">{charter.society.replace(/_/g, " ")}</span>
                 </div>
                 <p className="text-[11px] text-zinc-500 leading-relaxed mt-2">{charter.mandate}</p>
-                <p className="text-[10px] text-zinc-600 mt-2">Powers: {charter.powers.join(" · ")}</p>
+                <p className="text-[10px] text-zinc-400 mt-2">Powers: {charter.powers.join(" · ")}</p>
               </article>
             ))}
           </div>
@@ -619,7 +619,7 @@ export function CaseFilePanel({ pack }: { pack: PackSummary }) {
             {pack.documents.map((document) => (
               <article key={document.id}>
                 <p className="text-xs font-medium text-zinc-200">{document.title}</p>
-                <p className="text-[10px] font-mono text-zinc-600 mt-0.5">{document.id}</p>
+                <p className="text-[10px] font-mono text-zinc-400 mt-0.5">{document.id}</p>
                 <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed whitespace-pre-wrap">{document.body}</p>
               </article>
             ))}
@@ -737,7 +737,7 @@ export function InterventionConsole({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="eyebrow">Auditor in the loop</p>
-          <h3 id="intervention-title" className="text-sm font-semibold text-zinc-200 mt-1">Intervene on the record</h3>
+          <h2 id="intervention-title" className="text-sm font-semibold text-zinc-200 mt-1">Intervene on the record</h2>
         </div>
         <span className={`status-chip ${canIntervene ? "status-chip-live" : "status-chip-neutral"}`}>
           {canIntervene ? "checkpoint open" : "read only"}
@@ -812,10 +812,10 @@ export function InterventionConsole({
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[11px] text-zinc-300 truncate">
-                    <span className="uppercase text-[9px] text-sky-300 mr-1">{item.kind}</span>
+                    <span className="uppercase text-[10px] text-sky-300 mr-1">{item.kind}</span>
                     {item.text}
                   </p>
-                  <p className="font-mono text-[9px] text-zinc-600 mt-1 break-all">{item.interventionId}</p>
+                  <p className="font-mono text-[10px] text-zinc-400 mt-1 break-all">{item.interventionId}</p>
                 </div>
                 <span className={`status-chip ${item.state === "applied" ? "status-chip-live" : item.state === "not_applied" ? "status-chip-error" : "status-chip-neutral"}`}>
                   {item.state.replace("_", " ")}
@@ -862,7 +862,7 @@ export function LedgerExplorer({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="eyebrow">Verdict ledger</p>
-            <h3 id="ledger-explorer-title" className="text-sm font-semibold text-zinc-200 mt-1">Inspect every event and payload</h3>
+            <h2 id="ledger-explorer-title" className="text-sm font-semibold text-zinc-200 mt-1">Inspect every event and payload</h2>
           </div>
           <span className="status-chip status-chip-neutral">{events.length} events</span>
         </div>
@@ -887,7 +887,7 @@ export function LedgerExplorer({
                 <span className="text-xs text-zinc-200">{EVENT_LABELS[event.kind] ?? event.kind}</span>
                 <span className="font-mono text-[10px] text-zinc-500">#{event.seq}</span>
               </span>
-              <span className="mt-1 block truncate font-mono text-[10px] text-zinc-600">{event.hash}</span>
+              <span className="mt-1 block truncate font-mono text-[10px] text-zinc-400">{event.hash}</span>
             </button>
           ))}
           {filtered.length === 0 && <p className="p-5 text-xs text-zinc-500">No events match this filter.</p>}
@@ -920,7 +920,7 @@ export function LedgerExplorer({
 function HashField({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-2.5 min-w-0">
-      <p className="uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className="uppercase tracking-wider text-zinc-400">{label}</p>
       <p className="text-zinc-400 break-all mt-1">{value}</p>
     </div>
   );
@@ -946,9 +946,9 @@ export function TelemetryPanel({ telemetry }: { telemetry: RunTelemetry }) {
             {telemetry.panel.map((seat) => (
               <li key={seat.seatId} className="py-2 first:pt-0 last:pb-0">
                 <p className="text-[11px] text-zinc-300 capitalize">{seat.society.replace(/_/g, " ")} · {seat.provider}</p>
-                <p className="font-mono text-[10px] text-zinc-600 mt-0.5 break-all">{seat.model}</p>
+                <p className="font-mono text-[10px] text-zinc-400 mt-0.5 break-all">{seat.model}</p>
                 {seat.modelSource && (
-                  <p className="text-[9px] text-zinc-600 mt-0.5">
+                  <p className="text-[10px] text-zinc-400 mt-0.5">
                     {seat.modelSource === "cli_config" ? "reported as CLI-configured, not API-confirmed" : `model source: ${seat.modelSource.replace("_", " ")}`}
                   </p>
                 )}
@@ -964,7 +964,7 @@ export function TelemetryPanel({ telemetry }: { telemetry: RunTelemetry }) {
             {telemetry.servedModels.map((item) => (
               <li key={item.seatId} className="py-2 first:pt-0 last:pb-0">
                 <p className="font-mono text-[10px] text-zinc-400 break-all">{item.model}</p>
-                <p className="text-[9px] text-zinc-600 mt-0.5">
+                <p className="text-[10px] text-zinc-400 mt-0.5">
                   {item.servingProvider ? `served by ${item.servingProvider}` : "serving host not reported"}
                   {item.requestedModel && item.requestedModel !== item.model ? ` · requested ${item.requestedModel}` : ""}
                 </p>
@@ -981,7 +981,7 @@ function TelemetryValue({ label, value, alert = false }: { label: string; value:
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/30 p-2.5">
       <p className={`text-sm font-medium ${alert ? "text-rose-300" : "text-zinc-200"}`}>{value}</p>
-      <p className="text-[9px] uppercase tracking-wider text-zinc-600 mt-0.5">{label}</p>
+      <p className="text-[10px] uppercase tracking-wider text-zinc-400 mt-0.5">{label}</p>
     </div>
   );
 }
@@ -1016,6 +1016,7 @@ export function RunLibrary({
 
   return (
     <div className="space-y-5">
+      <h1 className="sr-only">Run registry</h1>
       <section className="glass p-4 md:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -1036,7 +1037,7 @@ export function RunLibrary({
                   <span className="font-mono text-[10px] text-zinc-500">{run.events ?? 0} events</span>
                 </div>
                 <h3 className="text-sm text-zinc-200 mt-3">{run.label}</h3>
-                <p className="font-mono text-[10px] text-zinc-600 mt-1">{compactRunId(run.runId)}</p>
+                <p className="font-mono text-[10px] text-zinc-400 mt-1">{compactRunId(run.runId)}</p>
                 <button type="button" className="secondary-button w-full mt-4" onClick={() => onAttach(run)}>Attach to live stream</button>
               </article>
             ))}
@@ -1069,7 +1070,7 @@ export function RunLibrary({
                     {isCollisionCopy && <span className="status-chip status-chip-warn">distinct artifact</span>}
                   </div>
                   <p className="text-xs text-zinc-300 mt-2 truncate">{run.label}</p>
-                  <p className="font-mono text-[10px] text-zinc-600 mt-1 truncate" title={storageKey}>{storageKey}</p>
+                  <p className="font-mono text-[10px] text-zinc-400 mt-1 truncate" title={storageKey}>{storageKey}</p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button type="button" className="text-button" onClick={() => onOpen(run)}>Open</button>
