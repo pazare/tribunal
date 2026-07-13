@@ -28,13 +28,14 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 
 ## Live decoder claim boundary
 
-Decoder Lab may say **complete observed public provider exchange** when its
-ledger contains every prompt sent by the decoder and every public CLI response
-and process receipt received. It must not shorten that to "complete reasoning"
-or "full chain-of-thought." Provider-hidden reasoning, system text, policies,
-logits, and internal execution traces are unavailable. Public warrants and
-critiques are auditable statements produced for the protocol, not measurements
-of hidden cognition.
+Decoder Lab may say **full observable decoder transcript** when its persisted
+ledger contains every exact prompt, raw CLI receipt, public response, validation,
+phase decision, dissent, and committed unit. It may say **VERIFIED FULL** only
+after the canonical state-machine verifier also passes exact output binding,
+model evidence, terminal structure, and every hash link. Provider computation
+not emitted through its CLI is outside the observable interface. Public warrants
+and critiques are auditable protocol artifacts, not measurements of un-emitted
+provider state.
 
 The live decoder also distinguishes requested configuration from served-model
 evidence. `gpt-5.6-sol` / `medium` and `claude-opus-4-8` / `medium` are command

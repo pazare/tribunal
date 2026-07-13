@@ -330,6 +330,14 @@ export async function verifyDecoderEvents(
   });
 }
 
+export async function verifyDecoderRun(runId: string): Promise<DecoderVerifyResponse> {
+  return request<DecoderVerifyResponse>("/api/decoder/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ runId }),
+  });
+}
+
 function safeParse(value: string): unknown {
   try {
     return JSON.parse(value);

@@ -676,7 +676,7 @@ export async function runDecoder(options: RunDecoderOptions): Promise<DecoderRun
       transport: client.transport,
     })),
     config: { maxRounds: options.maxRounds, requiredQuorum: 2, freshDeliberationPerUnit: true },
-    transcriptBoundary: "complete observed public CLI I/O; not private chain-of-thought",
+    transcriptBoundary: "complete observable CLI I/O and decoder decision trace; provider-internal state is outside the CLI interface",
   });
 
   for (let roundIndex = 0; roundIndex < options.maxRounds; roundIndex++) {

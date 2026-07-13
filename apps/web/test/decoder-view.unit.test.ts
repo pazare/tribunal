@@ -7,7 +7,9 @@ import {
   isDecoderTerminalStatus,
   phaseReceiptStatus,
   strictSurfaceUnit,
+  transcriptAssuranceState,
   transcriptCompleteness,
+  transcriptEvidenceSummary,
 } from "../src/decoder-components.js";
 import { normalizeAgentHealth, type DecoderEvent, type DecoderHealth } from "../src/decoder-api.js";
 
@@ -160,4 +162,80 @@ test("terminal transcript requires one canonical phase completion for each opene
     event(7, "decoder_finished", { status: "failed" }),
   ];
   assert.equal(transcriptCompleteness(complete, true, false, false, 0).state, "full");
+});
+
+test("observable transcript claim is backed by materially present evidence", () => {
+  const events = [
+    event(0, "decoder_started"),
+    event(1, "provider_call_started", { prompt: "exact prompt" }),
+    event(2, "provider_attempt", {
+      stdout: "raw stdout",
+      stderr: "",
+      responseText: "{\"pick\":0}",
+      status: "ok",
+      exitCode: 0,
+      signal: null,
+      command: { bin: "provider", args: [] },
+      validation: { ok: true, errors: [] },
+      parsed: { pick: 0 },
+    }),
+    event(3, "provider_attempt", {
+      stdout: "incomplete receipt",
+      validation: { ok: false, errors: ["missing terminal evidence"] },
+    }),
+    event(4, "phase_completed"),
+    event(5, "unit_selected"),
+    event(6, "dissent_preserved"),
+    event(7, "unit_committed"),
+    event(8, "decoder_finished"),
+  ];
+
+  assert.deepEqual(transcriptEvidenceSummary(events), {
+    providerCalls: 1,
+    exactPrompts: 1,
+    providerAttempts: 2,
+    completeRawReceipts: 1,
+    publicResponses: 1,
+    decisionArtifacts: 5,
+    hashLinkedEvents: 9,
+    totalEvents: 9,
+  });
+});
+
+test("full transcript assurance requires the canonical verifier receipt", () => {
+  const base = {
+    eventCount: 12,
+    terminal: true,
+    completenessState: "full" as const,
+    ledgerConflict: false,
+    verifying: false,
+    verifyResult: null,
+  };
+  assert.equal(transcriptAssuranceState({ ...base, eventCount: 0 }), "ready");
+  assert.equal(transcriptAssuranceState({ ...base, terminal: false }), "capturing");
+  assert.equal(transcriptAssuranceState(base), "captured");
+  assert.equal(
+    transcriptAssuranceState({
+      ...base,
+      verifyResult: {
+        ok: true,
+        verify: { ok: true, exactOutputConsistent: true, problems: [] },
+      },
+    }),
+    "verified_full",
+  );
+  assert.equal(
+    transcriptAssuranceState({
+      ...base,
+      verifyResult: {
+        ok: false,
+        verify: { ok: false, exactOutputConsistent: false, problems: [{ reason: "bad_hash" }] },
+      },
+    }),
+    "incomplete",
+  );
+  assert.equal(
+    transcriptAssuranceState({ ...base, ledgerConflict: true }),
+    "conflict",
+  );
 });

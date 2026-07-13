@@ -14,6 +14,7 @@ import {
   startDecoderRun,
   subscribeDecoderRun,
   verifyDecoderEvents,
+  verifyDecoderRun,
   type DecoderAgentHealth,
   type DecoderEvent,
   type DecoderHealth,
@@ -277,6 +278,96 @@ function eventIsProviderEvidence(event: DecoderEvent): boolean {
   return /provider|agent|prompt|stdout|stderr|proposal|revision|judge|validation|retry|tie|dissent|selection/.test(
     event.kind,
   );
+}
+
+export interface TranscriptEvidenceSummary {
+  providerCalls: number;
+  exactPrompts: number;
+  providerAttempts: number;
+  completeRawReceipts: number;
+  publicResponses: number;
+  decisionArtifacts: number;
+  hashLinkedEvents: number;
+  totalEvents: number;
+}
+
+export type TranscriptAssuranceState =
+  | "ready"
+  | "capturing"
+  | "captured"
+  | "verified_full"
+  | "incomplete"
+  | "conflict";
+
+export function transcriptAssuranceState(args: {
+  eventCount: number;
+  terminal: boolean;
+  completenessState: "collecting" | "full" | "partial";
+  ledgerConflict: boolean;
+  verifying: boolean;
+  verifyResult: DecoderVerifyResponse | null;
+}): TranscriptAssuranceState {
+  if (args.ledgerConflict) return "conflict";
+  if (args.eventCount === 0) return "ready";
+  if (!args.terminal) return "capturing";
+  if (args.completenessState !== "full") return "incomplete";
+  if (args.verifying || !args.verifyResult) return "captured";
+  const verification = record(args.verifyResult.verify ?? args.verifyResult);
+  const problems = Array.isArray(verification.problems) ? verification.problems : [];
+  return verification.ok === true &&
+    verification.exactOutputConsistent === true &&
+    problems.length === 0
+    ? "verified_full"
+    : "incomplete";
+}
+
+/**
+ * Counts only evidence that is materially present in the visible ledger. The
+ * component uses these counts to make its transcript claim inspectable rather
+ * than relying on defensive or aspirational copy.
+ */
+export function transcriptEvidenceSummary(events: DecoderEvent[]): TranscriptEvidenceSummary {
+  const calls = events.filter((event) => event.kind === "provider_call_started");
+  const attempts = events.filter((event) => event.kind === "provider_attempt");
+  return {
+    providerCalls: calls.length,
+    exactPrompts: calls.filter((event) => typeof event.payload.prompt === "string").length,
+    providerAttempts: attempts.length,
+    completeRawReceipts: attempts.filter(
+      (event) =>
+        typeof event.payload.stdout === "string" &&
+        typeof event.payload.stderr === "string" &&
+        typeof event.payload.responseText === "string" &&
+        typeof event.payload.status === "string" &&
+        Object.prototype.hasOwnProperty.call(event.payload, "exitCode") &&
+        Object.prototype.hasOwnProperty.call(event.payload, "signal") &&
+        typeof event.payload.command === "object",
+    ).length,
+    publicResponses: attempts.filter(
+      (event) =>
+        record(event.payload.validation).ok === true &&
+        event.payload.parsed != null &&
+        typeof event.payload.responseText === "string",
+    ).length,
+    decisionArtifacts: events.filter((event) =>
+      [
+        "tie_committed",
+        "phase_completed",
+        "unit_selected",
+        "dissent_preserved",
+        "unit_committed",
+        "decoder_finished",
+      ].includes(event.kind),
+    ).length,
+    hashLinkedEvents: events.filter(
+      (event) =>
+        typeof event.hash === "string" &&
+        event.hash.length === 64 &&
+        typeof event.prevHash === "string" &&
+        event.prevHash.length === 64,
+    ).length,
+    totalEvents: events.length,
+  };
 }
 
 export function transcriptCompleteness(
@@ -597,6 +688,7 @@ export function DecoderLab() {
   const connectRef = useRef<(id: string) => void>(() => {});
   const eventMapRef = useRef(new Map<string, DecoderEvent>());
   const reattachCheckedRef = useRef(false);
+  const verificationRequestedRef = useRef<string | null>(null);
 
   const ingestEvents = useCallback((incoming: DecoderEvent[]): boolean => {
     let conflict = "";
@@ -704,6 +796,36 @@ export function DecoderLab() {
     ),
     [events, terminal, ledgerConflict, transcriptIssue, invalidCommitCount],
   );
+  const transcriptEvidence = useMemo(() => transcriptEvidenceSummary(events), [events]);
+  const assuranceState = transcriptAssuranceState({
+    eventCount: events.length,
+    terminal,
+    completenessState: completeness.state,
+    ledgerConflict: Boolean(ledgerConflict),
+    verifying,
+    verifyResult,
+  });
+  const verificationReceipt = record(verifyResult?.verify ?? verifyResult);
+  const verifiedLedgerHead =
+    assuranceState === "verified_full" && typeof verificationReceipt.head === "string"
+      ? verificationReceipt.head
+      : undefined;
+  const assuranceLabel: Record<TranscriptAssuranceState, string> = {
+    ready: "ready",
+    capturing: "capturing",
+    captured: "captured · verifying",
+    verified_full: "verified full",
+    incomplete: "incomplete",
+    conflict: "ledger conflict",
+  };
+  const assuranceTone =
+    assuranceState === "verified_full"
+      ? "status-chip-live"
+      : assuranceState === "incomplete" || assuranceState === "conflict"
+        ? "status-chip-error"
+        : assuranceState === "capturing" || assuranceState === "captured"
+          ? "status-chip-warn"
+          : "status-chip-neutral";
   const agentsReady = decoderAgentsReady(health);
   const active = Boolean(runId) && !terminal && status !== "idle";
 
@@ -863,6 +985,7 @@ export function DecoderLab() {
     setError("");
     setStreamNotice("");
     setVerifyResult(null);
+    verificationRequestedRef.current = null;
     setEvents([]);
     eventMapRef.current.clear();
     setRunId(null);
@@ -905,17 +1028,41 @@ export function DecoderLab() {
     }
   };
 
-  const verify = async () => {
+  const verify = useCallback(async (persistedRunId?: string) => {
     setVerifying(true);
     setError("");
     try {
-      setVerifyResult(await verifyDecoderEvents(events));
+      setVerifyResult(
+        persistedRunId
+          ? await verifyDecoderRun(persistedRunId)
+          : await verifyDecoderEvents(events),
+      );
     } catch (nextError: unknown) {
       setError(nextError instanceof Error ? nextError.message : String(nextError));
     } finally {
       setVerifying(false);
     }
-  };
+  }, [events]);
+
+  useEffect(() => {
+    if (
+      !runId ||
+      !terminal ||
+      completeness.state !== "full" ||
+      ledgerConflict ||
+      transcriptIssue ||
+      verificationRequestedRef.current === runId
+    ) return;
+    verificationRequestedRef.current = runId;
+    void verify(runId);
+  }, [
+    completeness.state,
+    ledgerConflict,
+    runId,
+    terminal,
+    transcriptIssue,
+    verify,
+  ]);
 
   return (
     <section className="space-y-5" data-testid="decoder-lab" aria-labelledby="decoder-lab-title">
@@ -1173,22 +1320,60 @@ export function DecoderLab() {
             <div className="border-b border-zinc-800 p-4 md:p-5">
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="max-w-3xl">
-                  <p className="eyebrow">Chronological public record</p>
+                  <p className="eyebrow text-tribunal-gold">Observable transcript contract</p>
                   <h2 id="public-exchange-title" className="mt-1 font-serif text-2xl text-zinc-100">
-                    Public provider exchange — not private chain-of-thought
+                    Full observable decoder transcript
                   </h2>
                   <p className="mt-2 text-xs leading-relaxed text-zinc-400">
-                    Every prompt sent by Decoder Lab and every public CLI response received is shown when the ledger contains it.
-                    Provider-hidden reasoning, private system text, and undisclosed platform policy are unavailable and are not claimed here.
+                    Every decoder-observable input, exact UTF-8 provider-output text, public deliberation object,
+                    process and model receipt, protocol decision, dissent, and committed unit—bound to one persisted ledger.
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <span className={`status-chip ${completeness.state === "full" ? "status-chip-live" : completeness.state === "partial" ? "status-chip-error" : "status-chip-warn"}`}>
-                    transcript {completeness.state}
+                  <span className={`status-chip ${assuranceTone}`}>
+                    {assuranceLabel[assuranceState]}
                   </span>
-                  <p className="mt-1 max-w-xs text-[10px] leading-relaxed text-zinc-500">{completeness.note}</p>
+                  <p className="mt-1 max-w-xs text-[10px] leading-relaxed text-zinc-500">
+                    {verifiedLedgerHead
+                      ? `${events.length} persisted events · head ${verifiedLedgerHead.slice(0, 16)}…`
+                      : assuranceState === "captured"
+                        ? "The persisted ledger is complete; the canonical verifier is replaying it now."
+                        : completeness.note}
+                  </p>
                 </div>
               </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4" aria-label="Observable transcript evidence coverage">
+                <TranscriptEvidenceLane
+                  label="Provider inputs"
+                  value={events.length ? `${transcriptEvidence.exactPrompts}/${transcriptEvidence.providerCalls}` : "ready"}
+                  detail="Exact prompts recorded"
+                  complete={transcriptEvidence.providerCalls > 0 && transcriptEvidence.exactPrompts === transcriptEvidence.providerCalls}
+                />
+                <TranscriptEvidenceLane
+                  label="Provider outputs"
+                  value={events.length ? `${transcriptEvidence.completeRawReceipts}/${transcriptEvidence.providerAttempts}` : "ready"}
+                  detail="Complete raw CLI receipts"
+                  complete={transcriptEvidence.providerAttempts > 0 && transcriptEvidence.completeRawReceipts === transcriptEvidence.providerAttempts}
+                />
+                <TranscriptEvidenceLane
+                  label="Public deliberation"
+                  value={events.length ? `${transcriptEvidence.publicResponses}/${transcriptEvidence.providerAttempts}` : "ready"}
+                  detail="Validated public objects · invalid attempts stay visible"
+                  complete={transcriptEvidence.providerAttempts > 0 && transcriptEvidence.publicResponses === transcriptEvidence.providerAttempts}
+                />
+                <TranscriptEvidenceLane
+                  label="Decision ledger"
+                  value={assuranceState === "verified_full" ? "verified" : events.length ? `${transcriptEvidence.decisionArtifacts} artifacts` : "ready"}
+                  detail={`${transcriptEvidence.hashLinkedEvents}/${transcriptEvidence.totalEvents} events present · canonical replay ${assuranceState === "verified_full" ? "passed" : "required"}`}
+                  complete={assuranceState === "verified_full"}
+                />
+              </div>
+              <p className="mt-3 rounded-lg border border-zinc-800 bg-zinc-950/30 px-3 py-2 text-[11px] leading-relaxed text-zinc-400">
+                <span className="font-medium text-zinc-200">Precision contract:</span>{" "}
+                VERIFIED FULL means the persisted run passes the canonical state-machine verifier: exact prompts and raw receipts,
+                model evidence, validation, phase quorum, selection, dissent, output binding, and every hash link.
+                Provider computation not emitted through its CLI is outside the observable interface.
+              </p>
             </div>
             <ol
               className="max-h-[900px] divide-y divide-zinc-800 overflow-y-auto"
@@ -1228,7 +1413,10 @@ export function DecoderLab() {
                 <button
                   type="button"
                   className="secondary-button"
-                  onClick={() => void verify()}
+                  onClick={() => {
+                    if (runId) verificationRequestedRef.current = runId;
+                    void verify(runId ?? undefined);
+                  }}
                   disabled={!events.length || verifying || !terminal || Boolean(ledgerConflict) || invalidCommitCount > 0}
                 >
                   {verifying ? "Verifying…" : "Verify exact ledger"}
@@ -1305,6 +1493,30 @@ function RosterCard({
       {health?.version && <p className="mt-1 font-mono text-[10px] text-zinc-600">CLI {health.version}</p>}
       {health?.note && <p className="mt-1 text-[10px] text-zinc-500">{health.note}</p>}
     </article>
+  );
+}
+
+function TranscriptEvidenceLane({
+  label,
+  value,
+  detail,
+  complete,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  complete: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/30 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="field-label">{label}</p>
+        <span className={`status-chip ${complete ? "status-chip-live" : "status-chip-neutral"}`}>
+          {value}
+        </span>
+      </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-zinc-400">{detail}</p>
+    </div>
   );
 }
 

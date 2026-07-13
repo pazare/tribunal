@@ -1072,7 +1072,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-tribunal-border/60 px-4 md:px-6 py-4 text-center text-[10px] text-zinc-400 font-mono">
-        Tribunal records due process; it does not certify answer quality or legal compliance. ·{" "}
+        Tribunal makes AI due process inspectable: recorded decisions are challengeable and replay-verifiable. ·{" "}
         <a href="https://github.com/pazare/tribunal" className="text-zinc-500 hover:text-tribunal-gold focus-visible:text-tribunal-gold">
           source repository
         </a>

@@ -81,3 +81,23 @@ Visual evidence:
   `8676a4be8278a9f287b72b59039d298b0be3865ac5f9b6918946d6a0eb5e2d48`.
 - The final production build renders at `http://localhost:8787/`. The browser
   tab was left on the ready Decoder Lab screen.
+
+## Claim precision component improvement
+
+- Replaced the defensive "not private chain-of-thought" header with a stronger,
+  testable **Full observable decoder transcript** contract.
+- Added live evidence coverage for exact provider inputs, complete raw provider
+  outputs, validated public deliberation objects, decision artifacts, and the
+  persisted ledger.
+- Terminal structural completeness is no longer enough for the strongest badge.
+  The UI automatically verifies the persisted run by `runId` and shows
+  **VERIFIED FULL** only after canonical state-machine replay and exact output
+  binding pass.
+- Live run `decoder_mrihdmtr_6588bb9b9714a9a2` proved the component end to end:
+  4/4 prompts, 4/4 raw receipts, 4/4 validated public objects, 16/16 persisted
+  events, and verified head
+  `5e4b4a25bdbe657b86190b6b4fb6f89f8a9bdc0e36f61b4ce0f7ba13ec8aa4d7`.
+- `09-claim-component-before-crop-true.png` and
+  `10-claim-component-after-true.png` are the same-width before/after comparison.
+  The existing Tribunal typography, spacing, border, and status-chip system are
+  preserved while the component gains an evidence hierarchy and assurance state.

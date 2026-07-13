@@ -92,10 +92,12 @@ The ledger records every observable decoder action:
 - proposals, revisions, critiques, judge ballots, selection rule, tie evidence,
   dissent, exact unit, and prefixes before and after commitment.
 
-This is the complete **observed public provider exchange**. It is not private
-chain-of-thought, hidden system text, undisclosed platform policy, logits, or a
-provider-side execution trace. Tribunal never claims access to those unavailable
-artifacts. Public warrants are inspectable claims, not proof of hidden cognition.
+Together these artifacts form the **full observable decoder transcript**. The
+UI labels a terminal run **VERIFIED FULL** only after the persisted ledger passes
+the canonical state-machine verifier, including exact output binding and every
+hash link. Provider computation not emitted through its CLI is outside the
+observable interface. Public warrants remain inspectable protocol artifacts,
+not measurements of un-emitted provider state.
 
 ## Ledger and verifier
 
