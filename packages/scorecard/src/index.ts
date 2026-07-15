@@ -295,7 +295,11 @@ export function computeAuditability(events: LedgerEvent[]): AuditabilityReport {
         "A11",
         "STOP ratified explicitly (no silent trailing-off)",
         ok,
-        ok ? "the run ended because the panel RATIFIED stop" : `run ended by "${stoppedBy}"`,
+        ok
+          ? "the run ended because the panel RATIFIED stop"
+          : stoppedBy === "cancelled"
+            ? "the operator cancelled the run before STOP was ratified"
+            : `run ended by "${stoppedBy}"`,
       ),
     );
   }
@@ -384,7 +388,54 @@ function validatePayload(e: LedgerEvent): boolean {
   const req = REQUIRED_FIELDS[e.kind];
   if (!req) return false;
   const p = e.payload as Record<string, unknown>;
-  return req.every((k) => p != null && k in p);
+  if (p == null || typeof p !== "object" || Array.isArray(p)) return false;
+  if (!req.every((k) => k in p)) return false;
+  if (e.kind === "run_finished") return validateRunFinishedPayload(p);
+  return true;
+}
+
+function validateRunFinishedPayload(payload: Record<string, unknown>): boolean {
+  const hasCancellation = Object.prototype.hasOwnProperty.call(payload, "cancellation");
+  const disposition = payload.unappliedInterventionIds;
+  if (
+    disposition !== undefined &&
+    (!Array.isArray(disposition) ||
+      disposition.some((id) => typeof id !== "string" || !id.trim()) ||
+      new Set(disposition).size !== disposition.length)
+  ) {
+    return false;
+  }
+  if (payload.stoppedBy !== "cancelled") {
+    // A cancellation receipt is terminal provenance, not generic run metadata.
+    // Its presence on any other stop path would misstate how the run ended.
+    return !hasCancellation;
+  }
+  if (!hasCancellation || !validateCancellationReceipt(payload.cancellation)) return false;
+  if (disposition === undefined) return true;
+  const receiptIds = (payload.cancellation as Record<string, unknown>).unappliedInterventionIds as string[];
+  return disposition.length === receiptIds.length && disposition.every((id) => receiptIds.includes(id));
+}
+
+function validateCancellationReceipt(value: unknown): boolean {
+  if (value == null || typeof value !== "object" || Array.isArray(value)) return false;
+  const receipt = value as Record<string, unknown>;
+  const ids = receipt.unappliedInterventionIds;
+  if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim())) return false;
+  const count = receipt.unappliedInterventions;
+  return (
+    typeof receipt.actor === "string" &&
+    receipt.actor.trim().length > 0 &&
+    typeof receipt.reason === "string" &&
+    receipt.reason.trim().length > 0 &&
+    typeof receipt.requestedAt === "number" &&
+    Number.isFinite(receipt.requestedAt) &&
+    receipt.requestedAt > 0 &&
+    typeof count === "number" &&
+    Number.isInteger(count) &&
+    count >= 0 &&
+    count === ids.length &&
+    new Set(ids).size === ids.length
+  );
 }
 
 export { candidateKey };

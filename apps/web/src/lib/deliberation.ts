@@ -12,6 +12,7 @@ export interface SeatInfo {
   society: string;
   provider: string;
   model: string;
+  modelSource?: "response" | "requested" | "cli_config" | "scripted";
 }
 
 export type SeatPhase =
@@ -21,6 +22,7 @@ export type SeatPhase =
   | "revealed"
   | "revising"
   | "revised"
+  | "cancelled"
   | "done";
 
 export interface SeatState {
@@ -93,6 +95,14 @@ export interface DeliberationView {
   committedSpans: { text: string; isStop: boolean }[];
   liveNote: string | null;
   escalated: boolean;
+  stoppedBy: string | null;
+  cancellation: {
+    actor: string;
+    reason: string;
+    requestedAt: number;
+    unappliedInterventions: number;
+    unappliedInterventionIds: string[];
+  } | null;
 }
 
 const PHASE_OF_KIND: Record<string, RunPhaseId> = {
@@ -127,6 +137,8 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
   let finalAnswer: string | null = null;
   let liveNote: string | null = null;
   let escalated = false;
+  let stoppedBy: string | null = null;
+  let cancellation: DeliberationView["cancellation"] = null;
   const committedSpans: { text: string; isStop: boolean }[] = [];
   const dissents: DissentView[] = [];
   const humans: { actor: string; kind: string; text: string }[] = [];
@@ -134,6 +146,10 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
   // Candidate bookkeeping for the CURRENT span only (board resets per span).
   let table = new Map<string, CandidateState>();
   const textOf = new Map<string, { text: string; isStop: boolean }>();
+  // Running confidence sums per candidate key, so meanConfidence is a true
+  // arithmetic mean over the seats that proposed it — order-independent, and a
+  // genuine leading confidence of 0 is not mistaken for "unset".
+  const confSum = new Map<string, number>();
 
   const ensureCandidate = (key: string): CandidateState => {
     let c = table.get(key);
@@ -160,13 +176,14 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
 
   for (const e of events) {
     const p = e.payload as any;
-    const mapped = PHASE_OF_KIND[e.kind];
+    const mapped = e.kind === "run_finished" && p.stoppedBy === "cancelled" ? undefined : PHASE_OF_KIND[e.kind];
     if (mapped) phase = mapped;
     if (typeof e.spanIndex === "number" && e.spanIndex !== spanIndex) {
       // A new decision slot opened: reset the candidate board.
       spanIndex = e.spanIndex;
       table = new Map();
       textOf.clear();
+      confSum.clear();
       ratifiedMethod = null;
       ratifiedReason = null;
     }
@@ -230,7 +247,9 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
             textOf.set(key, { text: sc.candidate.text, isStop: sc.candidate.isStop });
             const c = ensureCandidate(key);
             c.support += 1;
-            c.meanConfidence = c.meanConfidence === 0 ? sc.confidence : (c.meanConfidence + sc.confidence) / 2;
+            const nextConfSum = (confSum.get(key) ?? 0) + (sc.confidence ?? 0);
+            confSum.set(key, nextConfSum);
+            c.meanConfidence = nextConfSum / c.support;
             c.maxLegalRisk = Math.max(c.maxLegalRisk, sc.legalRisk ?? 0);
           }
         }
@@ -317,7 +336,15 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
       }
       case "run_finished": {
         finalAnswer = p.finalAnswer ?? "";
-        phase = "done";
+        stoppedBy = p.stoppedBy ?? null;
+        cancellation = p.cancellation ?? null;
+        if (stoppedBy === "cancelled") {
+          for (const seat of seatsById.values()) {
+            if (seat.phase !== "done") seat.phase = "cancelled";
+          }
+        } else {
+          phase = "done";
+        }
         break;
       }
     }
@@ -356,6 +383,8 @@ export function deriveDeliberation(events: LedgerEvent[]): DeliberationView {
     committedSpans,
     liveNote,
     escalated,
+    stoppedBy,
+    cancellation,
   };
 }
 

@@ -11,6 +11,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
 | Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
 | Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
+| Safe cancellation | A stop seals `run_finished.stoppedBy=cancelled` with actor, reason, time, and exact IDs for queued interventions that never applied; it is never labeled a verdict |
 | A1–A12 scorecard | Twelve checklist items scored only from the run's own artifacts, with anti-spoof guards |
 | Independent verify | Anyone can re-run `verifyLedger()` on exported events (`POST /api/verify`, `npm run demo`, or the Cloudflare Worker) |
 
@@ -25,6 +26,24 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 | Offline panel as AI | Deterministic offline mode is scripted for CI/tests and is always labeled |
 | Stored credentials | Keys and CLI auth are read from the environment at call time only |
 
+## Live decoder claim boundary
+
+Decoder Lab may say **full observable decoder transcript** when its persisted
+ledger contains every exact prompt, raw CLI receipt, public response, validation,
+phase decision, dissent, and committed unit. It may say **VERIFIED FULL** only
+after the canonical state-machine verifier also passes exact output binding,
+model evidence, terminal structure, and every hash link. Provider computation
+not emitted through its CLI is outside the observable interface. Public warrants
+and critiques are auditable protocol artifacts, not measurements of un-emitted
+provider state.
+
+The live decoder also distinguishes requested configuration from served-model
+evidence. `gpt-5.6-sol` / `medium` and `claude-opus-4-8` / `medium` are command
+pins. A binary version probe proves only local availability. Served identity is
+reported only when the CLI itself supplies it in the live receipt; any reported
+model outside the pinned pair is rejected from quorum and left visible as a
+failed attempt.
+
 ## Invariants (copy-paste for contributors)
 
 1. Never claim answer-quality improvement. The claim is auditability.
@@ -35,6 +54,7 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 6. Anonymization removes identity fields, not writing style.
 7. Back-filled or trivial rationale **fails** scorecard items even when structure passes.
 8. If kernel ledger logic changes, update `apps/worker/src/index.ts` in the same change.
+9. Cancellation preserves already-ratified spans, records aborted calls as `cancelled`, and never implies that queued interventions applied.
 
 ## Scorecard honesty
 

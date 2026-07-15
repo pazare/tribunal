@@ -9,7 +9,7 @@ Tribunal is an npm-workspaces monorepo. The **kernel** owns the due-process engi
 | `@tribunal/kernel` | Engine, ledger, panel adapters (CLI, OpenRouter, offline), `verifyLedger()` |
 | `@tribunal/scorecard` | A1–A12 auditability checklist with anti-spoof guards |
 | `@tribunal/packs` | Domain case files — lending, insurance, benefits, moderation (all implemented) |
-| `@tribunal/server` | Node HTTP + SSE API, human intervention, run persistence |
+| `@tribunal/server` | Node HTTP + SSE API, exact seat assignment, intervention queue, safe cancellation, run persistence |
 | `@tribunal/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker port of `verifyLedger()` (no kernel imports) |
 | `runs/` | Committed replayable run ledgers (live CLI + scripted offline) + `meta.json` head hashes |
@@ -100,6 +100,7 @@ Implementation: `packages/kernel/src/hash.ts`, `packages/kernel/src/ledger.ts`. 
 | `openrouter` | HTTP via `OPENROUTER_API_KEY` | One key, five vendor models on the default roster |
 
 Default seat societies: `evidence`, `adversary`, `law_policy`, `affected_party`, `safety` (veto), `concision`.
+Live runs accept either a CLI provider pool or an exact six-society assignment. CLI seats choose the authenticated provider only; OpenRouter seats choose both vendor and model slug.
 
 ## Verification surfaces
 
@@ -114,9 +115,10 @@ Default seat societies: `evidence`, `adversary`, `law_policy`, `affected_party`,
 
 ```
 Browser / CLI
-    → POST /api/run (pack, mode)
+    → POST /api/run (pack, mode, controls, pool or exact assignment)
     → runTribunal() in kernel
     → SSE /api/runs/:id/events (ledger events)
+    → optional POST /api/runs/:id/intervene, queue removal, or receipt-bearing /api/runs/:id/cancel
     → persist runs/:id/ledger.json + meta.json (head hash)
     → POST /api/verify
 ```
@@ -125,8 +127,10 @@ Recorded runs under `runs/` replay over SSE with `status: replay` so the UI neve
 
 ## Tests
 
-- `packages/kernel/test/kernel.test.ts` — 19 tests (determinism, tamper, veto, dissent, ablations)
+- `packages/kernel/test/*.test.ts` — 52 tests (determinism, tamper, veto, dissent, ablations, assignment, provider provenance, cancellation, strict decoder protocol and canonical verification)
 - `packages/packs/test/packs.test.ts` — 2 tests (pack integrity)
-- `packages/scorecard/test/scorecard.test.ts` — 10 tests (A1–A12, spoof guards, baseline 0/12)
+- `packages/scorecard/test/scorecard.test.ts` — 14 tests (A1–A12, spoof guards, baseline 0/12, cancellation receipts)
+- `apps/server/test/*.test.ts` — 8 tests (decoder sessions, network policy, HTTP auth, persistence, cancellation, leases, recovery, and SSE replay)
+- `apps/web/test/*.unit.test.ts` — 9 tests (strict decoder rendering, transcript completeness, conflict handling, provider identity, and verification state)
 
 See [honesty.md](./honesty.md) for claims boundaries and [judging.md](./judging.md) for the demo script.

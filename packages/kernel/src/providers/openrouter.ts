@@ -19,7 +19,7 @@ import {
  * Tribunal panel can be, e.g.:
  *
  *   microsoft -> "microsoft/phi-4"                 (Microsoft)
- *   nvidia    -> "nvidia/llama-3.1-nemotron-70b-instruct"  (NVIDIA)
+ *   nvidia    -> "nvidia/nemotron-3-super-120b-a12b"      (NVIDIA)
  *   meta      -> "meta-llama/llama-3.3-70b-instruct" (often served on Nebius)
  *   deepseek  -> "deepseek/deepseek-chat"
  *   mistral   -> "mistralai/mistral-large"
@@ -44,6 +44,7 @@ const DEFAULT_BASE = "https://openrouter.ai/api/v1";
 
 export class OpenRouterPanelClient implements PanelClient {
   readonly transport = "http" as const;
+  readonly modelSource = "requested" as const;
   readonly model: string;
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -71,14 +72,17 @@ export class OpenRouterPanelClient implements PanelClient {
   async propose(req: ProposeRequest): Promise<ProposeResult> {
     const { system, user } = proposePrompt(req.view);
     const t0 = Date.now();
-    const { text, usage } = await this.chat(system, user, req.seed);
+    const { text, usage, model, servingProvider } = await this.chat(system, user, req.seed, req.signal);
     const latencyMs = Date.now() - t0;
     const parsed = parseProposal(text, this.society, req.view.case.slot.index);
     return {
       repaired: parsed.repaired,
       usage: {
         provider: this.provider,
-        model: this.model,
+        model: model ?? this.model,
+        modelSource: model ? "response" : this.modelSource,
+        requestedModel: this.model,
+        ...(servingProvider ? { servingProvider } : {}),
         latencyMs,
         tokensIn: usage?.prompt_tokens,
         tokensOut: usage?.completion_tokens,
@@ -101,14 +105,17 @@ export class OpenRouterPanelClient implements PanelClient {
   async revise(req: ReviseRequest): Promise<ReviseResult> {
     const { system, user } = revisePrompt(req.view, req.ownRound1, req.feedback, req.guidance);
     const t0 = Date.now();
-    const { text, usage } = await this.chat(system, user, req.seed);
+    const { text, usage, model, servingProvider } = await this.chat(system, user, req.seed, req.signal);
     const latencyMs = Date.now() - t0;
     const parsed = parseRevision(text, this.society, req.view.case.slot.index, req.ownRound1);
     return {
       repaired: parsed.repaired,
       usage: {
         provider: this.provider,
-        model: this.model,
+        model: model ?? this.model,
+        modelSource: model ? "response" : this.modelSource,
+        requestedModel: this.model,
+        ...(servingProvider ? { servingProvider } : {}),
         latencyMs,
         tokensIn: usage?.prompt_tokens,
         tokensOut: usage?.completion_tokens,
@@ -134,9 +141,19 @@ export class OpenRouterPanelClient implements PanelClient {
     system: string,
     user: string,
     seed: number,
-  ): Promise<{ text: string; usage?: { prompt_tokens?: number; completion_tokens?: number } }> {
+    signal?: AbortSignal,
+  ): Promise<{
+    text: string;
+    usage?: { prompt_tokens?: number; completion_tokens?: number };
+    model?: string;
+    servingProvider?: string;
+  }> {
+    signal?.throwIfAborted();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    const onAbort = () => controller.abort(signal?.reason);
+    signal?.addEventListener("abort", onAbort, { once: true });
+    if (signal?.aborted) onAbort();
     try {
       const res = await fetch(`${this.baseUrl}/chat/completions`, {
         method: "POST",
@@ -164,9 +181,15 @@ export class OpenRouterPanelClient implements PanelClient {
       }
       const json: any = await res.json();
       const text = json?.choices?.[0]?.message?.content ?? "";
-      return { text, usage: json?.usage };
+      return {
+        text,
+        usage: json?.usage,
+        model: typeof json?.model === "string" ? json.model : undefined,
+        servingProvider: typeof json?.provider === "string" ? json.provider : undefined,
+      };
     } finally {
       clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
     }
   }
 }

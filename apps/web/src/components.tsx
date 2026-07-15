@@ -29,8 +29,8 @@ export function PhaseTracker({ view }: { view: DeliberationView }) {
                   state === "now"
                     ? "bg-tribunal-gold/20 text-tribunal-gold ring-1 ring-tribunal-gold/50 shadow-[0_0_18px_rgba(201,169,98,0.25)]"
                     : state === "past"
-                      ? "text-tribunal-gold/60"
-                      : "text-zinc-600"
+                      ? "text-tribunal-gold"
+                      : "text-zinc-400"
                 }`}
               >
                 {state === "past" ? "✓ " : ""}
@@ -40,17 +40,18 @@ export function PhaseTracker({ view }: { view: DeliberationView }) {
           );
         })}
       </div>
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={view.phaseIndex}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          className="text-xs text-zinc-400 mt-1.5"
-        >
-          {view.narration}
-        </motion.p>
-      </AnimatePresence>
+      {/* Keyed on phaseIndex so React remounts (and re-fades) the line on every
+          phase change. No AnimatePresence "wait" here: paced streaming can change
+          the phase several times in quick succession, and a waiting exit animation
+          would strand a stale blurb that no longer matches the active phase. */}
+      <motion.p
+        key={view.phaseIndex}
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-xs text-zinc-400 mt-1.5"
+      >
+        {view.narration}
+      </motion.p>
     </div>
   );
 }
@@ -66,6 +67,7 @@ const SEAT_PHASE_BADGE: Record<SeatState["phase"], { label: string; cls: string;
   revealed: { label: "revealed", cls: "bg-zinc-700/60 text-zinc-300" },
   revising: { label: "weighing critique", cls: "bg-violet-500/15 text-violet-300", pulse: true },
   revised: { label: "final position", cls: "bg-emerald-500/15 text-emerald-300" },
+  cancelled: { label: "stopped", cls: "bg-rose-500/15 text-rose-300" },
   done: { label: "ratified", cls: "bg-tribunal-gold/15 text-tribunal-gold" },
 };
 
@@ -91,7 +93,7 @@ export function Bench({ view }: { view: DeliberationView }) {
                 </div>
               </div>
               {s.info.society === "safety" && (
-                <span className="text-[9px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded shrink-0">
+                <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded shrink-0">
                   VETO
                 </span>
               )}
@@ -100,7 +102,7 @@ export function Bench({ view }: { view: DeliberationView }) {
             <div className="flex items-center gap-1.5 mt-2">
               <span className={`w-1.5 h-1.5 rounded-full ${prov.dot}`} />
               <span className="text-[10px] font-mono text-zinc-400 truncate">{prov.label}</span>
-              <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full ${badge.cls} ${badge.pulse ? "animate-pulse" : ""}`}>
+              <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full ${badge.cls} ${badge.pulse ? "animate-pulse" : ""}`}>
                 {badge.label}
               </span>
             </div>
@@ -133,7 +135,7 @@ export function Bench({ view }: { view: DeliberationView }) {
                             transition={{ duration: 0.6 }}
                           />
                         </div>
-                        <span className="text-[9px] font-mono text-zinc-500">{Math.round(s.confidence * 100)}%</span>
+                        <span className="text-[10px] font-mono text-zinc-400">{Math.round(s.confidence * 100)}%</span>
                       </div>
                     )}
                   </motion.div>
@@ -147,7 +149,7 @@ export function Bench({ view }: { view: DeliberationView }) {
               </AnimatePresence>
             </div>
 
-            <div className="flex gap-2 mt-1 text-[9px] text-zinc-500">
+            <div className="flex gap-2 mt-1 text-[10px] text-zinc-400">
               {s.changedMind && <span className="text-violet-300">↺ changed mind on the record</span>}
               {s.objectionsRaised > 0 && <span>⚑ {s.objectionsRaised} objection{s.objectionsRaised > 1 ? "s" : ""}</span>}
             </div>
@@ -171,9 +173,9 @@ export function CandidateBoard({ view }: { view: DeliberationView }) {
   return (
     <div className="glass p-3.5" data-testid="candidate-board">
       <div className="flex items-baseline justify-between">
-        <h3 className="text-xs uppercase tracking-widest text-zinc-500">
+        <h2 className="text-xs uppercase tracking-widest text-zinc-400">
           The ballot · {view.currentSpanLabel ?? "current span"}
-        </h3>
+        </h2>
         {view.escalated && (
           <span className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full">
             runoff — an extra evidence round was spent
@@ -220,13 +222,13 @@ function CandidateRow({ c, method }: { c: CandidateState; method: string | null 
               {Array.from({ length: Math.min(6, Math.max(0, Math.round(c.support))) }).map((_, i) => (
                 <span key={i} className="w-1.5 h-1.5 rounded-full bg-zinc-400/80" />
               ))}
-              <span className="text-[9px] text-zinc-500 ml-0.5">{c.support} seat{c.support === 1 ? "" : "s"}</span>
+              <span className="text-[10px] text-zinc-400 ml-0.5">{c.support} seat{c.support === 1 ? "" : "s"}</span>
             </span>
             {c.meanConfidence > 0 && (
-              <span className="text-[9px] font-mono text-zinc-500">conf {Math.round(c.meanConfidence * 100)}%</span>
+              <span className="text-[10px] font-mono text-zinc-400">conf {Math.round(c.meanConfidence * 100)}%</span>
             )}
             {c.maxLegalRisk >= 0.5 && (
-              <span className="text-[9px] font-mono text-rose-300/90">legal risk {Math.round(c.maxLegalRisk * 100)}%</span>
+              <span className="text-[10px] font-mono text-rose-300/90">legal risk {Math.round(c.maxLegalRisk * 100)}%</span>
             )}
           </div>
         </div>
@@ -252,7 +254,7 @@ function CandidateRow({ c, method }: { c: CandidateState; method: string | null 
         )}
       </div>
       {c.ratified && method && (
-        <p className="text-[9px] font-mono text-tribunal-gold/80 mt-1">rule: {method.replace(/_/g, " ")}</p>
+        <p className="text-[10px] font-mono text-tribunal-gold/80 mt-1">rule: {method.replace(/_/g, " ")}</p>
       )}
       {c.vetoed && c.vetoReason && (
         <p className="text-[10px] text-rose-300/80 mt-1 italic">“{truncate(c.vetoReason, 160)}”</p>
@@ -268,10 +270,13 @@ function CandidateRow({ c, method }: { c: CandidateState; method: string | null 
 export function VerdictStrip({ view }: { view: DeliberationView }) {
   if (view.committedSpans.length === 0 && !view.finalAnswer) return null;
   const decided = view.committedSpans.filter((s) => !s.isStop).length;
+  const cancelled = view.stoppedBy === "cancelled";
   return (
     <motion.div layout className="glass p-4 border-l-2 border-tribunal-gold" data-testid="verdict-strip">
       <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">
-        {view.finalAnswer !== null
+        {cancelled
+          ? "Partial ratified record — run cancelled"
+          : view.finalAnswer !== null
           ? "Ratified verdict — decoded span by span"
           : `Verdict under construction · ${decided} span${decided === 1 ? "" : "s"} elected so far`}
       </p>
@@ -291,13 +296,43 @@ export function VerdictStrip({ view }: { view: DeliberationView }) {
           <span className="font-mono text-sm text-emerald-300 ml-2">▣ STOP ratified</span>
         )}
       </p>
-      {view.finalAnswer !== null && (
+      {view.finalAnswer !== null && !cancelled && (
         <p className="text-[10px] text-zinc-500 mt-2">
           No token of this verdict came from a single model sampling in the dark: every span above was elected under a
           named rule, and every losing argument is preserved below. Nothing off the record.
         </p>
       )}
     </motion.div>
+  );
+}
+
+export function CancellationPanel({ view }: { view: DeliberationView }) {
+  if (view.stoppedBy !== "cancelled") return null;
+  const receipt = view.cancellation;
+  return (
+    <section className="glass p-4 border-l-2 border-rose-400" data-testid="cancellation-record">
+      <p className="eyebrow text-rose-300">Proceeding stopped safely</p>
+      <h2 className="font-serif text-2xl text-zinc-100 mt-2">No final verdict was issued.</h2>
+      <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
+        Any spans ratified before the stop remain part of the verified record. In-flight work was cancelled, and queued
+        interventions that did not reach a checkpoint are named below rather than implied to have applied.
+      </p>
+      {receipt && (
+        <dl className="grid sm:grid-cols-2 gap-3 mt-4 text-xs">
+          <div><dt className="field-label">Requested by</dt><dd className="text-zinc-200 mt-1">{receipt.actor}</dd></div>
+          <div><dt className="field-label">Requested at</dt><dd className="text-zinc-200 mt-1">{new Date(receipt.requestedAt).toLocaleString()}</dd></div>
+          <div className="sm:col-span-2"><dt className="field-label">Reason</dt><dd className="text-zinc-200 mt-1">{receipt.reason}</dd></div>
+          <div className="sm:col-span-2">
+            <dt className="field-label">Not applied</dt>
+            <dd className="font-mono text-[11px] text-zinc-400 mt-1 break-all">
+              {receipt.unappliedInterventionIds.length
+                ? receipt.unappliedInterventionIds.join(", ")
+                : "No queued interventions were left unapplied."}
+            </dd>
+          </div>
+        </dl>
+      )}
+    </section>
   );
 }
 
@@ -309,7 +344,7 @@ export function DissentRegister({ view }: { view: DeliberationView }) {
   if (view.dissents.length === 0 && view.humanInterventions.length === 0) return null;
   return (
     <div className="glass p-3.5 space-y-2" data-testid="dissent-register">
-      <h3 className="text-xs uppercase tracking-widest text-zinc-500">Preserved dissent</h3>
+      <h2 className="text-xs uppercase tracking-widest text-zinc-400">Preserved dissent</h2>
       {view.dissents.map((d, i) => {
         const meta = SOCIETY_META[d.society];
         return (
@@ -320,8 +355,8 @@ export function DissentRegister({ view }: { view: DeliberationView }) {
             className="border-l-2 border-rose-400/50 pl-2.5 py-0.5"
           >
             <p className="text-[11px] text-rose-200/90 leading-snug italic">“{truncate(d.text, 220)}”</p>
-            <p className="text-[9px] text-zinc-500 mt-0.5">
-              — {meta?.label ?? d.society} seat · span {d.spanIndex} · severity {Math.round(d.severity * 100)}% · retained on the permanent record
+            <p className="text-[10px] text-zinc-400 mt-0.5">
+              — {meta?.label ?? d.society} seat · span {d.spanIndex + 1} · severity {Math.round(d.severity * 100)}% · retained on the permanent record
             </p>
           </motion.blockquote>
         );
@@ -329,9 +364,9 @@ export function DissentRegister({ view }: { view: DeliberationView }) {
       {view.humanInterventions.map((h, i) => (
         <motion.div key={`h${i}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border-l-2 border-sky-400/50 pl-2.5 py-0.5">
           <p className="text-[11px] text-sky-200/90 leading-snug">
-            <span className="font-semibold uppercase text-[9px] mr-1">{h.kind}</span>“{truncate(h.text, 180)}”
+            <span className="font-semibold uppercase text-[10px] mr-1">{h.kind}</span>“{truncate(h.text, 180)}”
           </p>
-          <p className="text-[9px] text-zinc-500 mt-0.5">— {h.actor} (human, ledgered mid-run)</p>
+          <p className="text-[10px] text-zinc-400 mt-0.5">— {h.actor} (human, ledgered mid-run)</p>
         </motion.div>
       ))}
     </div>
@@ -379,15 +414,15 @@ export function CompareStrip() {
   return (
     <section className="glass p-5" data-testid="compare-strip">
       <div className="flex items-baseline justify-between flex-wrap gap-2">
-        <h3 className="font-serif text-xl text-zinc-200">
+        <h2 className="font-serif text-xl text-zinc-200">
           “Couldn't you just use <span className="text-tribunal-gold">SHAP or LIME</span>?”
-      </h3>
+      </h2>
         <p className="text-[11px] text-zinc-500">
           No — different question. Attribution explains a score. Tribunal makes the decision contestable.
         </p>
       </div>
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-left text-[12px]">
+        <table className="w-full min-w-[600px] text-left text-[12px]">
           <thead>
             <tr className="text-[10px] uppercase tracking-widest text-zinc-500">
               <th className="py-2 pr-3 font-medium w-[22%]"></th>
@@ -406,7 +441,7 @@ export function CompareStrip() {
           </tbody>
         </table>
       </div>
-      <p className="text-[10px] text-zinc-600 mt-3">
+      <p className="text-[10px] text-zinc-400 mt-3">
         Honest footnote: SHAP/LIME remain the right tool for debugging feature-based scoring models — Tribunal governs the
         decision procedure and can sit on top of any of them. They are complements, not substitutes.
       </p>

@@ -15,7 +15,7 @@ Beat-by-beat guide for live presentation. Assume `npm run dev` is running (UI `:
 
 ## 0:35 — Live run (60 s)
 
-1. Start a run — prefer **`openrouter`** if key is set, else **`cli`** if CLIs probe green on `GET /api/panel`, else **`offline`** and **say so out loud**.
+1. Start a run — prefer **`openrouter`** if its key is valid, else **`cli`** if the operator's explicit real-probe action succeeds, else **`offline`** and **say so out loud**. `GET /api/panel` is detection-only; quota-using probes require `POST /api/panel/probe`.
 2. SSE stream: call out ledger events as they appear:
    - `blind_commitment` before `proposals_revealed`
    - anonymized `feedback_issued`
@@ -90,7 +90,7 @@ Optional: "Same check deploys to Cloudflare Workers" — show `apps/worker` READ
 
 ## Pre-demo checklist
 
-- [ ] `npm test` green (19 kernel + 2 packs + 10 scorecard)
+- [ ] `npm test` green (52 kernel + 8 decoder server + 9 decoder UI + 14 scorecard + 2 packs = 85)
 - [ ] `npm run demo` prints `VERIFY: OK`
 - [ ] `GET /api/panel` reflects actual CLI/key availability
 - [ ] At least one run in `runs/` with `meta.json` head (if committed)

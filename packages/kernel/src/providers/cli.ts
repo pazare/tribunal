@@ -86,6 +86,8 @@ const CLI: Record<string, CliSpec> = {
 };
 
 const ANSI = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+const TERMINATE_GRACE_MS = 750;
+const TERMINATE_FALLBACK_MS = 2_000;
 
 export interface CliOptions {
   timeoutMs?: number;
@@ -94,6 +96,7 @@ export interface CliOptions {
 
 export class CliPanelClient implements PanelClient {
   readonly transport = "cli" as const;
+  readonly modelSource = "cli_config" as const;
   readonly model: string;
   private readonly spec: CliSpec;
   private readonly timeoutMs: number;
@@ -115,7 +118,7 @@ export class CliPanelClient implements PanelClient {
     const { system, user } = proposePrompt(req.view);
     const prompt = `${system}\n\n${user}`;
     const t0 = Date.now();
-    const raw = await this.run(prompt);
+    const raw = await this.run(prompt, req.signal);
     const latencyMs = Date.now() - t0;
     const { scored, objections, publicWarrant, rejected, repaired } = parseProposal(
       raw,
@@ -127,6 +130,7 @@ export class CliPanelClient implements PanelClient {
       usage: {
         provider: this.provider,
         model: this.model,
+        modelSource: this.modelSource,
         latencyMs,
         status: "ok",
         transport: "cli",
@@ -149,7 +153,7 @@ export class CliPanelClient implements PanelClient {
     const { system, user } = revisePrompt(req.view, req.ownRound1, req.feedback, req.guidance);
     const prompt = `${system}\n\n${user}`;
     const t0 = Date.now();
-    const raw = await this.run(prompt);
+    const raw = await this.run(prompt, req.signal);
     const latencyMs = Date.now() - t0;
     const { final, changed, ansObj, steel, cmm, maintained, repaired } = parseRevision(
       raw,
@@ -162,6 +166,7 @@ export class CliPanelClient implements PanelClient {
       usage: {
         provider: this.provider,
         model: this.model,
+        modelSource: this.modelSource,
         latencyMs,
         status: "ok",
         transport: "cli",
@@ -182,7 +187,8 @@ export class CliPanelClient implements PanelClient {
     };
   }
 
-  private run(prompt: string): Promise<string> {
+  private run(prompt: string, signal?: AbortSignal): Promise<string> {
+    signal?.throwIfAborted();
     const args = this.spec.buildArgs(prompt);
     const cwd = mkdtempSync(join(tmpdir(), "tribunal-"));
     return new Promise<string>((resolve, reject) => {
@@ -190,31 +196,132 @@ export class CliPanelClient implements PanelClient {
         cwd,
         env: { ...process.env, NO_COLOR: "1", CI: "1" },
         stdio: ["pipe", "pipe", "pipe"],
+        // A dedicated POSIX process group lets cancellation terminate any
+        // descendants spawned by an agent CLI, not only its wrapper process.
+        detached: process.platform !== "win32",
       });
       let out = "";
       let err = "";
-      const timer = setTimeout(() => {
-        child.kill("SIGKILL");
-        reject(new Error(`${this.spec.bin} timed out after ${this.timeoutMs}ms`));
-      }, this.timeoutMs);
+      let settled = false;
+      let terminationError: Error | null = null;
+      let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
+      let forceKillTimer: ReturnType<typeof setTimeout> | undefined;
+      let postKillSettleTimer: ReturnType<typeof setTimeout> | undefined;
+      let settleFallbackTimer: ReturnType<typeof setTimeout> | undefined;
+      let childClosed = false;
+      let forceKillSent = false;
+
+      const signalProcessGroup = (killSignal: NodeJS.Signals) => {
+        if (!child.pid) return;
+        if (process.platform !== "win32") {
+          try {
+            process.kill(-child.pid, killSignal);
+            return;
+          } catch (error: any) {
+            // ESRCH means the group already exited. For other errors, fall back
+            // to the direct child so cancellation still makes best effort.
+            if (error?.code === "ESRCH") return;
+          }
+        }
+        try {
+          child.kill(killSignal);
+        } catch {
+          // The bounded fallback below still settles if Node never emits close.
+        }
+      };
+      const processGroupIsAlive = () => {
+        if (process.platform === "win32" || !child.pid) return false;
+        try {
+          process.kill(-child.pid, 0);
+          return true;
+        } catch (error: any) {
+          return error?.code !== "ESRCH";
+        }
+      };
+      const cleanup = () => {
+        if (timeoutTimer) clearTimeout(timeoutTimer);
+        if (forceKillTimer) clearTimeout(forceKillTimer);
+        if (postKillSettleTimer) clearTimeout(postKillSettleTimer);
+        if (settleFallbackTimer) clearTimeout(settleFallbackTimer);
+        signal?.removeEventListener("abort", onAbort);
+      };
+      const fail = (error: Error) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(error);
+      };
+      const succeed = (value: string) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(value);
+      };
+
+      const terminate = (error: Error) => {
+        if (settled || terminationError) return;
+        terminationError = error;
+        signalProcessGroup("SIGTERM");
+        forceKillTimer = setTimeout(() => {
+          forceKillSent = true;
+          signalProcessGroup("SIGKILL");
+          if (childClosed) {
+            postKillSettleTimer = setTimeout(() => fail(error), 50);
+          }
+        }, TERMINATE_GRACE_MS);
+        // Normally `close` settles after every stdio handle closes. Bound that
+        // wait so a broken CLI cannot leave the Tribunal run stuck forever.
+        settleFallbackTimer = setTimeout(() => fail(error), TERMINATE_FALLBACK_MS);
+      };
+
+      const onAbort = () =>
+        terminate(
+          signal?.reason instanceof Error
+            ? signal.reason
+            : new DOMException("Run cancelled", "AbortError"),
+        );
 
       child.stdout.on("data", (d) => (out += d.toString()));
       child.stderr.on("data", (d) => (err += d.toString()));
+      child.stdin.on("error", (e) => {
+        // Killing a CLI can close its stdin while buffered prompt bytes remain.
+        // That EPIPE is part of cancellation; outside termination it is a real
+        // transport failure and should not become an unhandled stream error.
+        if (!terminationError) fail(new Error(`${this.spec.bin} stdin failed: ${e.message}`));
+      });
       child.on("error", (e) => {
-        clearTimeout(timer);
-        reject(new Error(`${this.spec.bin} spawn failed: ${e.message}`));
+        fail(new Error(`${this.spec.bin} spawn failed: ${e.message}`));
       });
       child.on("close", (code) => {
-        clearTimeout(timer);
-        const clean = out.replace(ANSI, "").trim();
-        if (!clean && code !== 0) {
-          reject(new Error(`${this.spec.bin} exited ${code}: ${err.slice(0, 200)}`));
+        if (settled) return;
+        childClosed = true;
+        if (terminationError) {
+          // The wrapper can close before a descendant that ignored SIGTERM. Keep
+          // waiting until the group disappears or the force-kill path runs.
+          if (processGroupIsAlive() && !forceKillSent) return;
+          if (forceKillSent) {
+            postKillSettleTimer = setTimeout(() => fail(terminationError!), 50);
+            return;
+          }
+          fail(terminationError);
           return;
         }
-        resolve(clean);
+        const clean = out.replace(ANSI, "").trim();
+        if (!clean && code !== 0) {
+          fail(new Error(`${this.spec.bin} exited ${code}: ${err.slice(0, 200)}`));
+          return;
+        }
+        succeed(clean);
       });
 
-      if (this.spec.inputMode === "stdin") {
+      timeoutTimer = setTimeout(
+        () => terminate(new Error(`${this.spec.bin} timed out after ${this.timeoutMs}ms`)),
+        this.timeoutMs,
+      );
+      signal?.addEventListener("abort", onAbort, { once: true });
+      if (signal?.aborted) onAbort();
+
+      if (!terminationError && this.spec.inputMode === "stdin") {
         child.stdin.write(prompt);
       }
       child.stdin.end();

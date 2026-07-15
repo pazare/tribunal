@@ -4,6 +4,7 @@ import {
   runTribunal,
   DEFAULT_FLAGS,
   buildPanel,
+  hashOf,
   type RunConfig,
   type LedgerEvent,
 } from "@tribunal/kernel";
@@ -20,6 +21,35 @@ async function offlineRun(config: RunConfig) {
     config,
     seats: buildPanel({ mode: "offline" }),
     clock: "logical",
+  });
+}
+
+function rehash(events: LedgerEvent[]): LedgerEvent[] {
+  let prevHash = "0".repeat(64);
+  for (const event of events) {
+    event.prevHash = prevHash;
+    const { hash: _discarded, ...body } = event;
+    event.hash = hashOf(body);
+    prevHash = event.hash;
+  }
+  return events;
+}
+
+async function cancelledRun() {
+  const controller = new AbortController();
+  controller.abort({
+    actor: "Operator",
+    reason: "Stopped after reviewing the live evidence",
+    requestedAt: 1_750_000_000_000,
+    unappliedInterventions: 2,
+    unappliedInterventionIds: ["human_one", "human_two"],
+  });
+  return runTribunal({
+    pack: LENDING_FIXTURE,
+    config: cfg(),
+    seats: buildPanel({ mode: "offline" }),
+    clock: "logical",
+    signal: controller.signal,
   });
 }
 
@@ -100,4 +130,69 @@ test("A10 fails on a tampered ledger", async () => {
   (t.find((e) => e.kind === "ratification")!.payload as any).decision.publicReason = "TAMPERED";
   const rep = computeAuditability(t);
   assert.equal(rep.items.find((i) => i.id === "A10")!.pass, false);
+});
+
+test("cancelled run keeps A12 schema credit but honestly fails A11", async () => {
+  const r = await cancelledRun();
+  const terminal = r.events.at(-1)!;
+  assert.equal(terminal.kind, "run_finished");
+  assert.equal((terminal.payload as any).stoppedBy, "cancelled");
+
+  const rep = computeAuditability(r.events);
+  const a10 = rep.items.find((i) => i.id === "A10")!;
+  const a11 = rep.items.find((i) => i.id === "A11")!;
+  const a12 = rep.items.find((i) => i.id === "A12")!;
+  assert.equal(a10.pass, true, a10.evidence);
+  assert.equal(a11.pass, false);
+  assert.match(a11.evidence, /operator cancelled.*before STOP was ratified/i);
+  assert.equal(a12.pass, true, a12.evidence);
+});
+
+test("A12 rejects cancelled run_finished without a typed cancellation receipt", async () => {
+  const r = await cancelledRun();
+  const malformed: LedgerEvent[] = structuredClone(r.events);
+  const terminal = malformed.at(-1)!;
+  delete (terminal.payload as any).cancellation;
+  rehash(malformed);
+
+  const rep = computeAuditability(malformed);
+  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, true);
+  assert.equal(rep.items.find((i) => i.id === "A12")!.pass, false);
+});
+
+test("A12 rejects malformed cancellation receipt fields", async () => {
+  const r = await cancelledRun();
+  const invalidReceipts = [
+    { actor: "", reason: "reason", requestedAt: 1, unappliedInterventions: 0, unappliedInterventionIds: [] },
+    { actor: "Operator", reason: "", requestedAt: 1, unappliedInterventions: 0, unappliedInterventionIds: [] },
+    { actor: "Operator", reason: "reason", requestedAt: 0, unappliedInterventions: 0, unappliedInterventionIds: [] },
+    { actor: "Operator", reason: "reason", requestedAt: 1, unappliedInterventions: 2, unappliedInterventionIds: ["one"] },
+    { actor: "Operator", reason: "reason", requestedAt: 1, unappliedInterventions: 2, unappliedInterventionIds: ["same", "same"] },
+  ];
+
+  for (const cancellation of invalidReceipts) {
+    const malformed: LedgerEvent[] = structuredClone(r.events);
+    (malformed.at(-1)!.payload as any).cancellation = cancellation;
+    rehash(malformed);
+    const a12 = computeAuditability(malformed).items.find((item) => item.id === "A12")!;
+    assert.equal(a12.pass, false, JSON.stringify(cancellation));
+  }
+});
+
+test("A12 rejects a cancellation receipt on a non-cancelled run", async () => {
+  const r = await offlineRun(cfg());
+  const malformed: LedgerEvent[] = structuredClone(r.events);
+  (malformed.at(-1)!.payload as any).cancellation = {
+    actor: "Operator",
+    reason: "This receipt does not belong on a STOP-ratified run",
+    requestedAt: 1_750_000_000_000,
+    unappliedInterventions: 0,
+    unappliedInterventionIds: [],
+  };
+  rehash(malformed);
+
+  const rep = computeAuditability(malformed);
+  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, true);
+  assert.equal(rep.items.find((i) => i.id === "A11")!.pass, true);
+  assert.equal(rep.items.find((i) => i.id === "A12")!.pass, false);
 });

@@ -26,6 +26,8 @@ import type {
 export interface ProposeRequest {
   view: PanelistCaseView;
   seed: number;
+  /** Cancels an in-flight provider call when the operator stops the run. */
+  signal?: AbortSignal;
 }
 
 export interface ReviseRequest {
@@ -35,6 +37,8 @@ export interface ReviseRequest {
   feedback: FeedbackCandidateSummary[];
   guidance: string;
   seed: number;
+  /** Cancels an in-flight provider call when the operator stops the run. */
+  signal?: AbortSignal;
 }
 
 export interface ProposeResult {
@@ -52,6 +56,7 @@ export interface ReviseResult {
 export interface PanelClient {
   readonly provider: Provider;
   readonly model: string;
+  readonly modelSource?: UsageRecord["modelSource"];
   readonly transport: "cli" | "http" | "offline";
   readonly seatId: string;
   readonly society: Society;
