@@ -12,7 +12,7 @@ Tribunal replaces sampling with **election**. The output is decoded in atomic su
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point). Three committed live runs score an honest **11/12** — the panel refused to ratify STOP, and [the ledger shows exactly why](docs/honesty.md#the-scorecard-fails-our-own-live-runs--on-purpose).
 
-Tests: **52** kernel · **6** decoder server · **9** decoder UI · **14** scorecard · **2** packs (`npm test`).
+Tests: **52** kernel · **8** decoder server · **9** decoder UI · **14** scorecard · **2** packs (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -96,7 +96,7 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 52 kernel + 6 server + 9 web + 2 packs + 14 scorecard tests
+npm test                 # 52 kernel + 8 server + 9 web + 2 packs + 14 scorecard tests
 npm run smoke --workspace @tribunal/web  # isolated offline UI/API browser gate
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
@@ -131,7 +131,8 @@ through its CLI is outside the observable interface.
 
 The decoder server binds to loopback by default, admits one two-agent run at a
 time, and stores private decoder artifacts under ignored, owner-only
-`runs/decoder/` paths.
+`runs/decoder/` paths. A non-loopback bind requires
+`TRIBUNAL_DECODER_OPERATOR_TOKEN` on every decoder route.
 
 ```bash
 npm run dev
@@ -142,9 +143,12 @@ curl -s -X POST http://localhost:8787/api/decoder/runs \
 ```
 
 Latency is not used to select or skip work: each unit always receives two
-proposals, two cross-revisions, and, when needed, two judge ballots. Exact
-provider calls have no wall-clock deadline and wait for completion or explicit
-operator cancellation. Exact protocol and honesty boundaries:
+proposals, two cross-revisions, and, when needed, two judge ballots. The kernel
+and direct CLI adapter default impose no wall-clock deadline. At the service
+edge, each provider call has a configurable backstop of 1,800,000 ms (30
+minutes) by default via `TRIBUNAL_DECODER_TIMEOUT_MS`; expiry fails the run
+closed rather than fabricating STOP. Explicit operator cancellation remains a
+separate terminal state. Exact protocol and honesty boundaries:
 [`docs/decoder-design.md`](docs/decoder-design.md).
 
 ---
@@ -289,10 +293,38 @@ Nothing above implies a specific sponsor runtime was exercised in a given demo u
 
 ```bash
 docker build -t tribunal .
-docker run -p 8787:8787 -e OPENROUTER_API_KEY tribunal
+export TRIBUNAL_DECODER_OPERATOR_TOKEN="$(openssl rand -hex 32)"
+docker run --rm \
+  --publish 127.0.0.1:8787:8787 \
+  --env TRIBUNAL_DECODER_OPERATOR_TOKEN \
+  tribunal
 ```
 
-Serves the API on port 8787. Web static assets included only if `@tribunal/web` built successfully.
+The container listens on `HOST=0.0.0.0` so Docker can publish it; that
+non-loopback bind makes the operator token mandatory even though the host port
+above is safely limited to loopback. Open `http://127.0.0.1:8787/` and enter the
+token when Decoder Lab asks to unlock. The browser sends it once in an
+`Authorization` header, then uses a random opaque session cookie marked
+`HttpOnly`, `SameSite=Strict`, and `Path=/api/decoder`; the token is never put
+in web storage, a URL, or the client bundle. Session cookies expire after eight
+hours; a server restart or `DELETE /api/decoder/session` revokes them for new
+requests. Direct API clients can send the token in an
+`Authorization: Bearer …` header. Browser origins are
+matched exactly; set `TRIBUNAL_DECODER_ALLOWED_ORIGINS` to a comma-separated
+list when a trusted HTTPS reverse proxy serves a different origin. Set
+`TRIBUNAL_DECODER_TRUST_PROXY=true` only when that proxy overwrites
+`X-Forwarded-Proto` and the backend cannot be reached directly. Add
+`--env OPENROUTER_API_KEY` only when that variable is already exported and
+OpenRouter mode is needed. The image build fails if the web UI does not compile;
+the live two-agent CLI decoder also requires its CLI binaries and authenticated
+state inside the container.
+
+Keep the published host port on loopback as shown. The decoder session gate is
+not a whole-service multi-user access layer: the governed-case operator APIs
+remain local-trust surfaces. Any off-device deployment must put the entire
+service behind an authenticated TLS reverse proxy, not merely expose port 8787.
+The operator token must contain at least 32 bytes; the example generates 32
+random bytes represented as 64 hexadecimal characters.
 
 ---
 

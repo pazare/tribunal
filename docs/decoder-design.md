@@ -126,7 +126,26 @@ a complete prefix after a torn final journal line, then atomically seals the
 terminal JSON ledger and metadata. It admits one two-agent run at a time across
 processes, disconnects backpressured SSE clients so they can resume from
 `afterSeq`, and never silently replaces a conflicting sequence. Loopback is the
-default; a non-loopback bind requires an operator token on every decoder route.
+default; a non-loopback bind requires `TRIBUNAL_DECODER_OPERATOR_TOKEN` on every
+decoder route and the server refuses to start without it. Direct API clients
+may present the secret as a Bearer token. In the browser, Decoder Lab accepts
+the operator token only through its unlock flow and sends it once in an
+`Authorization` header. The server exchanges it for a random opaque session
+cookie marked `HttpOnly`, `SameSite=Strict`, and `Path=/api/decoder`; the token
+is not retained in local or session storage, placed in a URL, or bundled into
+the client. Session cookies expire after eight hours; a server restart or
+`DELETE /api/decoder/session` revokes them for new requests. Browser origins
+are matched exactly; a trusted proxy origin must be listed in
+`TRIBUNAL_DECODER_ALLOWED_ORIGINS`. Trust its `X-Forwarded-Proto=https` signal
+with `TRIBUNAL_DECODER_TRUST_PROXY=true` only when the proxy overwrites that
+header and the backend is unreachable directly. Use trusted
+TLS transport for any off-device access: HttpOnly protects the established
+browser session from script access, not a secret sent over an untrusted network.
+
+This gate covers the decoder routes; it is not a whole-service multi-user
+authorization layer. The governed-case operator routes remain local-trust
+surfaces. Keep a container's published host port on loopback, or place the
+entire service behind an authenticated TLS reverse proxy before off-device use.
 
 ## Surfaces
 

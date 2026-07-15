@@ -11,7 +11,15 @@ import {
   transcriptCompleteness,
   transcriptEvidenceSummary,
 } from "../src/decoder-components.js";
-import { normalizeAgentHealth, type DecoderEvent, type DecoderHealth } from "../src/decoder-api.js";
+import {
+  DecoderApiError,
+  fetchDecoderHealth,
+  isDecoderAuthorizationError,
+  normalizeAgentHealth,
+  subscribeDecoderRun,
+  type DecoderEvent,
+  type DecoderHealth,
+} from "../src/decoder-api.js";
 
 function event(seq: number, kind: string, payload: Record<string, unknown> = {}): DecoderEvent {
   return {
@@ -48,6 +56,31 @@ test("same-sequence hash conflict is never treated as a replacement", () => {
     assessDecoderEvent(original, { ...original, hash: "f".repeat(64), payload: { stdout: "B" } }),
     "conflict",
   );
+
+  const originalEventSource = globalThis.EventSource;
+  let eventSourceOptions: EventSourceInit | undefined;
+  class FakeEventSource {
+    onerror: ((event: Event) => void) | null = null;
+    onmessage: ((event: MessageEvent) => void) | null = null;
+    onopen: ((event: Event) => void) | null = null;
+    constructor(_url: string | URL, options?: EventSourceInit) {
+      eventSourceOptions = options;
+    }
+    addEventListener() {}
+    close() {}
+  }
+  Object.assign(globalThis, { EventSource: FakeEventSource });
+  try {
+    const close = subscribeDecoderRun("decoder_test", {
+      onEvent: () => {},
+      onStatus: () => {},
+      onError: () => {},
+    });
+    assert.equal(eventSourceOptions?.withCredentials, true);
+    close();
+  } finally {
+    Object.assign(globalThis, { EventSource: originalEventSource });
+  }
 });
 
 test("ledger conflict is a terminal error state", () => {
@@ -70,7 +103,7 @@ test("phase receipt reports its actual quorum and validity separately", () => {
   assert.deepEqual(phaseReceiptStatus(), { present: false, quorum: 0, valid: false });
 });
 
-test("health identity is unreported, not inferred, when the API omits its pins", () => {
+test("health identity is unreported, not inferred, when the API omits its pins", async () => {
   const incomplete: DecoderHealth = {
     agents: [
       normalizeAgentHealth("codex", { present: true }),
@@ -98,6 +131,32 @@ test("health identity is unreported, not inferred, when the API omits its pins",
     ],
   };
   assert.equal(decoderAgentsReady(ready), true);
+
+  const originalFetch = globalThis.fetch;
+  let credentials: RequestCredentials | undefined;
+  globalThis.fetch = async (_input, init) => {
+    credentials = init?.credentials;
+    return new Response(JSON.stringify({ agents: [] }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  try {
+    await fetchDecoderHealth();
+    assert.equal(credentials, "include");
+    globalThis.fetch = async () =>
+      new Response(JSON.stringify({ error: "decoder operator authorization required" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    await assert.rejects(fetchDecoderHealth(), (error: unknown) => {
+      assert.equal(isDecoderAuthorizationError(error), true);
+      assert.equal(error instanceof DecoderApiError && error.status, 401);
+      return true;
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("terminal transcript cannot be full when a round has no provider exchange", () => {

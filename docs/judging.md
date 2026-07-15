@@ -90,7 +90,7 @@ Optional: "Same check deploys to Cloudflare Workers" — show `apps/worker` READ
 
 ## Pre-demo checklist
 
-- [ ] `npm test` green (30 kernel + 2 packs + 14 scorecard)
+- [ ] `npm test` green (52 kernel + 8 decoder server + 9 decoder UI + 14 scorecard + 2 packs = 85)
 - [ ] `npm run demo` prints `VERIFY: OK`
 - [ ] `GET /api/panel` reflects actual CLI/key availability
 - [ ] At least one run in `runs/` with `meta.json` head (if committed)

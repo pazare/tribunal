@@ -127,8 +127,10 @@ Recorded runs under `runs/` replay over SSE with `status: replay` so the UI neve
 
 ## Tests
 
-- `packages/kernel/test/*.test.ts` — 30 tests (determinism, tamper, veto, dissent, ablations, assignment, provider provenance, cancellation)
+- `packages/kernel/test/*.test.ts` — 52 tests (determinism, tamper, veto, dissent, ablations, assignment, provider provenance, cancellation, strict decoder protocol and canonical verification)
 - `packages/packs/test/packs.test.ts` — 2 tests (pack integrity)
 - `packages/scorecard/test/scorecard.test.ts` — 14 tests (A1–A12, spoof guards, baseline 0/12, cancellation receipts)
+- `apps/server/test/*.test.ts` — 8 tests (decoder sessions, network policy, HTTP auth, persistence, cancellation, leases, recovery, and SSE replay)
+- `apps/web/test/*.unit.test.ts` — 9 tests (strict decoder rendering, transcript completeness, conflict handling, provider identity, and verification state)
 
 See [honesty.md](./honesty.md) for claims boundaries and [judging.md](./judging.md) for the demo script.

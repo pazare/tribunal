@@ -94,6 +94,20 @@ export interface DecoderVerifyResponse {
 
 type UnknownRecord = Record<string, unknown>;
 
+export class DecoderApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "DecoderApiError";
+  }
+}
+
+export function isDecoderAuthorizationError(error: unknown): boolean {
+  return error instanceof DecoderApiError && error.status === 401;
+}
+
 function record(value: unknown): UnknownRecord {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as UnknownRecord)
@@ -111,18 +125,38 @@ function booleanValue(...values: unknown[]): boolean {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API}${path}`, init);
+  const response = await fetch(`${API}${path}`, {
+    ...init,
+    credentials: "include",
+  });
   let body: unknown;
   try {
     body = await response.json();
   } catch {
-    throw new Error(`Decoder API returned ${response.status} without JSON.`);
+    throw new DecoderApiError(
+      `Decoder API returned ${response.status} without JSON.`,
+      response.status,
+    );
   }
   if (!response.ok) {
     const message = stringValue(record(body).error, record(body).message);
-    throw new Error(message ?? `Decoder API returned ${response.status}.`);
+    throw new DecoderApiError(
+      message ?? `Decoder API returned ${response.status}.`,
+      response.status,
+    );
   }
   return body as T;
+}
+
+export async function unlockDecoderOperator(token: string): Promise<void> {
+  await request<unknown>("/api/decoder/session", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function revokeDecoderOperatorSession(): Promise<void> {
+  await request<unknown>("/api/decoder/session", { method: "DELETE" });
 }
 
 export function normalizeAgentHealth(
@@ -275,6 +309,7 @@ export function subscribeDecoderRun(
   const suffix = handlers.afterSeq != null ? `?afterSeq=${handlers.afterSeq}` : "";
   const source = new EventSource(
     `${API}/api/decoder/runs/${encodeURIComponent(runId)}/events${suffix}`,
+    { withCredentials: true },
   );
   let receivedNamedEvent = false;
 
@@ -301,7 +336,13 @@ export function subscribeDecoderRun(
     if (!receivedNamedEvent) receive(message);
   };
   source.onopen = () => handlers.onOpen?.();
-  source.onerror = () => handlers.onError("Decoder event stream disconnected; reconnecting from the last event.");
+  source.onerror = () => {
+    // Native EventSource otherwise retries a rejected/expired session forever.
+    // The view performs one credentialed reconciliation before deciding whether
+    // to reconnect or present the operator unlock.
+    source.close();
+    handlers.onError("Decoder event stream disconnected; reconnecting from the last event.");
+  };
 
   return () => source.close();
 }

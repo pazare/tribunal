@@ -40,7 +40,10 @@ import { PACKS } from "@tribunal/packs";
 import { createDecoderService, DecoderServiceError } from "./decoder-service.js";
 import {
   assertDecoderNetworkPolicy,
-  decoderOperatorAuthorized,
+  clearDecoderSessionCookie,
+  decoderSessionTransportAllowed,
+  decoderSessionCookie,
+  DecoderSessionStore,
 } from "./decoder-auth.js";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -60,7 +63,18 @@ const PORT = Number(process.env.PORT ?? 8787);
 // the operator explicitly opts in (e.g. HOST=0.0.0.0 inside a container).
 const HOST = process.env.HOST ?? "127.0.0.1";
 const DECODER_OPERATOR_TOKEN = process.env.TRIBUNAL_DECODER_OPERATOR_TOKEN?.trim() || undefined;
+const DECODER_TRUST_PROXY = process.env.TRIBUNAL_DECODER_TRUST_PROXY === "true";
 assertDecoderNetworkPolicy(HOST, DECODER_OPERATOR_TOKEN);
+const decoderSessions = new DecoderSessionStore(DECODER_OPERATOR_TOKEN);
+const DECODER_ALLOWED_ORIGINS = new Set([
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://[::1]:5173",
+  ...(process.env.TRIBUNAL_DECODER_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean),
+]);
 // Resolve repository assets from this file, not process.cwd(). Workspace npm
 // scripts launch with apps/server as cwd; tying paths to cwd made both persisted
 // runs and the production web build disappear under that supported entrypoint.
@@ -107,18 +121,54 @@ class HttpError extends Error {
   }
 }
 
-/** Browser origins allowed to call this API (dev UI + same host). */
+function directRequestOrigin(req: IncomingMessage): string | null {
+  const host = req.headers.host;
+  if (!host) return null;
+  const encrypted = Boolean((req.socket as typeof req.socket & { encrypted?: boolean }).encrypted);
+  return `${encrypted ? "https" : "http"}://${host}`;
+}
+
+/** Browser origins allowed to call this API (exact dev/configured UI + same origin). */
 function corsOriginFor(req: IncomingMessage): string | null {
   const origin = req.headers.origin;
   if (!origin) return null;
   try {
     const parsed = new URL(origin);
-    const sameHost = Boolean(req.headers.host) && parsed.host === req.headers.host;
-    const localHost = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(parsed.host);
-    return ["http:", "https:"].includes(parsed.protocol) && (sameHost || localHost) ? origin : null;
+    if (!["http:", "https:"].includes(parsed.protocol) || parsed.origin !== origin) return null;
+    const directOrigin = directRequestOrigin(req);
+    return origin === directOrigin || DECODER_ALLOWED_ORIGINS.has(origin) ? origin : null;
   } catch {
     return null;
   }
+}
+
+function forwardedProtocol(req: IncomingMessage): string | undefined {
+  const value = req.headers["x-forwarded-proto"];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function decoderRequestIsSecure(req: IncomingMessage): boolean {
+  const encrypted = Boolean((req.socket as typeof req.socket & { encrypted?: boolean }).encrypted);
+  return Boolean(
+    encrypted ||
+    (DECODER_TRUST_PROXY && forwardedProtocol(req)?.split(",", 1)[0]?.trim().toLowerCase() === "https")
+  );
+}
+
+function decoderUnlockTransportAllowed(req: IncomingMessage, origin: string | null): boolean {
+  const encrypted = Boolean((req.socket as typeof req.socket & { encrypted?: boolean }).encrypted);
+  return decoderSessionTransportAllowed({
+    origin,
+    host: req.headers.host,
+    remoteAddress: req.socket.remoteAddress,
+    encrypted,
+    trustProxy: DECODER_TRUST_PROXY,
+    forwardedProto: forwardedProtocol(req),
+  });
+}
+
+function secureDecoderCookie(req: IncomingMessage): boolean {
+  return decoderRequestIsSecure(req);
 }
 
 // ---------------------------------------------------------------------------
@@ -646,6 +696,13 @@ function json(res: ServerResponse, status: number, data: unknown) {
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
+  const decoderPath = path === "/api/decoder" || path.startsWith("/api/decoder/");
+
+  if (decoderPath) {
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Referrer-Policy", "no-referrer");
+  }
 
   // CORS: reflect only allowlisted (local) origins; set once for every route,
   // including SSE. Non-local browser origins get no CORS grant at all.
@@ -655,7 +712,8 @@ const server = createServer(async (req, res) => {
   }
   if (origin) {
     res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
     res.setHeader(
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization, X-Tribunal-Operator-Token",
@@ -817,11 +875,29 @@ const server = createServer(async (req, res) => {
     }
 
     // --- Live explainable decoder (two-agent, one elected surface unit/round) ---
-    if (
-      (path === "/api/decoder" || path.startsWith("/api/decoder/")) &&
-      !decoderOperatorAuthorized(req.headers, DECODER_OPERATOR_TOKEN)
-    ) {
+    // Browser unlock sends the operator token once in Authorization. The
+    // response rotates it into a random process-local session cookie; the raw
+    // operator token is never placed in a URL, cookie, bundle, or SSE request.
+    if (path === "/api/decoder/session" && req.method === "POST") {
+      if (!decoderUnlockTransportAllowed(req, origin)) {
+        return json(res, 403, { error: "secure decoder session transport required" });
+      }
+      const session = decoderSessions.unlock(req.headers);
+      if (!session) {
+        res.setHeader("WWW-Authenticate", 'Bearer realm="tribunal-decoder"');
+        return json(res, 401, { error: "decoder operator authorization required" });
+      }
+      res.setHeader("Set-Cookie", decoderSessionCookie(session, secureDecoderCookie(req)));
+      return json(res, 200, { ok: true, expiresAt: session.expiresAt });
+    }
+    if (path === "/api/decoder/session" && req.method === "DELETE") {
+      decoderSessions.revoke(req.headers);
+      res.setHeader("Set-Cookie", clearDecoderSessionCookie(secureDecoderCookie(req)));
+      return json(res, 200, { ok: true });
+    }
+    if (decoderPath && !decoderSessions.authorized(req.headers)) {
       res.setHeader("WWW-Authenticate", 'Bearer realm="tribunal-decoder"');
+      res.setHeader("Set-Cookie", clearDecoderSessionCookie(secureDecoderCookie(req)));
       return json(res, 401, { error: "decoder operator authorization required" });
     }
     try {

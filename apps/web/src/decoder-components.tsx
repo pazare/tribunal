@@ -11,8 +11,10 @@ import {
   fetchDecoderHealth,
   fetchDecoderRun,
   fetchDecoderRuns,
+  isDecoderAuthorizationError,
   startDecoderRun,
   subscribeDecoderRun,
+  unlockDecoderOperator,
   verifyDecoderEvents,
   verifyDecoderRun,
   type DecoderAgentHealth,
@@ -680,6 +682,11 @@ export function DecoderLab() {
   const [verifying, setVerifying] = useState(false);
   const [ledgerConflict, setLedgerConflict] = useState("");
   const [transcriptIssue, setTranscriptIssue] = useState("");
+  const [operatorUnlockRequired, setOperatorUnlockRequired] = useState(false);
+  const [operatorToken, setOperatorToken] = useState("");
+  const [operatorUnlockError, setOperatorUnlockError] = useState("");
+  const [unlockingOperator, setUnlockingOperator] = useState(false);
+  const [authEpoch, setAuthEpoch] = useState(0);
 
   const disconnectRef = useRef<(() => void) | null>(null);
   const reconnectTimerRef = useRef<number | null>(null);
@@ -689,6 +696,17 @@ export function DecoderLab() {
   const eventMapRef = useRef(new Map<string, DecoderEvent>());
   const reattachCheckedRef = useRef(false);
   const verificationRequestedRef = useRef<string | null>(null);
+  const operatorUnlockRequiredRef = useRef(false);
+
+  const requireOperatorUnlock = useCallback((nextError: unknown): boolean => {
+    if (!isDecoderAuthorizationError(nextError)) return false;
+    operatorUnlockRequiredRef.current = true;
+    setOperatorUnlockRequired(true);
+    setOperatorUnlockError("");
+    setError("");
+    setStreamNotice("");
+    return true;
+  }, []);
 
   const ingestEvents = useCallback((incoming: DecoderEvent[]): boolean => {
     let conflict = "";
@@ -834,11 +852,13 @@ export function DecoderLab() {
     try {
       setHealth(await fetchDecoderHealth());
     } catch (nextError: unknown) {
-      setError(nextError instanceof Error ? nextError.message : String(nextError));
+      if (!requireOperatorUnlock(nextError)) {
+        setError(nextError instanceof Error ? nextError.message : String(nextError));
+      }
     } finally {
       setHealthLoading(false);
     }
-  }, []);
+  }, [requireOperatorUnlock]);
 
   useEffect(() => {
     void refreshHealth();
@@ -857,10 +877,11 @@ export function DecoderLab() {
         setStatus(details.status);
         if (isDecoderTerminalStatus(details.status)) terminalRef.current = true;
       }
-    } catch {
+    } catch (nextError: unknown) {
+      requireOperatorUnlock(nextError);
       // The SSE reconnect remains authoritative; reconciliation retries later.
     }
-  }, [ingestEvents]);
+  }, [ingestEvents, requireOperatorUnlock]);
 
   const connect = useCallback(
     (id: string) => {
@@ -907,11 +928,13 @@ export function DecoderLab() {
           if (terminalRef.current) return;
           setStreamNotice(message);
           disconnectRef.current?.();
-          void reconcile(id);
-          if (reconnectTimerRef.current != null) window.clearTimeout(reconnectTimerRef.current);
-          reconnectTimerRef.current = window.setTimeout(() => {
-            if (!terminalRef.current) connectRef.current(id);
-          }, 1500);
+          void reconcile(id).finally(() => {
+            if (operatorUnlockRequiredRef.current || terminalRef.current) return;
+            if (reconnectTimerRef.current != null) window.clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = window.setTimeout(() => {
+              if (!terminalRef.current && !operatorUnlockRequiredRef.current) connectRef.current(id);
+            }, 1500);
+          });
         },
         onMalformed: (message) => {
           setTranscriptIssue(message);
@@ -955,14 +978,15 @@ export function DecoderLab() {
         setStatus(details.status || "running");
         if (!ingestEvents(details.events)) return;
         connectRef.current(id);
-      } catch {
+      } catch (nextError: unknown) {
+        requireOperatorUnlock(nextError);
         // Normal when no live run exists; the prompt remains ready.
       }
     })();
     return () => {
       disposed = true;
     };
-  }, [ingestEvents]);
+  }, [authEpoch, ingestEvents, requireOperatorUnlock]);
 
   useEffect(
     () => () => {
@@ -1003,8 +1027,12 @@ export function DecoderLab() {
       setStatus(response.status ?? "starting");
       connect(response.runId);
     } catch (nextError: unknown) {
-      setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : String(nextError));
+      if (requireOperatorUnlock(nextError)) {
+        setStatus("idle");
+      } else {
+        setStatus("error");
+        setError(nextError instanceof Error ? nextError.message : String(nextError));
+      }
     } finally {
       setStarting(false);
     }
@@ -1022,7 +1050,9 @@ export function DecoderLab() {
       });
       setStatus(response.status || "cancelling");
     } catch (nextError: unknown) {
-      setError(nextError instanceof Error ? nextError.message : String(nextError));
+      if (!requireOperatorUnlock(nextError)) {
+        setError(nextError instanceof Error ? nextError.message : String(nextError));
+      }
     } finally {
       setCancelling(false);
     }
@@ -1038,11 +1068,43 @@ export function DecoderLab() {
           : await verifyDecoderEvents(events),
       );
     } catch (nextError: unknown) {
-      setError(nextError instanceof Error ? nextError.message : String(nextError));
+      if (!requireOperatorUnlock(nextError)) {
+        setError(nextError instanceof Error ? nextError.message : String(nextError));
+      }
     } finally {
       setVerifying(false);
     }
-  }, [events]);
+  }, [events, requireOperatorUnlock]);
+
+  const unlockOperator = async (event: FormEvent) => {
+    event.preventDefault();
+    const token = operatorToken.trim();
+    if (!token) return;
+    setUnlockingOperator(true);
+    setOperatorUnlockError("");
+    try {
+      await unlockDecoderOperator(token);
+      operatorUnlockRequiredRef.current = false;
+      setOperatorUnlockRequired(false);
+      setOperatorToken("");
+      setOperatorUnlockError("");
+      setError("");
+      setStreamNotice("");
+      reattachCheckedRef.current = false;
+      setAuthEpoch((current) => current + 1);
+      await refreshHealth();
+    } catch (nextError: unknown) {
+      if (requireOperatorUnlock(nextError)) {
+        setOperatorUnlockError("The decoder operator token was not accepted.");
+      } else {
+        setOperatorUnlockError(
+          nextError instanceof Error ? nextError.message : String(nextError),
+        );
+      }
+    } finally {
+      setUnlockingOperator(false);
+    }
+  };
 
   useEffect(() => {
     if (
@@ -1097,6 +1159,56 @@ export function DecoderLab() {
           {streamNotice}
         </div>
       </header>
+
+      {operatorUnlockRequired && (
+        <form
+          className="glass space-y-3 border-tribunal-gold/30 p-4 md:p-5"
+          aria-labelledby="decoder-operator-unlock-title"
+          onSubmit={unlockOperator}
+        >
+          <div>
+            <p className="eyebrow text-tribunal-gold">Operator access required</p>
+            <h2 id="decoder-operator-unlock-title" className="mt-1 text-sm font-semibold text-zinc-100">
+              Unlock Decoder Lab
+            </h2>
+            <p className="field-help mt-1">
+              Enter the server-configured token once. It is exchanged for an HttpOnly decoder session and is not saved by this page.
+            </p>
+          </div>
+          <label htmlFor="decoder-operator-token" className="block max-w-xl">
+            <span className="field-label">Decoder operator token</span>
+            <input
+              id="decoder-operator-token"
+              data-testid="decoder-operator-token"
+              className={`${CONTROL_CLASS} mt-1.5`}
+              type="password"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              value={operatorToken}
+              onChange={(next) => {
+                setOperatorToken(next.target.value);
+                setOperatorUnlockError("");
+              }}
+              disabled={unlockingOperator}
+              required
+            />
+          </label>
+          {operatorUnlockError && (
+            <p className="text-xs text-rose-300" role="alert">
+              {operatorUnlockError}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="primary-button"
+            data-testid="decoder-operator-unlock"
+            disabled={unlockingOperator || !operatorToken.trim()}
+          >
+            {unlockingOperator ? "Unlocking…" : "Unlock Decoder Lab"}
+          </button>
+        </form>
+      )}
 
       {error && (
         <div className="notice notice-error" role="alert">
