@@ -1,0 +1,3264 @@
+[
+ {
+  "seq": 0,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": null,
+  "ts": 1,
+  "kind": "run_started",
+  "payload": {
+   "packId": "benefits-fraud-flag",
+   "title": "Claim #55102 — automated fraud flag and overpayment notice",
+   "domain": "benefits",
+   "question": "Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?",
+   "panel": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "model": "offline/scripted-v1"
+    }
+   ],
+   "config": {
+    "seed": 7,
+    "maxSpans": 4,
+    "flags": {
+     "blindRound": true,
+     "anonymizeFeedback": true,
+     "randomizeCandidateOrder": true,
+     "debateRounds": 1,
+     "roleMemory": true,
+     "independentEvidence": true,
+     "safetyVeto": true
+    },
+    "clientView": "answer_plus_summary"
+   },
+   "note": "OFFLINE deterministic panel (no model calls) — CI/smoke mode."
+  },
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "d4e3ad8db709585f83d5422511ddbf1421b9f3d1b089731cbcb06f1b416f8c1b"
+ },
+ {
+  "seq": 1,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 2,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 0,
+    "label": "the fraud determination",
+    "instruction": "Decide whether the fraud determination and $4,860 overpayment notice issue against claimant #55102. Before adopting the flag, check the employer identity behind the name mismatch yourself: compare the EIN and wage totals on the W-2 and the wage feed with the declared amounts ('DELTA SVC LLC' vs 'Delta Services Inc'), and say what you checked.",
+    "riskBands": {
+     "factual": "high",
+     "legal": "high",
+     "fairness": "high",
+     "user_impact": "high"
+    },
+    "candidatesHint": [
+     "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+     "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+     "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented."
+    ]
+   }
+  },
+  "prevHash": "d4e3ad8db709585f83d5422511ddbf1421b9f3d1b089731cbcb06f1b416f8c1b",
+  "hash": "c536a45aab5cabd15c2f54d87061b0017b6e29ad455efd3606b18253103d39fe"
+ },
+ {
+  "seq": 2,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 3,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_2a4de0a8156f",
+    "packId": "benefits-fraud-flag",
+    "title": "Claim #55102 — automated fraud flag and overpayment notice",
+    "domain": "benefits",
+    "question": "Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?",
+    "constraints": [
+     {
+      "id": "c_due_process",
+      "kind": "statute",
+      "text": "Due process requires that a benefits recipient receive adequate notice and an opportunity to be heard before benefits are terminated or clawed back; the notice must state the actual factual basis of the determination."
+     },
+     {
+      "id": "c_no_sole_algo",
+      "kind": "policy",
+      "text": "Agency policy: a fraud determination may not issue on automated matching alone; a human examiner must verify the underlying records and document the verification before any penalty attaches."
+     },
+     {
+      "id": "c_evidence_standard",
+      "kind": "policy",
+      "text": "Agency policy: fraud requires evidence of knowing misrepresentation. A data discrepancy that has an innocent explanation on the face of the record does not meet the standard."
+     },
+     {
+      "id": "c_notice_specific",
+      "kind": "regulation",
+      "text": "Overpayment and fraud notices must state the specific wages, employer, and period at issue, and how the alleged overpayment was computed, so the claimant can meaningfully contest it."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_w2",
+      "source": "verified_w2",
+      "citation": "W-2 (tax year 2025), box 1 and employer block",
+      "summary": "Verified W-2 shows wages of $23,410 from employer EIN 84-1102337, 'Delta Services Inc' — matching the claimant's declared income to the dollar; the payroll processor's cover sheet lists 'DELTA SVC LLC' as a remittance alias of the same EIN.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_declaration",
+      "source": "claim_file",
+      "citation": "quarterly declarations Q1–Q4",
+      "summary": "Claimant declared $23,410 in wages from 'Delta Services Inc' across four quarterly declarations, filed on time, each listing the same single employer.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_fraud_flag",
+      "source": "matching_system_output",
+      "citation": "cross-match run #2291, rule E-7",
+      "summary": "Automated cross-match flags 'DELTA SVC LLC' in the state wage feed as an undisclosed second employer (name similarity 0.44 to the declared 'Delta Services Inc'), scores the case as fraud, and computes a $4,860 overpayment with penalty; no EIN comparison and no human review were performed.",
+      "quality": 0.35,
+      "contradicts": [
+       "e_w2",
+       "e_declaration"
+      ]
+     },
+     {
+      "id": "e_wage_feed",
+      "source": "state_wage_feed",
+      "citation": "employer wage records, four quarters",
+      "summary": "The state wage feed reports quarterly wages under 'DELTA SVC LLC' that sum to $23,410 for the year — the same total the claimant declared — reported under EIN 84-1102337.",
+      "quality": 0.85
+     },
+     {
+      "id": "e_history",
+      "source": "case_history",
+      "citation": "claimant file, 6-year history",
+      "summary": "Six years of claim history show no prior flags, no late filings, and no discrepancies; contact and banking details unchanged throughout.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_notice_draft",
+      "title": "Draft fraud determination and overpayment notice (as queued for sending)",
+      "body": "Dear claimant: Our records show you received wages from an employer you did not disclose (DELTA SVC LLC). You have been determined to have committed fraud by failing to report this employment. You owe $4,860 in overpaid benefits plus a 30% civil penalty. Repayment begins in 30 days; benefits are suspended immediately. This determination was produced by the agency's automated cross-match system."
+     },
+     {
+      "id": "d_w2_record",
+      "title": "Verified W-2 and payroll processor cover sheet",
+      "body": "W-2, tax year 2025. Employer: Delta Services Inc, EIN 84-1102337. Box 1 wages: $23,410. Payroll processor cover sheet: 'Remittances for EIN 84-1102337 are transmitted to state wage systems under the ledger name DELTA SVC LLC. DELTA SVC LLC and Delta Services Inc are the same employing entity.' The claimant's declarations total $23,410 from this employer — identical to the W-2 figure."
+     },
+     {
+      "id": "d_match_spec",
+      "title": "Cross-match rule E-7 specification (excerpt)",
+      "body": "Rule E-7 flags a potential undisclosed employer when a wage-feed employer name has similarity below 0.60 to any declared employer name. The specification notes: 'Name similarity is a screening heuristic only. E-7 output MUST be verified against EIN and wage amounts by an examiner before any determination issues.' Cross-match run #2291 recorded no EIN comparison and no examiner sign-off."
+     }
+    ],
+    "prefix": "",
+    "slot": {
+     "index": 0,
+     "label": "the fraud determination",
+     "instruction": "Decide whether the fraud determination and $4,860 overpayment notice issue against claimant #55102. Before adopting the flag, check the employer identity behind the name mismatch yourself: compare the EIN and wage totals on the W-2 and the wage feed with the declared amounts ('DELTA SVC LLC' vs 'Delta Services Inc'), and say what you checked.",
+     "riskBands": {
+      "factual": "high",
+      "legal": "high",
+      "fairness": "high",
+      "user_impact": "high"
+     },
+     "candidatesHint": [
+      "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+      "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented."
+     ]
+    },
+    "ratifiedCommitments": [],
+    "rejectedAlternatives": [],
+    "unresolvedDissent": []
+   }
+  },
+  "prevHash": "c536a45aab5cabd15c2f54d87061b0017b6e29ad455efd3606b18253103d39fe",
+  "hash": "27b2cb5d552f1d7aa1d392b0540e0fbb1192f90a3acf334f1fed0a347bfa8f41"
+ },
+ {
+  "seq": 3,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 4,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "27b2cb5d552f1d7aa1d392b0540e0fbb1192f90a3acf334f1fed0a347bfa8f41",
+  "hash": "086e879b06b7052ca25ee4edc414a3412709c2d0154cc54d8383d69b8907f4c9"
+ },
+ {
+  "seq": 4,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 5,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "086e879b06b7052ca25ee4edc414a3412709c2d0154cc54d8383d69b8907f4c9",
+  "hash": "08c125a5a6a89efd7959a8996947bf84f3c0a847e846616c2ce452bad96b8558"
+ },
+ {
+  "seq": 5,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 6,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "08c125a5a6a89efd7959a8996947bf84f3c0a847e846616c2ce452bad96b8558",
+  "hash": "0791c77ca1261e923f626443873fd97f05a323195ee69c7d0d6b71e35593d8d3"
+ },
+ {
+  "seq": 6,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 7,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "0791c77ca1261e923f626443873fd97f05a323195ee69c7d0d6b71e35593d8d3",
+  "hash": "456bde60c32233f6624c6dde321d9f4429f1e89e86b22a7ae68e3bd9c41d7c0b"
+ },
+ {
+  "seq": 7,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 8,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "456bde60c32233f6624c6dde321d9f4429f1e89e86b22a7ae68e3bd9c41d7c0b",
+  "hash": "2ad07825c5f22b30926e03cf1932669cf69324591d7037d171c56426f09f61ad"
+ },
+ {
+  "seq": 8,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 9,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "2ad07825c5f22b30926e03cf1932669cf69324591d7037d171c56426f09f61ad",
+  "hash": "ed8c2d434b5c225c7a2d5f88aa16d49b265095377c2795c787ab8b50192cc546"
+ },
+ {
+  "seq": 9,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 10,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "6dc88321aacca336427df824dc285ac59fa886d4299d757f68e4ca4a756c9939"
+  },
+  "prevHash": "ed8c2d434b5c225c7a2d5f88aa16d49b265095377c2795c787ab8b50192cc546",
+  "hash": "09f6d1f5dcd3be0b95a321089ca404bc74dc6ba895abdf7969b1072891f5a80f"
+ },
+ {
+  "seq": 10,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 11,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "968eff56efdf43d98b4d6ada6f7b1539c87567edaf42b33c02914c3894c82de3"
+  },
+  "prevHash": "09f6d1f5dcd3be0b95a321089ca404bc74dc6ba895abdf7969b1072891f5a80f",
+  "hash": "e1b1b3d6b6d6bc639f4d0d40167204995d33c789dd6df2c1cb33ae534fd0f4d2"
+ },
+ {
+  "seq": 11,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 12,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "573c79b46e4c692dfe4a21839c4d882eb4a23e951ed11ece91d7ae1c1379b0aa"
+  },
+  "prevHash": "e1b1b3d6b6d6bc639f4d0d40167204995d33c789dd6df2c1cb33ae534fd0f4d2",
+  "hash": "142544f2465088a35d83f2df6f2b29603d0027d5743bdd1079c1ae93d306edb7"
+ },
+ {
+  "seq": 12,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 13,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "4007f3814031329300c913c8c74d36a37ecabcf6115e1d5006317d6874a493ff"
+  },
+  "prevHash": "142544f2465088a35d83f2df6f2b29603d0027d5743bdd1079c1ae93d306edb7",
+  "hash": "2de6c1064bb2f8312afa92d59abdaab8bec4ab521f438fa265e9e97a63aa0e6c"
+ },
+ {
+  "seq": 13,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 14,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "8676789a35e26958f7e6d340dc4bea986278b1c5f2bb3456196417a877a7af10"
+  },
+  "prevHash": "2de6c1064bb2f8312afa92d59abdaab8bec4ab521f438fa265e9e97a63aa0e6c",
+  "hash": "493be39b66f5b249e53268a544c36bcc0430fe15e3fae82cb19337f9ee6c8ba8"
+ },
+ {
+  "seq": 14,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 15,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 0,
+   "proposalHash": "ec256e5a438d50c1677e1350f7fb2b2dc11d271b749e46c8d224ed05626e801f"
+  },
+  "prevHash": "493be39b66f5b249e53268a544c36bcc0430fe15e3fae82cb19337f9ee6c8ba8",
+  "hash": "2397dc48f2e83c5ad51f69857b091761eb033cfb8a7634e55a9f7d835ddf05a6"
+ },
+ {
+  "seq": 15,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 16,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.2,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.52,
+       "warrant": "Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.17,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Evidence seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.61,
+       "warrant": "Adversary seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.45,
+       "factualityRisk": 0.35,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.65,
+       "warrant": "Adversary seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.41,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.28,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Adversary seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_02de714edcd0",
+       "targetKey": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.66,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.31,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Law/Policy seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.65,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Law/Policy seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.56,
+       "warrant": "Law/Policy seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.25,
+       "legalRisk": 0.27,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.68,
+       "warrant": "Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.56,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.25,
+       "fairnessRisk": 0.4,
+       "affectedPartyImpact": 0.71,
+       "warrant": "Affected-party seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.49,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.2,
+       "fairnessRisk": 0.38,
+       "affectedPartyImpact": 0.68,
+       "warrant": "Affected-party seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.64,
+       "warrant": "Safety seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.24,
+       "legalRisk": 0.33,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Safety seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.46,
+       "factualityRisk": 0.28,
+       "legalRisk": 0.29,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Safety seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" does not, on review, cross the veto threshold grounded in e_w2.",
+     "objections": [
+      {
+       "id": "obj_a0a675dfc183",
+       "targetKey": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 0,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+        "isStop": false
+       },
+       "confidence": 0.67,
+       "factualityRisk": 0.28,
+       "legalRisk": 0.18,
+       "fairnessRisk": 0.24,
+       "affectedPartyImpact": 0.51,
+       "warrant": "Concision seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Concision seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+        "isStop": false
+       },
+       "confidence": 0.61,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.5,
+       "warrant": "Concision seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the shortest span that fully answers the slot grounded in e_w2.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "6dc88321aacca336427df824dc285ac59fa886d4299d757f68e4ca4a756c9939",
+     "recomputed": "6dc88321aacca336427df824dc285ac59fa886d4299d757f68e4ca4a756c9939",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "968eff56efdf43d98b4d6ada6f7b1539c87567edaf42b33c02914c3894c82de3",
+     "recomputed": "968eff56efdf43d98b4d6ada6f7b1539c87567edaf42b33c02914c3894c82de3",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "573c79b46e4c692dfe4a21839c4d882eb4a23e951ed11ece91d7ae1c1379b0aa",
+     "recomputed": "573c79b46e4c692dfe4a21839c4d882eb4a23e951ed11ece91d7ae1c1379b0aa",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "4007f3814031329300c913c8c74d36a37ecabcf6115e1d5006317d6874a493ff",
+     "recomputed": "4007f3814031329300c913c8c74d36a37ecabcf6115e1d5006317d6874a493ff",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "8676789a35e26958f7e6d340dc4bea986278b1c5f2bb3456196417a877a7af10",
+     "recomputed": "8676789a35e26958f7e6d340dc4bea986278b1c5f2bb3456196417a877a7af10",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "ec256e5a438d50c1677e1350f7fb2b2dc11d271b749e46c8d224ed05626e801f",
+     "recomputed": "ec256e5a438d50c1677e1350f7fb2b2dc11d271b749e46c8d224ed05626e801f",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "2397dc48f2e83c5ad51f69857b091761eb033cfb8a7634e55a9f7d835ddf05a6",
+  "hash": "059757486072f49f1b094264ca45bfb0f2d788f5329ab04a5186992eb11bb9a0"
+ },
+ {
+  "seq": 16,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 17,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 0,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5817,
+      "confidenceDispersion": 0.0884,
+      "strongestArgument": "Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5267,
+      "confidenceDispersion": 0.0914,
+      "strongestArgument": "Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5717,
+      "confidenceDispersion": 0.0452,
+      "strongestArgument": "Law/Policy seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.075,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "059757486072f49f1b094264ca45bfb0f2d788f5329ab04a5186992eb11bb9a0",
+  "hash": "8ea0b9c8740cc59aa560c9108f1c25a8158dfa0b0ac7723a4db94e87b6bbff95"
+ },
+ {
+  "seq": 17,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 18,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "8ea0b9c8740cc59aa560c9108f1c25a8158dfa0b0ac7723a4db94e87b6bbff95",
+  "hash": "9d6caf7be09de7f5c1811bf27f0c52511f9efdc327c7994b514fdb818c7c7f51"
+ },
+ {
+  "seq": 18,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 19,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "9d6caf7be09de7f5c1811bf27f0c52511f9efdc327c7994b514fdb818c7c7f51",
+  "hash": "fb0ab7cdc522c94c13b2900f6dced94b966e9c16edc5aeedf7e1e129ea0015dc"
+ },
+ {
+  "seq": 19,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 20,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "fb0ab7cdc522c94c13b2900f6dced94b966e9c16edc5aeedf7e1e129ea0015dc",
+  "hash": "e2d16aa6e241a79bb1116cb2100a15d0153b85aff2255dbb61c5e93cd4e381c0"
+ },
+ {
+  "seq": 20,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 21,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "e2d16aa6e241a79bb1116cb2100a15d0153b85aff2255dbb61c5e93cd4e381c0",
+  "hash": "07f50076ad95e87923a3722c9d6739dc75124a1d505339b6d59b40d21ee556fd"
+ },
+ {
+  "seq": 21,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 22,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "07f50076ad95e87923a3722c9d6739dc75124a1d505339b6d59b40d21ee556fd",
+  "hash": "4e887c1afb98af58a21b35f43121d5ecf4bcf643d5c8b740ca3614da07f70916"
+ },
+ {
+  "seq": 22,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 23,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "4e887c1afb98af58a21b35f43121d5ecf4bcf643d5c8b740ca3614da07f70916",
+  "hash": "f55805b62ca324b9f5d79074d2af8cebb685e2eddc7bb5911210e6f23483c796"
+ },
+ {
+  "seq": 23,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 24,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f55805b62ca324b9f5d79074d2af8cebb685e2eddc7bb5911210e6f23483c796",
+  "hash": "9cdd31727aaee5bb8cc065116617ef4a69a345b92c65a4a23d52dbb9787d6af8"
+ },
+ {
+  "seq": 24,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 25,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "isStop": false
+     },
+     "confidence": 0.75,
+     "factualityRisk": 0.2,
+     "legalRisk": 0.22,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.52,
+     "warrant": "Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "9cdd31727aaee5bb8cc065116617ef4a69a345b92c65a4a23d52dbb9787d6af8",
+  "hash": "7529910ecf85ca4d755858427fb4b136f3fe33cd1550680b9c37ee03585b92be"
+ },
+ {
+  "seq": 25,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 26,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "7529910ecf85ca4d755858427fb4b136f3fe33cd1550680b9c37ee03585b92be",
+  "hash": "c2d6757fb77231ead6912b0db7ca6de4503d30d1974f49ac6a48b54557a2829f"
+ },
+ {
+  "seq": 26,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 27,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "isStop": false
+     },
+     "confidence": 0.6,
+     "factualityRisk": 0.27,
+     "legalRisk": 0.28,
+     "fairnessRisk": 0.34,
+     "affectedPartyImpact": 0.61,
+     "warrant": "Adversary seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_a3c592562f7a",
+      "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "c2d6757fb77231ead6912b0db7ca6de4503d30d1974f49ac6a48b54557a2829f",
+  "hash": "03abdf9ac605288479ffdef23d673949e0690b230a66c558d53b1fa223323077"
+ },
+ {
+  "seq": 27,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 28,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "03abdf9ac605288479ffdef23d673949e0690b230a66c558d53b1fa223323077",
+  "hash": "c1eafdf41d5f5f2be49eb5bd4a2972041a8879c8528139dbb208f54416ab640f"
+ },
+ {
+  "seq": 28,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 29,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+      "isStop": false
+     },
+     "confidence": 0.71,
+     "factualityRisk": 0.29,
+     "legalRisk": 0.31,
+     "fairnessRisk": 0.26,
+     "affectedPartyImpact": 0.56,
+     "warrant": "Law/Policy seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) addresses it, and the law_policy mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "c1eafdf41d5f5f2be49eb5bd4a2972041a8879c8528139dbb208f54416ab640f",
+  "hash": "461d3a10bb615bd251aa0dc270eb9198dfe59fcb6ccc2c48d451a0e3b5ee016a"
+ },
+ {
+  "seq": 29,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 30,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "461d3a10bb615bd251aa0dc270eb9198dfe59fcb6ccc2c48d451a0e3b5ee016a",
+  "hash": "994f46bcbb0e7bf6d97d681453150b52e5ab76366c3832d3a2154efabaab60ac"
+ },
+ {
+  "seq": 30,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 31,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+      "isStop": false
+     },
+     "confidence": 0.73,
+     "factualityRisk": 0.25,
+     "legalRisk": 0.27,
+     "fairnessRisk": 0.32,
+     "affectedPartyImpact": 0.68,
+     "warrant": "Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) addresses it, and the affected_party mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Affected-party seat: \"Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "994f46bcbb0e7bf6d97d681453150b52e5ab76366c3832d3a2154efabaab60ac",
+  "hash": "2ce6c60059463ccb224b70babd693e60ddc790b9ad8d6dc026ec8b1400bf089d"
+ },
+ {
+  "seq": 31,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 32,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "2ce6c60059463ccb224b70babd693e60ddc790b9ad8d6dc026ec8b1400bf089d",
+  "hash": "87bde593f0c410f3b82aecd94bb893ef6982de393ba9735606eb10c9b1db754a"
+ },
+ {
+  "seq": 32,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 33,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "isStop": false
+     },
+     "confidence": 0.57,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.33,
+     "fairnessRisk": 0.34,
+     "affectedPartyImpact": 0.64,
+     "warrant": "Safety seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" does not, on review, cross the veto threshold grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.\" is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_7668c56c9482",
+      "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "87bde593f0c410f3b82aecd94bb893ef6982de393ba9735606eb10c9b1db754a",
+  "hash": "e24e8c5cd6f7b31e24e0e8737aa174f86cce144335570ae36c1d5df97de230f9"
+ },
+ {
+  "seq": 33,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 34,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "e24e8c5cd6f7b31e24e0e8737aa174f86cce144335570ae36c1d5df97de230f9",
+  "hash": "414f9c5c94e68f5be92950a562eb663ae38b91559a62ac782435889484a509b0"
+ },
+ {
+  "seq": 34,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 35,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 0,
+    "final": {
+     "candidate": {
+      "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "isStop": false
+     },
+     "confidence": 0.76,
+     "factualityRisk": 0.28,
+     "legalRisk": 0.18,
+     "fairnessRisk": 0.24,
+     "affectedPartyImpact": 0.51,
+     "warrant": "Concision seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" is the shortest span that fully answers the slot grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "414f9c5c94e68f5be92950a562eb663ae38b91559a62ac782435889484a509b0",
+  "hash": "d7f65c5da7fc5c67584d88627b3110e9ecacf0f95e1c4c5e2794df8064cbfc0c"
+ },
+ {
+  "seq": 35,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 36,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+     "veto": false,
+     "legalRisk": 0.33,
+     "publicReason": "Safety seat reviewed \"Suspend the determination and order examiner …\"; no veto (legal risk 0.33)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "d7f65c5da7fc5c67584d88627b3110e9ecacf0f95e1c4c5e2794df8064cbfc0c",
+  "hash": "6e2aca934738853f7b1f1753877ed1a2fa326198ce5a382beb19689c37622d34"
+ },
+ {
+  "seq": 36,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 37,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 0,
+    "method": "dissent_preserving_supermajority",
+    "metaRule": "R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+    "selected": {
+     "candidate": {
+      "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "isStop": false
+     },
+     "confidence": 0.76,
+     "factualityRisk": 0.28,
+     "legalRisk": 0.18,
+     "fairnessRisk": 0.24,
+     "affectedPartyImpact": 0.51,
+     "warrant": "Concision seat: \"Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.\" is the shortest span that fully answers the slot grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "publicReason": "No candidate dominates; the plurality leader \"Suspend the determination and order examiner …\" is ratified and every material minority objection is preserved on the record.",
+    "candidateTable": [
+     {
+      "key": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "support": 3,
+      "meanConfidence": 0.6433,
+      "dispersion": 0.0834,
+      "maxLegalRisk": 0.33,
+      "meanFactualityRisk": 0.27,
+      "meanFairnessRisk": 0.3067,
+      "meanAffectedPartyImpact": 0.5867,
+      "aggregateScore": 0.2597
+     },
+     {
+      "key": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+      "support": 2,
+      "meanConfidence": 0.72,
+      "dispersion": 0.01,
+      "maxLegalRisk": 0.31,
+      "meanFactualityRisk": 0.27,
+      "meanFairnessRisk": 0.29,
+      "meanAffectedPartyImpact": 0.62,
+      "aggregateScore": 0.2292
+     },
+     {
+      "key": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "support": 1,
+      "meanConfidence": 0.75,
+      "dispersion": 0,
+      "maxLegalRisk": 0.22,
+      "meanFactualityRisk": 0.2,
+      "meanFairnessRisk": 0.28,
+      "meanAffectedPartyImpact": 0.52,
+      "aggregateScore": 0.2053
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_877da8c9a51e",
+      "spanIndex": 0,
+      "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_8fcc92ed653c",
+      "spanIndex": 0,
+      "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "6e2aca934738853f7b1f1753877ed1a2fa326198ce5a382beb19689c37622d34",
+  "hash": "b6d1e89b6b0088ef9227fb5b2cc11c0192faf0682472de3e4ed4d0eb08a5f869"
+ },
+ {
+  "seq": 37,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 38,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_877da8c9a51e",
+    "spanIndex": 0,
+    "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "b6d1e89b6b0088ef9227fb5b2cc11c0192faf0682472de3e4ed4d0eb08a5f869",
+  "hash": "0931bc4673c1572eb7bcec1a4299a8e138bf13658b153de6c15764e5bdf94ba2"
+ },
+ {
+  "seq": 38,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 39,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_8fcc92ed653c",
+    "spanIndex": 0,
+    "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+     "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "0931bc4673c1572eb7bcec1a4299a8e138bf13658b153de6c15764e5bdf94ba2",
+  "hash": "9561c14b16798778fe4f77d17c8e56cfe9f62dcd64ae704582e4e35948ec5a98"
+ },
+ {
+  "seq": 39,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 40,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 0,
+   "text": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+   "isStop": false,
+   "prefixAfter": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented."
+  },
+  "prevHash": "9561c14b16798778fe4f77d17c8e56cfe9f62dcd64ae704582e4e35948ec5a98",
+  "hash": "dcd45eec55b451d499abc13611ee2ecc133104a2cd00ef74994e67abb0d0d846"
+ },
+ {
+  "seq": 40,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 41,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_0_rule",
+     "content": "dissent_preserving_supermajority: R7: no dominant winner → ratify the plurality leader and PRESERVE minority dissent",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_877da8c9a51e",
+     "content": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "spanOrigin": 0
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_8fcc92ed653c",
+     "content": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 0
+    }
+   ]
+  },
+  "prevHash": "dcd45eec55b451d499abc13611ee2ecc133104a2cd00ef74994e67abb0d0d846",
+  "hash": "66ec2fc3b6cab4526eccbcea9ff8be2260a7a858ecc1023159cb6035287395d4"
+ },
+ {
+  "seq": 41,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 0,
+  "ts": 42,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 0
+  },
+  "prevHash": "66ec2fc3b6cab4526eccbcea9ff8be2260a7a858ecc1023159cb6035287395d4",
+  "hash": "3245a1e8157119768844cbf6ece82d0629d31b254666750af0f1aaf43aaaa1dd"
+ },
+ {
+  "seq": 42,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 43,
+  "kind": "decision_opened",
+  "payload": {
+   "slot": {
+    "index": 1,
+    "label": "the notice and record disposition",
+    "instruction": "Write what the claimant's file and any outgoing notice must record, consistent with the ratified determination: name the specific employer strings, EIN, and wage figures at issue, and the verification performed. Check the EIN and dollar totals against the record before writing. STOP if the ratified determination already fully answers the question.",
+    "riskBands": {
+     "legal": "high",
+     "user_impact": "high"
+    },
+    "candidatesHint": [
+     "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+     "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+     "<STOP>"
+    ]
+   }
+  },
+  "prevHash": "3245a1e8157119768844cbf6ece82d0629d31b254666750af0f1aaf43aaaa1dd",
+  "hash": "5d8ea0c0fe4468856cf234bdd82bbdf445ab661ac2fd71985652d2d769255f0a"
+ },
+ {
+  "seq": 43,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 44,
+  "kind": "case_presented",
+  "payload": {
+   "case": {
+    "runId": "run_2a4de0a8156f",
+    "packId": "benefits-fraud-flag",
+    "title": "Claim #55102 — automated fraud flag and overpayment notice",
+    "domain": "benefits",
+    "question": "Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?",
+    "constraints": [
+     {
+      "id": "c_due_process",
+      "kind": "statute",
+      "text": "Due process requires that a benefits recipient receive adequate notice and an opportunity to be heard before benefits are terminated or clawed back; the notice must state the actual factual basis of the determination."
+     },
+     {
+      "id": "c_no_sole_algo",
+      "kind": "policy",
+      "text": "Agency policy: a fraud determination may not issue on automated matching alone; a human examiner must verify the underlying records and document the verification before any penalty attaches."
+     },
+     {
+      "id": "c_evidence_standard",
+      "kind": "policy",
+      "text": "Agency policy: fraud requires evidence of knowing misrepresentation. A data discrepancy that has an innocent explanation on the face of the record does not meet the standard."
+     },
+     {
+      "id": "c_notice_specific",
+      "kind": "regulation",
+      "text": "Overpayment and fraud notices must state the specific wages, employer, and period at issue, and how the alleged overpayment was computed, so the claimant can meaningfully contest it."
+     }
+    ],
+    "evidence": [
+     {
+      "id": "e_w2",
+      "source": "verified_w2",
+      "citation": "W-2 (tax year 2025), box 1 and employer block",
+      "summary": "Verified W-2 shows wages of $23,410 from employer EIN 84-1102337, 'Delta Services Inc' — matching the claimant's declared income to the dollar; the payroll processor's cover sheet lists 'DELTA SVC LLC' as a remittance alias of the same EIN.",
+      "quality": 0.95
+     },
+     {
+      "id": "e_declaration",
+      "source": "claim_file",
+      "citation": "quarterly declarations Q1–Q4",
+      "summary": "Claimant declared $23,410 in wages from 'Delta Services Inc' across four quarterly declarations, filed on time, each listing the same single employer.",
+      "quality": 0.9
+     },
+     {
+      "id": "e_fraud_flag",
+      "source": "matching_system_output",
+      "citation": "cross-match run #2291, rule E-7",
+      "summary": "Automated cross-match flags 'DELTA SVC LLC' in the state wage feed as an undisclosed second employer (name similarity 0.44 to the declared 'Delta Services Inc'), scores the case as fraud, and computes a $4,860 overpayment with penalty; no EIN comparison and no human review were performed.",
+      "quality": 0.35,
+      "contradicts": [
+       "e_w2",
+       "e_declaration"
+      ]
+     },
+     {
+      "id": "e_wage_feed",
+      "source": "state_wage_feed",
+      "citation": "employer wage records, four quarters",
+      "summary": "The state wage feed reports quarterly wages under 'DELTA SVC LLC' that sum to $23,410 for the year — the same total the claimant declared — reported under EIN 84-1102337.",
+      "quality": 0.85
+     },
+     {
+      "id": "e_history",
+      "source": "case_history",
+      "citation": "claimant file, 6-year history",
+      "summary": "Six years of claim history show no prior flags, no late filings, and no discrepancies; contact and banking details unchanged throughout.",
+      "quality": 0.85
+     }
+    ],
+    "documents": [
+     {
+      "id": "d_notice_draft",
+      "title": "Draft fraud determination and overpayment notice (as queued for sending)",
+      "body": "Dear claimant: Our records show you received wages from an employer you did not disclose (DELTA SVC LLC). You have been determined to have committed fraud by failing to report this employment. You owe $4,860 in overpaid benefits plus a 30% civil penalty. Repayment begins in 30 days; benefits are suspended immediately. This determination was produced by the agency's automated cross-match system."
+     },
+     {
+      "id": "d_w2_record",
+      "title": "Verified W-2 and payroll processor cover sheet",
+      "body": "W-2, tax year 2025. Employer: Delta Services Inc, EIN 84-1102337. Box 1 wages: $23,410. Payroll processor cover sheet: 'Remittances for EIN 84-1102337 are transmitted to state wage systems under the ledger name DELTA SVC LLC. DELTA SVC LLC and Delta Services Inc are the same employing entity.' The claimant's declarations total $23,410 from this employer — identical to the W-2 figure."
+     },
+     {
+      "id": "d_match_spec",
+      "title": "Cross-match rule E-7 specification (excerpt)",
+      "body": "Rule E-7 flags a potential undisclosed employer when a wage-feed employer name has similarity below 0.60 to any declared employer name. The specification notes: 'Name similarity is a screening heuristic only. E-7 output MUST be verified against EIN and wage amounts by an examiner before any determination issues.' Cross-match run #2291 recorded no EIN comparison and no examiner sign-off."
+     }
+    ],
+    "prefix": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+    "slot": {
+     "index": 1,
+     "label": "the notice and record disposition",
+     "instruction": "Write what the claimant's file and any outgoing notice must record, consistent with the ratified determination: name the specific employer strings, EIN, and wage figures at issue, and the verification performed. Check the EIN and dollar totals against the record before writing. STOP if the ratified determination already fully answers the question.",
+     "riskBands": {
+      "legal": "high",
+      "user_impact": "high"
+     },
+     "candidatesHint": [
+      "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+      "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "<STOP>"
+     ]
+    },
+    "ratifiedCommitments": [
+     "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented."
+    ],
+    "rejectedAlternatives": [
+     {
+      "text": "Issue the fraud determination and $4,860 overpayment notice: the wage feed shows earnings from DELTA SVC LLC, an employer the claimant never disclosed.",
+      "reason": "not ratified at span 0"
+     },
+     {
+      "text": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+      "reason": "not ratified at span 0"
+     }
+    ],
+    "unresolvedDissent": [
+     {
+      "id": "dissent_877da8c9a51e",
+      "spanIndex": 0,
+      "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_8fcc92ed653c",
+      "spanIndex": 0,
+      "chosenKey": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     }
+    ]
+   }
+  },
+  "prevHash": "5d8ea0c0fe4468856cf234bdd82bbdf445ab661ac2fd71985652d2d769255f0a",
+  "hash": "f02207ec877e086b4496c99a0b9d4689f870f27aca4fb75f9c460840e44a2e3d"
+ },
+ {
+  "seq": 44,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 45,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f02207ec877e086b4496c99a0b9d4689f870f27aca4fb75f9c460840e44a2e3d",
+  "hash": "9453fec224172e1b71ce435abf41b61f894aa42e2558a065c9162a89c4bf5906"
+ },
+ {
+  "seq": 45,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 46,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "9453fec224172e1b71ce435abf41b61f894aa42e2558a065c9162a89c4bf5906",
+  "hash": "1c77fdcb547dfdb669d0bb1c3c434bbd516de98baf8dc0f8b9f65c4fbef6eeb5"
+ },
+ {
+  "seq": 46,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 47,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1c77fdcb547dfdb669d0bb1c3c434bbd516de98baf8dc0f8b9f65c4fbef6eeb5",
+  "hash": "aaf047375510466033f2acd7d3fb2680ffd06295d7896542f7923bfacde39939"
+ },
+ {
+  "seq": 47,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 48,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "aaf047375510466033f2acd7d3fb2680ffd06295d7896542f7923bfacde39939",
+  "hash": "1484e776bb648b06f759c842147ba144562f8f0823f18c599dde2b557165fcf8"
+ },
+ {
+  "seq": 48,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 49,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1484e776bb648b06f759c842147ba144562f8f0823f18c599dde2b557165fcf8",
+  "hash": "e14623d68acf567124d52ef93811e65c9bf7446d971dd38e7e599f038250cf8d"
+ },
+ {
+  "seq": 49,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 50,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "e14623d68acf567124d52ef93811e65c9bf7446d971dd38e7e599f038250cf8d",
+  "hash": "15c3dbf2ba31b4953aff7eae03a7a6cdb7d20bf79abc7223fdead7db6981a1c9"
+ },
+ {
+  "seq": 50,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 51,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "society": "evidence",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "7bcf6d4944466a90566c0dd9fa3d87750f76afa2b492a2beb5f73dd9538ee856"
+  },
+  "prevHash": "15c3dbf2ba31b4953aff7eae03a7a6cdb7d20bf79abc7223fdead7db6981a1c9",
+  "hash": "e6aa727520f1ad04b241790c2d554ef2d0288de5134cb762e18784f284d1ba2e"
+ },
+ {
+  "seq": 51,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 52,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "society": "adversary",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "79a3dce9b706b0bdf2a68bf5b8bfcef509051c439dbb1c5f12a633daef5f4b79"
+  },
+  "prevHash": "e6aa727520f1ad04b241790c2d554ef2d0288de5134cb762e18784f284d1ba2e",
+  "hash": "e979281710bfe3aa230e010420f447cafe8a9f7649b4614f2eb9403f7c0f6d49"
+ },
+ {
+  "seq": 52,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 53,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "society": "law_policy",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "ebd4381277a1f785667b542b21b50bc160abf60446554f630a3df9b1b1015f98"
+  },
+  "prevHash": "e979281710bfe3aa230e010420f447cafe8a9f7649b4614f2eb9403f7c0f6d49",
+  "hash": "7ecbba02b64f15a1bd12a3a66bbd266548d203fca2263e8d6f9d753c21264ab9"
+ },
+ {
+  "seq": 53,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 54,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "society": "affected_party",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "d11364d7636709fc21f7ba9cc98c122de78bef24b376bb0657dc57f43ef8d7c4"
+  },
+  "prevHash": "7ecbba02b64f15a1bd12a3a66bbd266548d203fca2263e8d6f9d753c21264ab9",
+  "hash": "fb415fc9ec291aba20e3784b2b7d026202912d042af4d10925f6eb34c3547f2a"
+ },
+ {
+  "seq": 54,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 55,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "society": "safety",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "e8d93a841c8def3dfc6dc0fc8a161a489c74cf02de8e590fbf29fb547dd22a2e"
+  },
+  "prevHash": "fb415fc9ec291aba20e3784b2b7d026202912d042af4d10925f6eb34c3547f2a",
+  "hash": "5f58c1593f5412e62c741e67e243f83135c58a204adf57c33cb3dcf8ea5e1f37"
+ },
+ {
+  "seq": 55,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 56,
+  "kind": "blind_commitment",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "society": "concision",
+   "provider": "offline",
+   "spanIndex": 1,
+   "proposalHash": "1f5cacc210b3dbdef2871128f17eeff7a8290c1374ffec1b6801299c4e75101d"
+  },
+  "prevHash": "5f58c1593f5412e62c741e67e243f83135c58a204adf57c33cb3dcf8ea5e1f37",
+  "hash": "b96b503c0dcda012522eb6f2e9ba3d5bfc978f0b9a0c0e7f0f4af9822afe3171"
+ },
+ {
+  "seq": 56,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 57,
+  "kind": "proposals_revealed",
+  "payload": {
+   "proposals": [
+    {
+     "seatId": "seat_1_evidence",
+     "society": "evidence",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.73,
+       "factualityRisk": 0.18,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Evidence seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.73,
+       "factualityRisk": 0.12,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.59,
+       "warrant": "Evidence seat: stopping here is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.62,
+       "factualityRisk": 0.13,
+       "legalRisk": 0.17,
+       "fairnessRisk": 0.26,
+       "affectedPartyImpact": 0.53,
+       "warrant": "Evidence seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" is the span best supported by the case record grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "evidence seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Evidence seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the span best supported by the case record grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "society": "adversary",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.26,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.63,
+       "warrant": "Adversary seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.27,
+       "fairnessRisk": 0.36,
+       "affectedPartyImpact": 0.64,
+       "warrant": "Adversary seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.5,
+       "factualityRisk": 0.17,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.62,
+       "warrant": "Adversary seat: stopping here survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "adversary seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Adversary seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+     "objections": [
+      {
+       "id": "obj_f46eabed2199",
+       "targetKey": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.5,
+       "kind": "factual",
+       "raisedBy": "adversary"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "society": "law_policy",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.68,
+       "factualityRisk": 0.22,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.29,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.59,
+       "factualityRisk": 0.3,
+       "legalRisk": 0.3,
+       "fairnessRisk": 0.25,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Law/Policy seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.1,
+       "legalRisk": 0.32,
+       "fairnessRisk": 0.23,
+       "affectedPartyImpact": 0.55,
+       "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "law_policy seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "society": "affected_party",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.66,
+       "factualityRisk": 0.26,
+       "legalRisk": 0.27,
+       "fairnessRisk": 0.35,
+       "affectedPartyImpact": 0.74,
+       "warrant": "Affected-party seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.57,
+       "factualityRisk": 0.27,
+       "legalRisk": 0.19,
+       "fairnessRisk": 0.39,
+       "affectedPartyImpact": 0.67,
+       "warrant": "Affected-party seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.54,
+       "factualityRisk": 0.12,
+       "legalRisk": 0.24,
+       "fairnessRisk": 0.4,
+       "affectedPartyImpact": 0.7,
+       "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "affected_party seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Affected-party seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" is the least-harmful span consistent with the evidence grounded in e_w2.",
+     "objections": []
+    },
+    {
+     "seatId": "seat_5_safety",
+     "society": "safety",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.14,
+       "legalRisk": 0.31,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.53,
+       "factualityRisk": 0.31,
+       "legalRisk": 0.31,
+       "fairnessRisk": 0.32,
+       "affectedPartyImpact": 0.58,
+       "warrant": "Safety seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.52,
+       "factualityRisk": 0.23,
+       "legalRisk": 0.34,
+       "fairnessRisk": 0.34,
+       "affectedPartyImpact": 0.64,
+       "warrant": "Safety seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" does not, on review, cross the veto threshold grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "safety seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_w2.",
+     "objections": [
+      {
+       "id": "obj_e382d7cbf3bd",
+       "targetKey": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.7,
+       "kind": "legal",
+       "raisedBy": "safety"
+      }
+     ]
+    },
+    {
+     "seatId": "seat_6_concision",
+     "society": "concision",
+     "provider": "offline",
+     "spanIndex": 1,
+     "candidates": [
+      {
+       "candidate": {
+        "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+        "isStop": false
+       },
+       "confidence": 0.69,
+       "factualityRisk": 0.29,
+       "legalRisk": 0.21,
+       "fairnessRisk": 0.28,
+       "affectedPartyImpact": 0.51,
+       "warrant": "Concision seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+        "isStop": false
+       },
+       "confidence": 0.55,
+       "factualityRisk": 0.21,
+       "legalRisk": 0.22,
+       "fairnessRisk": 0.2,
+       "affectedPartyImpact": 0.57,
+       "warrant": "Concision seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      },
+      {
+       "candidate": {
+        "text": "",
+        "isStop": true
+       },
+       "confidence": 0.51,
+       "factualityRisk": 0.19,
+       "legalRisk": 0.23,
+       "fairnessRisk": 0.22,
+       "affectedPartyImpact": 0.48,
+       "warrant": "Concision seat: stopping here is the shortest span that fully answers the slot grounded in e_w2.",
+       "evidenceRefs": [
+        "e_w2"
+       ]
+      }
+     ],
+     "rejectedAlternatives": [
+      {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "reason": "concision seat rejected this as weaker under its mandate."
+      }
+     ],
+     "publicWarrant": "Concision seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the shortest span that fully answers the slot grounded in e_w2.",
+     "objections": []
+    }
+   ],
+   "hashChecks": [
+    {
+     "seatId": "seat_1_evidence",
+     "committed": "7bcf6d4944466a90566c0dd9fa3d87750f76afa2b492a2beb5f73dd9538ee856",
+     "recomputed": "7bcf6d4944466a90566c0dd9fa3d87750f76afa2b492a2beb5f73dd9538ee856",
+     "ok": true
+    },
+    {
+     "seatId": "seat_2_adversary",
+     "committed": "79a3dce9b706b0bdf2a68bf5b8bfcef509051c439dbb1c5f12a633daef5f4b79",
+     "recomputed": "79a3dce9b706b0bdf2a68bf5b8bfcef509051c439dbb1c5f12a633daef5f4b79",
+     "ok": true
+    },
+    {
+     "seatId": "seat_3_law_policy",
+     "committed": "ebd4381277a1f785667b542b21b50bc160abf60446554f630a3df9b1b1015f98",
+     "recomputed": "ebd4381277a1f785667b542b21b50bc160abf60446554f630a3df9b1b1015f98",
+     "ok": true
+    },
+    {
+     "seatId": "seat_4_affected_party",
+     "committed": "d11364d7636709fc21f7ba9cc98c122de78bef24b376bb0657dc57f43ef8d7c4",
+     "recomputed": "d11364d7636709fc21f7ba9cc98c122de78bef24b376bb0657dc57f43ef8d7c4",
+     "ok": true
+    },
+    {
+     "seatId": "seat_5_safety",
+     "committed": "e8d93a841c8def3dfc6dc0fc8a161a489c74cf02de8e590fbf29fb547dd22a2e",
+     "recomputed": "e8d93a841c8def3dfc6dc0fc8a161a489c74cf02de8e590fbf29fb547dd22a2e",
+     "ok": true
+    },
+    {
+     "seatId": "seat_6_concision",
+     "committed": "1f5cacc210b3dbdef2871128f17eeff7a8290c1374ffec1b6801299c4e75101d",
+     "recomputed": "1f5cacc210b3dbdef2871128f17eeff7a8290c1374ffec1b6801299c4e75101d",
+     "ok": true
+    }
+   ]
+  },
+  "prevHash": "b96b503c0dcda012522eb6f2e9ba3d5bfc978f0b9a0c0e7f0f4af9822afe3171",
+  "hash": "4fc91e71336342524394253b8049ffa86b53c5ce4829ca64e6002bded9337b47"
+ },
+ {
+  "seq": 57,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 58,
+  "kind": "feedback_issued",
+  "payload": {
+   "packet": {
+    "spanIndex": 1,
+    "roundNo": 1,
+    "summaries": [
+     {
+      "candidate": {
+       "text": "",
+       "isStop": true
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.5633,
+      "confidenceDispersion": 0.077,
+      "strongestArgument": "Evidence seat: stopping here is the span best supported by the case record grounded in e_w2.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.6,
+      "confidenceDispersion": 0.058,
+      "strongestArgument": "Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+      "evidenceConflicts": []
+     },
+     {
+      "candidate": {
+       "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+       "isStop": false
+      },
+      "supportCount": 6,
+      "meanConfidence": 0.6033,
+      "confidenceDispersion": 0.0806,
+      "strongestArgument": "Evidence seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the span best supported by the case record grounded in e_w2.",
+      "strongestObjection": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "evidenceConflicts": []
+     }
+    ],
+    "overallDispersion": 0.0719,
+    "guidance": "Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors."
+   },
+   "anonymized": true
+  },
+  "prevHash": "4fc91e71336342524394253b8049ffa86b53c5ce4829ca64e6002bded9337b47",
+  "hash": "f88accee49e50fdc2984c8d802ba1f39245ee3a3ad4342d77ee63c0c23ca9410"
+ },
+ {
+  "seq": 58,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 59,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_1_evidence",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "f88accee49e50fdc2984c8d802ba1f39245ee3a3ad4342d77ee63c0c23ca9410",
+  "hash": "beae7d691210a4b217eec3af4a684bc1162c69a11d196bdb54d35990670fac5e"
+ },
+ {
+  "seq": 59,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 60,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_2_adversary",
+   "order": [
+    1,
+    0,
+    2
+   ]
+  },
+  "prevHash": "beae7d691210a4b217eec3af4a684bc1162c69a11d196bdb54d35990670fac5e",
+  "hash": "59c9d973977a2ec16e394958a0e7bc19cf85303730d15ed8377c2e0364395676"
+ },
+ {
+  "seq": 60,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 61,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_3_law_policy",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "59c9d973977a2ec16e394958a0e7bc19cf85303730d15ed8377c2e0364395676",
+  "hash": "2573666760131af174bb705df1b67049f474e5553255dc72ea552829d8b870f7"
+ },
+ {
+  "seq": 61,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 62,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_4_affected_party",
+   "order": [
+    0,
+    1,
+    2
+   ]
+  },
+  "prevHash": "2573666760131af174bb705df1b67049f474e5553255dc72ea552829d8b870f7",
+  "hash": "8c338634ba2ec3ee2b9dd748e9642c644e10352b0897ff9e4ff8650f7edc34f0"
+ },
+ {
+  "seq": 62,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 63,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_5_safety",
+   "order": [
+    1,
+    2,
+    0
+   ]
+  },
+  "prevHash": "8c338634ba2ec3ee2b9dd748e9642c644e10352b0897ff9e4ff8650f7edc34f0",
+  "hash": "d88d96691ccee5230ca4eebe0974a5b6f7eded97bac8dd84d4889cca8ec134af"
+ },
+ {
+  "seq": 63,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 64,
+  "kind": "feedback_view_assigned",
+  "payload": {
+   "recipientSeatId": "seat_6_concision",
+   "order": [
+    2,
+    0,
+    1
+   ]
+  },
+  "prevHash": "d88d96691ccee5230ca4eebe0974a5b6f7eded97bac8dd84d4889cca8ec134af",
+  "hash": "2a2d574c526eab8ab092a4624ff5baa88cdb75cf43101019c09267d2000ee6be"
+ },
+ {
+  "seq": 64,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 65,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_1_evidence",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "2a2d574c526eab8ab092a4624ff5baa88cdb75cf43101019c09267d2000ee6be",
+  "hash": "a8b94650fda93b46cf568fe8c0256a47d909d9f2b04ce662960d40585ee6f48b"
+ },
+ {
+  "seq": 65,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 66,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_1_evidence",
+    "society": "evidence",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "isStop": false
+     },
+     "confidence": 0.81,
+     "factualityRisk": 0.18,
+     "legalRisk": 0.24,
+     "fairnessRisk": 0.25,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Evidence seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" is the span best supported by the case record grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the evidence seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "a8b94650fda93b46cf568fe8c0256a47d909d9f2b04ce662960d40585ee6f48b",
+  "hash": "1a3ed31293c52a9e96b6d0bafb26cfac1f57c2220a26d2b0fd79602fe2a1910c"
+ },
+ {
+  "seq": 66,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 67,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_2_adversary",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1a3ed31293c52a9e96b6d0bafb26cfac1f57c2220a26d2b0fd79602fe2a1910c",
+  "hash": "122d786cf566ad668e0c1c1bdc0bc8b038b6866522b8f53ce2aeb37cdfe7c286"
+ },
+ {
+  "seq": 67,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 68,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_2_adversary",
+    "society": "adversary",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "isStop": false
+     },
+     "confidence": 0.63,
+     "factualityRisk": 0.27,
+     "legalRisk": 0.26,
+     "fairnessRisk": 0.32,
+     "affectedPartyImpact": 0.63,
+     "warrant": "Adversary seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" survives the sharpest attack I can mount grounded in e_w2, but see my objection.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the adversary seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_ca923b2bf096",
+      "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+      "severity": 0.55,
+      "kind": "fairness",
+      "raisedBy": "adversary"
+     }
+    ]
+   }
+  },
+  "prevHash": "122d786cf566ad668e0c1c1bdc0bc8b038b6866522b8f53ce2aeb37cdfe7c286",
+  "hash": "13733643d6f57b780d3af7bc21c9357fdfea742da850fcb34a357126cd101eb9"
+ },
+ {
+  "seq": 68,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 69,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_3_law_policy",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "13733643d6f57b780d3af7bc21c9357fdfea742da850fcb34a357126cd101eb9",
+  "hash": "d18a0c851393f9aee8d2547da218dde91f2587853e94daaf911111f431713542"
+ },
+ {
+  "seq": 69,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 70,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_3_law_policy",
+    "society": "law_policy",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.78,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.32,
+     "fairnessRisk": 0.29,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the law_policy seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "d18a0c851393f9aee8d2547da218dde91f2587853e94daaf911111f431713542",
+  "hash": "95a47488d55af07a3a2fb6843eb92b76406304365277688c3341fbdb8d576f9f"
+ },
+ {
+  "seq": 70,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 71,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_4_affected_party",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "95a47488d55af07a3a2fb6843eb92b76406304365277688c3341fbdb8d576f9f",
+  "hash": "8e8d8d225bc088bdd5941a8eceb9b39088646a5b7191c9df728b23b020ff9ee8"
+ },
+ {
+  "seq": 71,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 72,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_4_affected_party",
+    "society": "affected_party",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.73,
+     "factualityRisk": 0.26,
+     "legalRisk": 0.27,
+     "fairnessRisk": 0.35,
+     "affectedPartyImpact": 0.74,
+     "warrant": "Affected-party seat: stopping here is the least-harmful span consistent with the evidence grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": true,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: stopping here is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the affected_party seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "8e8d8d225bc088bdd5941a8eceb9b39088646a5b7191c9df728b23b020ff9ee8",
+  "hash": "f68a20db3e8928db5f6f4c4dd8bdf76175c7413561844a4f971fd9c911814017"
+ },
+ {
+  "seq": 72,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 73,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_5_safety",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "f68a20db3e8928db5f6f4c4dd8bdf76175c7413561844a4f971fd9c911814017",
+  "hash": "08eecdcc32e1421e07cbb7dc5127bfc6ac47d666b114c48861e1c85d64f80d52"
+ },
+ {
+  "seq": 73,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 74,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_5_safety",
+    "society": "safety",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.58,
+     "factualityRisk": 0.14,
+     "legalRisk": 0.31,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Safety seat: stopping here does not, on review, cross the veto threshold grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "The record (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) supports this span; Feedback is anonymized and your candidate order is shuffled. Weigh arguments, not authors.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Law/Policy seat: \"Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.\" satisfies the binding constraints and required disclosures grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the safety seat.",
+    "maintainedObjections": [
+     {
+      "id": "mobj_6259053d28e0",
+      "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+      "severity": 0.72,
+      "kind": "legal",
+      "raisedBy": "safety"
+     }
+    ]
+   }
+  },
+  "prevHash": "08eecdcc32e1421e07cbb7dc5127bfc6ac47d666b114c48861e1c85d64f80d52",
+  "hash": "1e85fa3ea88185036032ca35d1de7e6c1f3f83583106ee35915c0cfd79aa7e18"
+ },
+ {
+  "seq": 74,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 75,
+  "kind": "provider_call",
+  "payload": {
+   "seatId": "seat_6_concision",
+   "usage": {
+    "provider": "offline",
+    "model": "offline/scripted-v1",
+    "status": "ok",
+    "transport": "offline"
+   }
+  },
+  "prevHash": "1e85fa3ea88185036032ca35d1de7e6c1f3f83583106ee35915c0cfd79aa7e18",
+  "hash": "612d7fd6ccbe4ddfcc7bbea2234ceba6f586847b44b894c1a442c2dfcc4fd599"
+ },
+ {
+  "seq": 75,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 76,
+  "kind": "revision_received",
+  "payload": {
+   "revision": {
+    "seatId": "seat_6_concision",
+    "society": "concision",
+    "provider": "offline",
+    "spanIndex": 1,
+    "final": {
+     "candidate": {
+      "text": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+      "isStop": false
+     },
+     "confidence": 0.75,
+     "factualityRisk": 0.29,
+     "legalRisk": 0.21,
+     "fairnessRisk": 0.28,
+     "affectedPartyImpact": 0.51,
+     "warrant": "Concision seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the shortest span that fully answers the slot grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "changedFromRound1": false,
+    "answerToStrongestObjection": "On \"This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.\": the cited evidence (e_w2, e_declaration, e_fraud_flag, e_wage_feed, e_history) addresses it, and the concision mandate is satisfied.",
+    "steelmanOfBestRival": "The strongest case for the rival is that Evidence seat: \"Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.\" is the span best supported by the case record grounded in e_w2.",
+    "changeMyMind": "A document contradicting e_w2 would flip the concision seat.",
+    "maintainedObjections": []
+   }
+  },
+  "prevHash": "612d7fd6ccbe4ddfcc7bbea2234ceba6f586847b44b894c1a442c2dfcc4fd599",
+  "hash": "241b5dffccceeda7f64bf84886e9896454a990fb960dab6a8fda9fddc17f8bc4"
+ },
+ {
+  "seq": 76,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 77,
+  "kind": "safety_review",
+  "payload": {
+   "verdicts": [
+    {
+     "candidateKey": "<STOP>",
+     "veto": false,
+     "legalRisk": 0.31,
+     "publicReason": "Safety seat reviewed \"<STOP>\"; no veto (legal risk 0.31)."
+    }
+   ],
+   "vetoEnabled": true
+  },
+  "prevHash": "241b5dffccceeda7f64bf84886e9896454a990fb960dab6a8fda9fddc17f8bc4",
+  "hash": "fabbe5b047c5bf5fc0dfcfaef49133ea1596f3cc49d1db9bf6f146f434cf286d"
+ },
+ {
+  "seq": 77,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 78,
+  "kind": "ratification",
+  "payload": {
+   "decision": {
+    "spanIndex": 1,
+    "method": "cost_sensitive_sufficiency",
+    "metaRule": "R5: the verdict is complete and further text adds risk without value → ratify STOP",
+    "selected": {
+     "candidate": {
+      "text": "",
+      "isStop": true
+     },
+     "confidence": 0.78,
+     "factualityRisk": 0.22,
+     "legalRisk": 0.32,
+     "fairnessRisk": 0.29,
+     "affectedPartyImpact": 0.57,
+     "warrant": "Law/Policy seat: stopping here satisfies the binding constraints and required disclosures grounded in e_w2.",
+     "evidenceRefs": [
+      "e_w2"
+     ]
+    },
+    "publicReason": "The verdict already answers the question; the panel ratifies STOP rather than adding unwarranted text.",
+    "candidateTable": [
+     {
+      "key": "<STOP>",
+      "support": 3,
+      "meanConfidence": 0.6967,
+      "dispersion": 0.085,
+      "maxLegalRisk": 0.32,
+      "meanFactualityRisk": 0.2067,
+      "meanFairnessRisk": 0.3067,
+      "meanAffectedPartyImpact": 0.6267,
+      "aggregateScore": 0.284
+     },
+     {
+      "key": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+      "support": 2,
+      "meanConfidence": 0.72,
+      "dispersion": 0.09,
+      "maxLegalRisk": 0.26,
+      "meanFactualityRisk": 0.225,
+      "meanFairnessRisk": 0.285,
+      "meanAffectedPartyImpact": 0.6,
+      "aggregateScore": 0.2439
+     },
+     {
+      "key": "Record and notice: the fraud flag from cross-match run #2291 is dismissed — 'DELTA SVC LLC' is the payroll remittance alias of the declared employer Delta Services Inc (EIN 84-1102337), the W-2 confirms declared wages of $23,410 exactly, and no overpayment exists; no adverse action issues and the claimant's benefits continue uninterrupted.",
+      "support": 1,
+      "meanConfidence": 0.75,
+      "dispersion": 0,
+      "maxLegalRisk": 0.21,
+      "meanFactualityRisk": 0.29,
+      "meanFairnessRisk": 0.28,
+      "meanAffectedPartyImpact": 0.51,
+      "aggregateScore": 0.1983
+     }
+    ],
+    "vetoes": [],
+    "dissents": [
+     {
+      "id": "dissent_944103a5e60c",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_ca923b2bf096",
+       "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55
+     },
+     {
+      "id": "dissent_a7b3e9189e26",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_6259053d28e0",
+       "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72
+     },
+     {
+      "id": "dissent_877da8c9a51e",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_a3c592562f7a",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+       "severity": 0.55,
+       "kind": "fairness",
+       "raisedBy": "adversary"
+      },
+      "status": "preserved",
+      "materiality": 0.55,
+      "carriedFromSpan": 0
+     },
+     {
+      "id": "dissent_8fcc92ed653c",
+      "spanIndex": 1,
+      "chosenKey": "<STOP>",
+      "objection": {
+       "id": "mobj_7668c56c9482",
+       "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+       "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+       "severity": 0.72,
+       "kind": "legal",
+       "raisedBy": "safety"
+      },
+      "status": "preserved",
+      "materiality": 0.72,
+      "carriedFromSpan": 0
+     }
+    ],
+    "escalationRounds": 0
+   }
+  },
+  "prevHash": "fabbe5b047c5bf5fc0dfcfaef49133ea1596f3cc49d1db9bf6f146f434cf286d",
+  "hash": "4c3a1f649b9ee65bad35db265065bce79bcd863b812703c3492afc72ac99318a"
+ },
+ {
+  "seq": 78,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 79,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_944103a5e60c",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_ca923b2bf096",
+     "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55
+   }
+  },
+  "prevHash": "4c3a1f649b9ee65bad35db265065bce79bcd863b812703c3492afc72ac99318a",
+  "hash": "d44f30e50522bfac4bca1e5d09db2e258e90366c1695cfda5d421d3b405e4b93"
+ },
+ {
+  "seq": 79,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 80,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_a7b3e9189e26",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_6259053d28e0",
+     "targetKey": "Record and notice: determination is held pending examiner verification — the claimant is informed that a wage-feed name discrepancy ('DELTA SVC LLC' vs 'Delta Services Inc') is under review, that no fraud finding has been made, and that benefits continue while an examiner compares the EIN and wage totals as rule E-7's specification requires.",
+     "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72
+   }
+  },
+  "prevHash": "d44f30e50522bfac4bca1e5d09db2e258e90366c1695cfda5d421d3b405e4b93",
+  "hash": "ad681b7b564bd558661237cdcb5b6367a3e042646cd2f24babdc17a69190c77d"
+ },
+ {
+  "seq": 80,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 81,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_877da8c9a51e",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_a3c592562f7a",
+     "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+     "text": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "severity": 0.55,
+     "kind": "fairness",
+     "raisedBy": "adversary"
+    },
+    "status": "preserved",
+    "materiality": 0.55,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "ad681b7b564bd558661237cdcb5b6367a3e042646cd2f24babdc17a69190c77d",
+  "hash": "f16db7af9e94011daed2aab13f1f6faf743dfb4264ee7d1b74342cdb4c6bd991"
+ },
+ {
+  "seq": 81,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 82,
+  "kind": "dissent_preserved",
+  "payload": {
+   "dissent": {
+    "id": "dissent_8fcc92ed653c",
+    "spanIndex": 1,
+    "chosenKey": "<STOP>",
+    "objection": {
+     "id": "mobj_7668c56c9482",
+     "targetKey": "Refuse the fraud determination: the wage feed's 'DELTA SVC LLC' and the declared 'Delta Services Inc' are the same employer under EIN 84-1102337, and the verified W-2 shows the declared $23,410 was accurate to the dollar — there is no undisclosed employer and no overpayment.",
+     "text": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "severity": 0.72,
+     "kind": "legal",
+     "raisedBy": "safety"
+    },
+    "status": "preserved",
+    "materiality": 0.72,
+    "carriedFromSpan": 0
+   }
+  },
+  "prevHash": "f16db7af9e94011daed2aab13f1f6faf743dfb4264ee7d1b74342cdb4c6bd991",
+  "hash": "76fdbe04f7bd4c88297a0cc3c3d41c2988e6f9eb580b0bdea6de8ba3b5d86e1b"
+ },
+ {
+  "seq": 82,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 83,
+  "kind": "span_committed",
+  "payload": {
+   "spanIndex": 1,
+   "text": "",
+   "isStop": true,
+   "prefixAfter": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented."
+  },
+  "prevHash": "76fdbe04f7bd4c88297a0cc3c3d41c2988e6f9eb580b0bdea6de8ba3b5d86e1b",
+  "hash": "76c58f42748346e39b64f5eb4d8398e2788567b983c69ce65787dee8a3b467c6"
+ },
+ {
+  "seq": 83,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 84,
+  "kind": "memory_updated",
+  "payload": {
+   "writes": [
+    {
+     "layer": "deliberation",
+     "key": "span_1_rule",
+     "content": "cost_sensitive_sufficiency: R5: the verdict is complete and further text adds risk without value → ratify STOP",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_944103a5e60c",
+     "content": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_a7b3e9189e26",
+     "content": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_877da8c9a51e",
+     "content": "This span leans on an inference the record does not fully support for \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\"; the premise should be checked.",
+     "spanOrigin": 1
+    },
+    {
+     "layer": "unresolved_objection",
+     "key": "dissent_8fcc92ed653c",
+     "content": "This span risks a compliance gap on \"Should the agency issue the fraud determination and $4,860 overpayment notice against claimant #55102, and what must the notice state?\" — it may omit a required disclosure or overstate certainty.",
+     "spanOrigin": 1
+    }
+   ]
+  },
+  "prevHash": "76c58f42748346e39b64f5eb4d8398e2788567b983c69ce65787dee8a3b467c6",
+  "hash": "552e43400a99265053dabda80534ed1b78bf4a6ffb4cc2b8bdbbcd05b9b9bcae"
+ },
+ {
+  "seq": 84,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": 1,
+  "ts": 85,
+  "kind": "decision_closed",
+  "payload": {
+   "spanIndex": 1
+  },
+  "prevHash": "552e43400a99265053dabda80534ed1b78bf4a6ffb4cc2b8bdbbcd05b9b9bcae",
+  "hash": "0201f97eede1a0141c8421f48db72fbe318042b872727bd5ddd5e32d163c0268"
+ },
+ {
+  "seq": 85,
+  "runId": "run_2a4de0a8156f",
+  "spanIndex": null,
+  "ts": 86,
+  "kind": "run_finished",
+  "payload": {
+   "finalAnswer": "Suspend the determination and order examiner verification of the employer identity (EIN and wage-total comparison) as rule E-7's own specification requires; no notice, penalty, or benefit suspension may issue until that verification is documented.",
+   "stoppedBy": "stop_ratified",
+   "spanCount": 2,
+   "totals": {
+    "calls": 24,
+    "tokensOut": 0,
+    "latencyMs": 0,
+    "repaired": 0
+   }
+  },
+  "prevHash": "0201f97eede1a0141c8421f48db72fbe318042b872727bd5ddd5e32d163c0268",
+  "hash": "515e3b34ef3193605c75e788158552031d83db0bb2e9812e660751fd02d890f1"
+ }
+]

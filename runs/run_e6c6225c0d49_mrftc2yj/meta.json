@@ -1,0 +1,13 @@
+{
+ "runId": "run_e6c6225c0d49",
+ "packId": "lending-adverse-action",
+ "mode": "offline",
+ "startedAt": 1783740998387,
+ "finishedAt": 1783740998398,
+ "events": 86,
+ "head": "74f81a7354a2aa1910323d2f25e0fe742888402ee6bc511f5decf9e2dd3370b6",
+ "verified": true,
+ "stoppedBy": "stop_ratified",
+ "auditability": "12/12",
+ "label": "lending-adverse-action · offline · 2026-07-11T03:36:38.387Z"
+}

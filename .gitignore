@@ -17,3 +17,4 @@ apps/web/src/*.js
 HANDOFF.md
 runs/demo-recording/webm/
 runs/decoder/
+.playwright-cli/
