@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tribunal Clinical — Krishnan Briefing</title>
+</head>
+<body>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F9FA; --panel: #FFFFFF; --ink: #16222E; --ink-2: #4A5B68; --ink-3: #7C8A96;
+    --rule: #D9E1E6; --accent: #0C7C72; --accent-ink: #0A5F58; --accent-soft: #E3EFED;
+    --status: #B4452F; --status-soft: #F7E9E4; --chip: #EDF2F4; --bar: #0C7C72;
+    --shadow: 0 1px 2px rgba(22,34,46,.06), 0 4px 14px rgba(22,34,46,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F161D; --panel: #16202A; --ink: #E9EFF3; --ink-2: #AAB8C3; --ink-3: #75838F;
+      --rule: #2A3742; --accent: #4FB3AA; --accent-ink: #6CC5BD; --accent-soft: #14312E;
+      --status: #D3705B; --status-soft: #3A221B; --chip: #1C2833; --bar: #4FB3AA;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F7F9FA; --panel: #FFFFFF; --ink: #16222E; --ink-2: #4A5B68; --ink-3: #7C8A96;
+    --rule: #D9E1E6; --accent: #0C7C72; --accent-ink: #0A5F58; --accent-soft: #E3EFED;
+    --status: #B4452F; --status-soft: #F7E9E4; --chip: #EDF2F4; --bar: #0C7C72;
+    --shadow: 0 1px 2px rgba(22,34,46,.06), 0 4px 14px rgba(22,34,46,.05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F161D; --panel: #16202A; --ink: #E9EFF3; --ink-2: #AAB8C3; --ink-3: #75838F;
+    --rule: #2A3742; --accent: #4FB3AA; --accent-ink: #6CC5BD; --accent-soft: #14312E;
+    --status: #D3705B; --status-soft: #3A221B; --chip: #1C2833; --bar: #4FB3AA;
+    --shadow: none;
+  }
+
+  html { scroll-snap-type: y mandatory; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .serif { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; }
+  .mono  { font-family: "SF Mono", SFMono-Regular, ui-monospace, "Cascadia Code", Consolas, "Liberation Mono", monospace; }
+
+  .slide {
+    min-height: 100vh; min-height: 100dvh;
+    scroll-snap-align: start;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 3.5rem 1.5rem 4.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .frame { width: 100%; max-width: 1120px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: "SF Mono", SFMono-Regular, ui-monospace, Consolas, monospace;
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent-ink); margin-bottom: 1.1rem;
+  }
+  .eyebrow .dim { color: var(--ink-3); }
+  h1, h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    font-weight: 600; text-wrap: balance; letter-spacing: -0.01em;
+  }
+  h1 { font-size: clamp(2.4rem, 5.5vw, 4.2rem); line-height: 1.06; }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.5rem); line-height: 1.14; margin-bottom: 1.6rem; }
+  .lede { font-size: 1.12rem; color: var(--ink-2); max-width: 62ch; }
+
+  .foot {
+    margin-top: 2.4rem; padding-top: .8rem; border-top: 1px solid var(--rule);
+    font-family: "SF Mono", SFMono-Regular, ui-monospace, Consolas, monospace;
+    font-size: .68rem; line-height: 1.6; color: var(--ink-3); max-width: 100%;
+  }
+
+  /* ---------- title ---------- */
+  .titlewrap { text-align: left; }
+  .titlewrap .def {
+    margin-top: 1.4rem; font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 56ch;
+  }
+  .phasestrip {
+    margin-top: 2.6rem; display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
+    font-family: "SF Mono", SFMono-Regular, ui-monospace, Consolas, monospace; font-size: .7rem;
+  }
+  .phasestrip span {
+    background: var(--chip); border: 1px solid var(--rule); border-radius: 3px;
+    padding: .28rem .5rem; color: var(--ink-2); white-space: nowrap;
+  }
+  .phasestrip span.veto { border-color: var(--status); color: var(--status); }
+  .phasestrip span.stop { border-color: var(--accent); color: var(--accent-ink); }
+  .byline { margin-top: 2.4rem; font-size: .85rem; color: var(--ink-3); }
+  .byline b { color: var(--ink-2); font-weight: 600; }
+
+  /* ---------- stat tiles ---------- */
+  .groups { display: grid; gap: 1.6rem; margin-top: .4rem; }
+  .grouplabel {
+    font-family: "SF Mono", SFMono-Regular, ui-monospace, Consolas, monospace;
+    font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: .6rem;
+  }
+  .grouplabel.warn { color: var(--status); }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  .tile {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 1rem 1.1rem; box-shadow: var(--shadow);
+  }
+  .tile .num {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 600; line-height: 1.1;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .tile .num.warn { color: var(--status); }
+  .tile .lab { margin-top: .4rem; font-size: .82rem; color: var(--ink-2); line-height: 1.35; }
+  .tile .src {
+    margin-top: .5rem; font-family: "SF Mono", ui-monospace, Consolas, monospace;
+    font-size: .64rem; color: var(--ink-3);
+  }
+  .takeaway {
+    margin-top: 1.6rem; padding: 1rem 1.2rem; border-left: 3px solid var(--accent);
+    background: var(--accent-soft); border-radius: 0 6px 6px 0;
+    font-size: 1rem; color: var(--ink); max-width: 74ch;
+  }
+
+  /* ---------- mechanism ---------- */
+  .twocol { display: grid; grid-template-columns: 7fr 5fr; gap: 2.2rem; align-items: start; }
+  .instr { display: grid; gap: .7rem; }
+  .irow {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+    padding: .8rem 1rem; box-shadow: var(--shadow);
+  }
+  .irow .iname { font-weight: 600; font-size: .95rem; }
+  .irow .idesc { font-size: .85rem; color: var(--ink-2); margin-top: .15rem; }
+  .irow .itag {
+    margin-top: .45rem; font-family: "SF Mono", ui-monospace, Consolas, monospace;
+    font-size: .66rem; color: var(--accent-ink);
+  }
+  .sidebox {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 1.2rem 1.3rem; box-shadow: var(--shadow);
+  }
+  .sidebox h3 { font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; color: var(--ink-3);
+    margin-bottom: .7rem; font-weight: 500; }
+  .sidebox p { font-size: .92rem; color: var(--ink-2); }
+  .sidebox p + p { margin-top: .7rem; }
+  .sidebox b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- architecture diagram ---------- */
+  .boundary {
+    border: 1.5px dashed var(--ink-3); border-radius: 10px;
+    padding: 1.3rem 1.4rem 1.1rem; position: relative; background: transparent;
+  }
+  .boundary > .blabel {
+    position: absolute; top: -0.62rem; left: 1.1rem; background: var(--bg); padding: 0 .5rem;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .64rem;
+    letter-spacing: .1em; color: var(--ink-3); text-transform: uppercase;
+  }
+  .plane { margin-bottom: .9rem; }
+  .plabel {
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .64rem;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: .4rem;
+  }
+  .prow { display: flex; align-items: stretch; gap: .4rem; flex-wrap: wrap; }
+  .node {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 5px;
+    padding: .5rem .7rem; font-size: .78rem; line-height: 1.3; flex: 1 1 0;
+    min-width: 8rem; box-shadow: var(--shadow);
+  }
+  .node b { display: block; font-size: .8rem; font-weight: 600; }
+  .node small { color: var(--ink-2); font-size: .7rem; }
+  .node.veto { border-color: var(--status); }
+  .node.veto b { color: var(--status); }
+  .node.win { border-color: var(--accent); background: var(--accent-soft); }
+  .node.win b { color: var(--accent-ink); }
+  .arr { align-self: center; color: var(--ink-3); font-size: .85rem; flex: 0 0 auto; }
+  .varr { text-align: center; color: var(--ink-3); font-size: .85rem; margin: .15rem 0; }
+  .feed {
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .64rem;
+    color: var(--ink-3); margin: .15rem 0 .35rem;
+  }
+  .stagehdr { font-size: .74rem; font-weight: 600; color: var(--ink-2); margin: .5rem 0 .3rem; }
+  .ledgerbar {
+    margin-top: .3rem; border: 1px solid var(--accent); background: var(--accent-soft);
+    border-radius: 5px; padding: .5rem .8rem; text-align: center;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .68rem; color: var(--accent-ink);
+  }
+  .anchorline {
+    display: flex; align-items: center; gap: .6rem; margin-top: .55rem;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .66rem; color: var(--ink-3);
+  }
+  .anchorchip {
+    border: 1px solid var(--rule); background: var(--chip); border-radius: 4px; padding: .3rem .6rem;
+    color: var(--ink-2); white-space: nowrap;
+  }
+  .legend { margin-top: .9rem; font-size: .7rem; color: var(--ink-3);
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; }
+  .sw { display: inline-block; width: .7rem; height: .7rem; border-radius: 2px; vertical-align: -1px; margin: 0 .25rem 0 .7rem; }
+
+  /* ---------- economics ---------- */
+  .ecogrid { display: grid; grid-template-columns: 6.5fr 5.5fr; gap: 2rem; align-items: start; }
+  .chartcard { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+  .chartcard + .chartcard { margin-top: .9rem; }
+  .charttitle { font-size: .78rem; font-weight: 600; margin-bottom: .8rem; color: var(--ink); }
+  .charttitle small { display: block; font-weight: 400; color: var(--ink-3); font-size: .68rem; margin-top: .1rem; }
+  .barrow { display: grid; grid-template-columns: 11.5rem 1fr 4.5rem; align-items: center; gap: .7rem; padding: .28rem 0; }
+  .barrow .blab { font-size: .78rem; color: var(--ink-2); text-align: right; line-height: 1.25; }
+  .btrack { background: var(--chip); border-radius: 3px; height: 1.05rem; position: relative; overflow: hidden; }
+  .bfill { background: var(--bar); height: 100%; border-radius: 3px 3px 3px 3px; transition: opacity .15s; }
+  .barrow:hover .bfill { opacity: .8; }
+  .bval { font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .78rem;
+    font-variant-numeric: tabular-nums; color: var(--ink); }
+  .chartnote { margin-top: .6rem; font-size: .72rem; color: var(--ink-3); }
+  .hero { display: flex; align-items: baseline; gap: .8rem; margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
+  .hero .hnum { font-family: "Iowan Old Style", Palatino, Georgia, serif; font-size: 2rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; }
+  .hero .hlab { font-size: .8rem; color: var(--ink-2); max-width: 26ch; line-height: 1.3; }
+  .callout {
+    margin-top: .9rem; border-left: 3px solid var(--accent); background: var(--accent-soft);
+    border-radius: 0 6px 6px 0; padding: .8rem 1rem; font-size: .9rem;
+  }
+  .bizlist { list-style: none; display: grid; gap: .55rem; }
+  .bizlist li { padding-left: 1.1rem; position: relative; font-size: .9rem; color: var(--ink-2); }
+  .bizlist li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
+  .neverbox { margin-top: 1rem; border: 1px solid var(--status); border-radius: 6px;
+    background: var(--status-soft); padding: .8rem 1rem; }
+  .neverbox h4 { font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .66rem;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--status); margin-bottom: .4rem; font-weight: 600; }
+  .neverbox p { font-size: .8rem; color: var(--ink-2); }
+
+  /* ---------- rigor ---------- */
+  .rigorgrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: stretch; }
+  .rcard { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+  .rcard h3 { font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .68rem;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-bottom: .7rem; }
+  .rcard ul { list-style: none; display: grid; gap: .45rem; }
+  .rcard li { font-size: .84rem; color: var(--ink-2); padding-left: 1rem; position: relative; }
+  .rcard li::before { content: "·"; position: absolute; left: .2rem; color: var(--accent); font-weight: 700; }
+  .rcard.receipt { border-left: 3px solid var(--status); }
+  .rcard.receipt p { font-size: .86rem; color: var(--ink-2); }
+  .rcard.receipt p + p { margin-top: .6rem; }
+  .rcard.receipt b { color: var(--ink); }
+  .claims { display: grid; gap: .6rem; }
+  .claims .yes, .claims .no { font-size: .82rem; }
+  .claims .tag { font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .62rem;
+    letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .2rem; }
+  .claims .yes .tag { color: var(--accent-ink); }
+  .claims .no .tag { color: var(--status); }
+  .claims p { color: var(--ink-2); }
+
+  /* ---------- next steps ---------- */
+  .nextgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .askpanel {
+    grid-column: 1 / -1; background: var(--accent-soft); border: 1px solid var(--accent);
+    border-radius: 6px; padding: 1.2rem 1.4rem;
+  }
+  .askpanel h3 { font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .7rem;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: .8rem; font-weight: 600; }
+  .asks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+  .asks .ask b { display: block; font-size: .92rem; margin-bottom: .25rem; }
+  .asks .ask p { font-size: .82rem; color: var(--ink-2); }
+  .askfoot { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--accent);
+    font-size: .84rem; color: var(--ink-2); }
+
+  /* ---------- chrome ---------- */
+  .counter {
+    position: fixed; right: 1.1rem; bottom: 1rem; z-index: 10;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .7rem;
+    color: var(--ink-3); background: var(--panel); border: 1px solid var(--rule);
+    border-radius: 999px; padding: .3rem .8rem; box-shadow: var(--shadow);
+  }
+  .hint { position: fixed; left: 1.1rem; bottom: 1rem; z-index: 10;
+    font-family: "SF Mono", ui-monospace, Consolas, monospace; font-size: .64rem; color: var(--ink-3); }
+
+  @media (max-width: 900px) {
+    .tiles { grid-template-columns: 1fr; }
+    .twocol, .ecogrid, .rigorgrid, .asks, .nextgrid { grid-template-columns: 1fr; }
+    .barrow { grid-template-columns: 8rem 1fr 4rem; }
+    .hint { display: none; }
+  }
+  @media print {
+    html { scroll-snap-type: none; }
+    .slide { min-height: 0; page-break-after: always; padding: 1.2rem; border: 0; }
+    .counter, .hint { display: none; }
+    :root { --shadow: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; transition: none !important; }
+  }
+</style>
+
+<!-- ======================= 1 · TITLE ======================= -->
+<section class="slide" id="s1">
+  <div class="frame titlewrap">
+    <div class="eyebrow">Briefing · Prof. Ramayya Krishnan <span class="dim">· Carnegie Mellon · July 16, 2026</span></div>
+    <h1>Tribunal Clinical</h1>
+    <p class="def serif">An auditable complex-case consensus and escalation copilot: independent agent analyses, earned consensus, preserved dissent, and calibrated escalation of underdetermined cases to credentialed human specialists.</p>
+    <div class="phasestrip" aria-label="The nine-phase deliberation protocol">
+      <span>① sealed proposals</span><span>② anonymized reveal</span><span>③ Delphi feedback</span><span>④ revision + change certificate</span><span>⑤ action ballots</span><span>⑥ capitulation check</span><span class="veto">⑦ binding safety veto</span><span>⑧ named ratification</span><span class="stop">⑨ commit / STOP → escalate</span>
+    </div>
+    <p class="byline"><b>Pablo Zavala</b> · Carnegie Mellon University · built on the open Tribunal engine (<span class="mono">pazare/tribunal</span>, MIT) · Abridge–Anthropic–Lightspeed hackathon, July 18</p>
+  </div>
+</section>
+
+<!-- ======================= 2 · PROBLEM ======================= -->
+<section class="slide" id="s2">
+  <div class="frame">
+    <div class="eyebrow">Problem</div>
+    <h2>Both halves of the safety system fail where cases are hardest.</h2>
+    <div class="groups">
+      <div>
+        <div class="grouplabel">The human system — scarce, fragmented, unevenly lethal</div>
+        <div class="tiles">
+          <div class="tile"><div class="num">141,160</div><div class="lab">projected US physician FTE shortage by 2038 — 30 of 35 specialties; 58% nonmetro vs 5% metro</div><div class="src">HRSA NCHWA, Dec 2025</div></div>
+          <div class="tile"><div class="num">+23%</div><div class="lab">mortality among rural Medicare beneficiaries tied to lack of specialist access (+40% preventable hospitalizations)</div><div class="src">Johnston et al., Health Affairs 2019</div></div>
+          <div class="tile"><div class="num">1.26–1.29×</div><div class="lab">in-hospital AMI mortality risk without cardiologist care; integrated care cuts costs in >80% of studied chronic programs</div><div class="src">Nash et al., JACC; Desmedt et al. 2016</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="grouplabel warn">The offered substitute — unreliable exactly under deliberative pressure</div>
+        <div class="tiles">
+          <div class="tile"><div class="num warn">&gt;80%</div><div class="lab">LLM failure rate on differential <em>construction</em> (vs &lt;40% on final diagnosis) across 21 models — premature closure</div><div class="src">Mass General Brigham, 2026</div></div>
+          <div class="tile"><div class="num warn">−14 pp</div><div class="lab">physician diagnostic accuracy under erroneous LLM advice — despite 20 h of AI-literacy training</div><div class="src">NEJM AI RCT, 2026</div></div>
+          <div class="tile"><div class="num warn">~50%</div><div class="lab">of pressure-induced answer flips leave a still-correct reasoning trace — "unfaithful capitulation"</div><div class="src">Li, Krishnan &amp; Padman, 2026</div></div>
+        </div>
+      </div>
+    </div>
+    <p class="takeaway"><b>The gap is a governed deliberation layer</b> — one that structures the open reasoning phase where models fail, detects manufactured agreement, and routes the scarce human specialist with a better case packet instead of pretending to replace them.</p>
+    <div class="foot">Sources: HRSA NCHWA State of the U.S. Health Care Workforce (2025) · Johnston, Wen &amp; Joynt Maddox, Health Affairs 38:12 (2019) · Nash et al., J Am Coll Cardiol (1997) · Desmedt et al., Value in Health (2016); Shiri et al., BMC Medicine (2021): 34–49% per-patient savings in integrated chronic services · MGB 21-model evaluation (2026) · NEJM AI AIoa2501001 (2026) · arXiv:2605.29087</div>
+  </div>
+</section>
+
+<!-- ======================= 3 · SOLUTION: MECHANISM ======================= -->
+<section class="slide" id="s3">
+  <div class="frame">
+    <div class="eyebrow">Solution <span class="dim">· mechanism · 1 of 3</span></div>
+    <h2>Consensus is earned, not generated — five instruments, each grounded in a measured failure mode.</h2>
+    <div class="twocol">
+      <div class="instr">
+        <div class="irow"><div class="iname">Sealed blind ballots, rotated candidate order</div><div class="idesc">Every material round is cryptographically committed before reveal; per-recipient order permutation controls position bias.</div><div class="itag">⇠ anchoring &amp; majority exposure — the attack surface of multi-turn influence</div></div>
+        <div class="irow"><div class="iname">Evidence-change certificates</div><div class="idesc">No vote change without naming the new fact, corrected inference, or normative trade-off. Uncertified changes flag as possible capitulation.</div><div class="itag">⇠ misleading suggestions universally effective across 9 frontier models — arXiv:2602.13093</div></div>
+        <div class="irow"><div class="iname">Capitulation detector — latent vs. behavioral 2×2</div><div class="idesc">Public reasoning graph compared against the emitted vote; unchanged warrant + flipped vote = unfaithful capitulation, not convergence.</div><div class="itag">⇠ ~50% of think-mode flips leave a correct trace — arXiv:2605.29087</div></div>
+        <div class="irow"><div class="iname">No self-reported confidence in ratification</div><div class="idesc">Calibration comes from outcome-anchored evaluation only; refusals and timeouts are ledgered non-votes, never fabricated ballots.</div><div class="itag">⇠ confidence-aware defenses (CARG) fail on reasoning models — reasoning-induced overconfidence</div></div>
+        <div class="irow"><div class="iname">Sen maximal-set abstention</div><div class="idesc">When no admissible aggregation separates the maximal set, the case is declared underdetermined → escalation to a credentialed human is a first-class outcome.</div><div class="itag">⇠ premature closure is the dominant 21-model failure; forced consensus reproduces it</div></div>
+      </div>
+      <div class="sidebox">
+        <h3>Two-stage Delphi</h3>
+        <p><b>Stage A — Epistemic board.</b> Settles <em>what is known</em>: timeline, contradictions, must-not-miss differential, evidence map with minority report. No treatment talk allowed.</p>
+        <p><b>Stage B — Action board.</b> Weighs <em>what is safe and feasible</em> under a lexicographic order: safety and patient rights are admission criteria; cost only compares admissible options.</p>
+        <p><b>Unit of commitment:</b> the clinical commitment span — the smallest statement binding the system to a fact, action, urgency, or escalation — each carrying evidence, dissent, and expiry in its envelope.</p>
+        <p><b>Telemetry:</b> reasoning graphs are exported DRL-compatible (clinically weighted graph-edit discrepancies — arXiv:2602.09945), so the system is measurable by construction.</p>
+      </div>
+    </div>
+    <div class="foot">Li, Krishnan &amp; Padman, Consistency of Large Reasoning Models Under Multi-Turn Attacks (arXiv:2602.13093) · The Chain Holds, the Answer Folds (arXiv:2605.29087) · Closing Reasoning Gaps in Clinical Agents with Differential Reasoning Learning (arXiv:2602.09945) · Sen, maximality under incomplete orderings</div>
+  </div>
+</section>
+
+<!-- ======================= 4 · SOLUTION: ARCHITECTURE ======================= -->
+<section class="slide" id="s4">
+  <div class="frame">
+    <div class="eyebrow">Solution <span class="dim">· architecture · 2 of 3</span></div>
+    <h2>Nine phases, three planes, one measurement surface.</h2>
+    <div class="boundary">
+      <div class="blabel">Health-system trust boundary — PHI never leaves</div>
+      <div class="plane">
+        <div class="plabel">Ⅰ · Evidence substrate</div>
+        <div class="prow">
+          <div class="node"><b>Data gateway</b><small>FHIR R4 · USCDI v3 · CDS Hooks 2.0.1 · DICOM · labs · meds</small></div>
+          <div class="arr">→</div>
+          <div class="node"><b>Evidence factorizer</b><small>verbatim originals + factored views · epistemic status · counter-anchoring</small></div>
+          <div class="arr">→</div>
+          <div class="node"><b>Temporal fact graph</b><small>deterministic build · contradictions · missingness</small></div>
+        </div>
+      </div>
+      <div class="varr">↓</div>
+      <div class="plane">
+        <div class="plabel">Ⅱ · Two-stage deliberation</div>
+        <div class="stagehdr">Stage A — Epistemic board · <span class="mono">what is known?</span> <span class="feed">⇢ fed by independent sandboxed retrieval channels</span></div>
+        <div class="prow">
+          <div class="node"><b>① Blind sealed proposals</b></div><div class="arr">→</div>
+          <div class="node"><b>②③ Anonymized reveal + Delphi feedback</b><small>rotated candidate order</small></div><div class="arr">→</div>
+          <div class="node"><b>④ Revision + change certificates</b></div><div class="arr">→</div>
+          <div class="node"><b>Evidence map</b><small>+ minority report</small></div>
+        </div>
+        <div class="stagehdr">Stage B — Action board · <span class="mono">what is safe &amp; feasible?</span> <span class="feed">⇢ fed by resource graph: capacity · formulary · transfer · payer</span></div>
+        <div class="prow">
+          <div class="node"><b>⑤ Blind action ballots</b></div><div class="arr">→</div>
+          <div class="node"><b>⑥ Cross-exam + capitulation detector</b></div><div class="arr">→</div>
+          <div class="node veto"><b>⑦ Safety review</b><small>narrow, binding veto — overrides majorities</small></div><div class="arr">→</div>
+          <div class="node"><b>⑧ Constitutional ratifier</b><small>hard constraints → lexicographic → utility</small></div>
+        </div>
+      </div>
+      <div class="varr">↓</div>
+      <div class="plane">
+        <div class="plabel">Ⅲ · Commitment &amp; escalation</div>
+        <div class="prow">
+          <div class="node win"><b>Ratified commitment span</b><small>→ clinician consensus packet: action · urgency · confidence · dissent</small></div>
+          <div class="node veto"><b>⑨ STOP / underdetermined</b><small>→ escalation packet to credentialed specialist: maximal set · unresolved questions</small></div>
+        </div>
+      </div>
+      <div class="ledgerbar">MEASUREMENT PLANE — hash-chained ledger: every ballot · objection · veto · change certificate · provider call · human intervention</div>
+      <div class="anchorline"><span>PHI-free head hashes + policy events</span> <span>→</span> <span class="anchorchip">External integrity anchor</span></div>
+    </div>
+    <div class="legend">legend: <span class="sw" style="background:var(--accent-soft);border:1px solid var(--accent)"></span> commitment path <span class="sw" style="background:transparent;border:1px solid var(--status)"></span> safety &amp; dissent powers <span class="sw" style="background:transparent;border:1.5px dashed var(--ink-3)"></span> trust boundary</div>
+    <div class="foot">The ledger is drawn as infrastructure because it is the evaluation surface: logs that capture alternatives and reasons — the requirement your Brookings agentic-evaluation agenda names — exist here by construction, not by retrofit.</div>
+  </div>
+</section>
+
+<!-- ======================= 5 · SOLUTION: ECONOMICS ======================= -->
+<section class="slide" id="s5">
+  <div class="frame">
+    <div class="eyebrow">Solution <span class="dim">· economics · 3 of 3</span></div>
+    <h2>Calibration is the economic endpoint.</h2>
+    <div class="ecogrid">
+      <div>
+        <div class="chartcard">
+          <div class="charttitle">AI cost per case — six agents, two Delphi stages <small>verified July 2026 API pricing; 20K in / 2K out per blind call, cached revisions</small></div>
+          <div class="barrow" title="3× GPT-5.6 Terra + 3× Claude Opus 4.8: $2.01 per case"><div class="blab">Balanced · Terra + Opus 4.8</div><div class="btrack"><div class="bfill" style="width:67%"></div></div><div class="bval">$2.01</div></div>
+          <div class="barrow" title="3× GPT-5.6 Sol + 3× Claude Opus 4.8: $2.72 per case"><div class="blab">Flagship · Sol + Opus 4.8</div><div class="btrack"><div class="bfill" style="width:91%"></div></div><div class="bval">$2.72</div></div>
+          <div class="chartnote">With retrieval, citation validation, retries, and telemetry: <b>$3.50–$7 per case</b>. Fable-class models excluded from PHI paths (30-day retention mandate; no zero-data-retention) — reserved for synthetic evaluation.</div>
+        </div>
+        <div class="chartcard">
+          <div class="charttitle">Illustrative program cost — 24,000 cases / year <small>10% human escalation at $600 honorarium</small></div>
+          <div class="barrow" title="24,000 cases × $10 AI cost = $0.24M"><div class="blab">AI deliberation</div><div class="btrack"><div class="bfill" style="width:17%"></div></div><div class="bval">$0.24M</div></div>
+          <div class="barrow" title="24,000 × 10% × $600 = $1.44M"><div class="blab">Specialist honoraria</div><div class="btrack"><div class="bfill" style="width:100%"></div></div><div class="bval">$1.44M</div></div>
+          <div class="barrow" title="Infrastructure, QA, and support"><div class="blab">Fixed platform + QA</div><div class="btrack"><div class="bfill" style="width:56%"></div></div><div class="bval">$0.80M</div></div>
+          <div class="hero"><div class="hnum">$103</div><div class="hlab">value required per reviewed case to break even ($2.48M ÷ 24,000)</div></div>
+        </div>
+        <div class="callout"><b>Honoraria outweigh AI cost 6 : 1.</b> Escalation precision — not token price — governs the economics. The scientific endpoint (calibrated abstention) and the commercial endpoint are the same number.</div>
+      </div>
+      <div>
+        <div class="sidebox">
+          <h3>Business design</h3>
+          <ul class="bizlist">
+            <li><b>Enterprise platform fee</b> — $300K–$1.5M/yr by institution size and integration depth</li>
+            <li><b>Bounded per-case usage fee</b> — deliberation, retrieval, audit storage</li>
+            <li><b>Specialist pass-through</b> — fair-market-value professional fees; transparent administration margin where permissible</li>
+            <li><b>Year-one design-partner program</b> — $3–7M total, staged to the evaluation ladder</li>
+          </ul>
+          <div class="neverbox">
+            <h4>Structurally excluded</h4>
+            <p>Treatment-linked commissions · referral bounties · facility-steering revenue · payer savings bonuses before safety and equity validation. Alignment with AKS/Stark is a design constraint, not an afterthought.</p>
+          </div>
+          <p style="margin-top:1rem; font-size:.84rem; color:var(--ink-2)">Literature support for the coordination thesis: integrated-care models reduced costs in <b>&gt;80%</b> of studies; <b>34–49%</b> per-patient savings in integrated chronic services.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot">OpenAI GPT-5.6 pricing (GA July 9, 2026): Sol $5/$30 (cached $0.50); Terra $2.50/$15 · Anthropic: Opus 4.8 $5/$25; Fable 5 $10/$50 with 30-day retention requirement · Desmedt et al., Value in Health 2016 · Shiri et al., BMC Medicine 2021 · Full derivation: docs/clinical/tribunal-clinical-brief.md §15</div>
+  </div>
+</section>
+
+<!-- ======================= 6 · RIGOR ======================= -->
+<section class="slide" id="s6">
+  <div class="frame">
+    <div class="eyebrow">Rigor</div>
+    <h2>The governance substrate already runs — and reports its own failures.</h2>
+    <div class="rigorgrid">
+      <div class="rcard">
+        <h3>Running today (open source)</h3>
+        <ul>
+          <li>Cross-vendor six-seat panels (OpenAI · Anthropic · xAI · OpenRouter fleet)</li>
+          <li>Sealed ballots, anonymized cross-exam, rotated candidate order</li>
+          <li>Binding safety veto under a named rule; minority reports preserved</li>
+          <li>Hash-chained ledger; anyone can re-verify (<span class="mono">POST /api/verify</span>)</li>
+          <li>A1–A12 auditability scorecard with anti-spoof guards</li>
+          <li>Fail-closed timeouts — no fabricated ballots</li>
+        </ul>
+      </div>
+      <div class="rcard receipt">
+        <h3>Receipts, not demos</h3>
+        <p>In committed live run <span class="mono">run_5467a5efcf9c</span>, STOP won a 3–2 majority — and the safety seat's binding veto (<span class="mono">safety_gate</span>) <b>overrode the majority</b>, electing a scope-limitation clause. On the ledger, with a public reason.</p>
+        <p>Our own live runs score an honest <b>11/12</b> — the scorecard publishes the miss instead of tuning the election to pass the demo.</p>
+      </div>
+      <div class="rcard">
+        <h3>Claim boundary</h3>
+        <div class="claims">
+          <div class="yes"><span class="tag">We claim</span><p>Structured due process · tamper-evident record · preserved dissent · calibrated abstention as a first-class outcome · a measurable evaluation plan</p></div>
+          <div class="no"><span class="tag">We do not claim</span><p>Better outcomes · superior diagnosis · faithful chain-of-thought · eliminated hallucination or bias · regulatory compliance — until controlled studies earn each one</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">Repository: pazare/tribunal (MIT) · committed run ledgers with externally anchorable head hashes in runs/ · honesty invariants in docs/honesty.md · clinical adaptation spec in docs/clinical/</div>
+  </div>
+</section>
+
+<!-- ======================= 7 · NEXT STEPS ======================= -->
+<section class="slide" id="s7">
+  <div class="frame">
+    <div class="eyebrow">Next steps</div>
+    <h2>Two days to a working POC; one decision from a measurable field program.</h2>
+    <div class="nextgrid">
+      <div class="rcard">
+        <h3>July 18 — hackathon POC</h3>
+        <ul>
+          <li>Rural/resource-constrained complex case; one bounded commitment: <b>escalate or not, which specialty, how urgently</b></li>
+          <li>Four agents + deterministic fact-checker (four-agent optimum: MAC, npj Digit. Med. 2025)</li>
+          <li>Acceptance tests: planted trap caught · uncertified vote-change flagged · underdetermined case escalates · refusal = ledgered non-vote · ledger verifies</li>
+        </ul>
+      </div>
+      <div class="rcard">
+        <h3>Scale path</h3>
+        <ul>
+          <li>Evaluation ladder: synthetic → retrospective → <b>silent mode</b> → clinician simulation → design-partner pilot</li>
+          <li>Federated evaluation — shared rubrics and failure patterns, no PHI pooling</li>
+          <li>Regulatory grain: FDA CDS criterion-4 transparency · HTI-1 (b)(11) source attributes · Joint Commission RUAIH (June 2026) organizational certification</li>
+        </ul>
+      </div>
+      <div class="askpanel">
+        <h3>What we ask of you today</h3>
+        <div class="asks">
+          <div class="ask"><b>① The construct</b><p>Which operationalization of "clinical consensus" should be the primary endpoint — agreement, correctness, action appropriateness, calibrated abstention, or clinician usefulness?</p></div>
+          <div class="ask"><b>② The detector</b><p>Are sealed ballots + change certificates + post-debate private votes + the latent/behavioral detector sufficient — or does distinguishing evidence from conformity require planted-evidence counterfactuals?</p></div>
+          <div class="ask"><b>③ The evidence bar</b><p>What minimum technical, clinical, measurement, and organizational package earns silent-mode approval from a hospital AI-governance committee?</p></div>
+        </div>
+        <div class="askfoot"><b>Standing offer:</b> the system is instrumented from birth — every alternative, objection, and veto is a typed event. If useful to AIMSEC as a multi-agent measurement testbed, we will build the telemetry to your specification.</div>
+      </div>
+    </div>
+    <div class="foot">Pablo Zavala · Carnegie Mellon University · pazare/tribunal · full brief and validation log: docs/clinical/ (every claim source-verified July 15, 2026)</div>
+  </div>
+</section>
+
+<div class="counter" id="counter" aria-live="polite">1 / 7</div>
+<div class="hint">↑↓ or space to navigate · prints as pages</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var counter = document.getElementById('counter');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var current = 0;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          current = slides.indexOf(e.target);
+          counter.textContent = (current + 1) + ' / ' + slides.length;
+        }
+      });
+    }, { threshold: 0.55 });
+    slides.forEach(function (s) { io.observe(s); });
+
+    function go(i) {
+      if (i < 0 || i >= slides.length) return;
+      slides[i].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+    }
+    window.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); go(current + 1); }
+      else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); go(current - 1); }
+      else if (ev.key === 'Home') { ev.preventDefault(); go(0); }
+      else if (ev.key === 'End') { ev.preventDefault(); go(slides.length - 1); }
+    });
+  })();
+</script>
+</body>
+</html>

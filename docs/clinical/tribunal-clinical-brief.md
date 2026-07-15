@@ -483,39 +483,44 @@ This is a feature. In high-stakes clinical work, a well-characterized inability 
 
 ```mermaid
 flowchart TB
-    subgraph BOUNDARY["Health-system trust boundary (PHI stays inside)"]
+    subgraph BOUNDARY["HEALTH-SYSTEM TRUST BOUNDARY — PHI never leaves"]
         direction TB
-        GW["Clinical data gateway<br/>SMART on FHIR · USCDI v3 · CDS Hooks 2.0.1<br/>DICOM · labs · meds · PROs · transcripts"]
-        FACT["Evidence factorizer<br/>verbatim originals + factored parallel view<br/>epistemic status · counter-anchoring"]
-        GRAPH["Temporal clinical fact graph<br/>deterministic build · contradictions · missingness"]
-        RES["Clinical resource graph<br/>capacity · formulary · transfer · payer"]
 
-        subgraph STAGEA["Stage A — Epistemic Board"]
-            A1["Blind proposals (sealed)"] --> A2["Anonymized reveal +<br/>randomized candidate order"]
-            A2 --> A3["Delphi revision +<br/>evidence-change certificates"]
-            A3 --> A4["Ratified evidence map<br/>(+ minority report)"]
+        subgraph PLANE1["Ⅰ · EVIDENCE SUBSTRATE"]
+            direction LR
+            GW["Data gateway<br/>FHIR R4 · USCDI v3 · CDS Hooks"] --> FZ["Evidence factorizer<br/>verbatim + factored views"] --> FG["Temporal fact graph<br/>contradictions · missingness"]
         end
 
-        subgraph STAGEB["Stage B — Action Board"]
-            B1["Blind action proposals (sealed)"] --> B2["Cross-examination +<br/>capitulation detector"]
-            B2 --> B3["Safety review<br/>(narrow binding vetoes)"]
-            B3 --> B4["Constitutional ratifier<br/>hard constraints → lexicographic → U(a)"]
+        subgraph PLANE2["Ⅱ · TWO-STAGE DELIBERATION"]
+            direction TB
+            subgraph SA["Stage A — Epistemic board · what is known?"]
+                direction LR
+                A1["① Blind sealed<br/>proposals"] --> A2["② Anonymized reveal<br/>rotated order"] --> A3["③ Revision +<br/>change certificates"] --> A4["④ Evidence map +<br/>minority report"]
+            end
+            subgraph SB["Stage B — Action board · what is safe and feasible?"]
+                direction LR
+                B1["⑤ Blind action<br/>ballots"] --> B2["⑥ Cross-exam +<br/>capitulation detector"] --> B3["⑦ Safety review<br/>narrow binding veto"] --> B4["⑧ Constitutional<br/>ratifier"]
+            end
+            SA --> SB
         end
 
-        GW --> FACT --> GRAPH --> STAGEA
-        RES --> STAGEB
-        A4 --> STAGEB
-        B4 -->|ratified span| PACK["Clinician consensus packet"]
-        B4 -->|underdetermined / STOP| ESC["Escalation packet →<br/>credentialed human specialist"]
-        LEDGER["PHI-side event ledger<br/>full hash-chained record"]
-        STAGEA -.every phase.-> LEDGER
-        STAGEB -.every phase.-> LEDGER
+        subgraph PLANE3["Ⅲ · COMMITMENT & ESCALATION"]
+            direction LR
+            OK["Ratified commitment span<br/>→ clinician consensus packet"]
+            ND["⑨ STOP / underdetermined<br/>→ specialist escalation packet"]
+        end
+
+        PLANE1 --> PLANE2 --> PLANE3
+        LED[["MEASUREMENT PLANE — hash-chained ledger: every ballot, objection, veto, change certificate, provider call"]]
+        PLANE2 -. every phase emits typed events .-> LED
     end
 
-    RETR["Independent evidence retrieval<br/>guidelines · trials · labels · interactions<br/>(sandboxed, untrusted-content isolation)"] --> STAGEA
-    ANCHOR["External integrity ledger<br/>pseudonymous IDs · head hashes ·<br/>model provenance · policy events — no PHI"]
-    LEDGER -->|head hash + de-identified events| ANCHOR
+    RET["Independent retrieval channels<br/>(sandboxed; untrusted-content isolation)"] --> SA
+    RG["Resource graph<br/>capacity · formulary · transfer · payer"] --> SB
+    LED -- "PHI-free head hashes + policy events" --> ANCH["External integrity anchor"]
 ```
+
+Reading order: three planes top to bottom (evidence → deliberation → outcome), nine numbered phases left to right inside the deliberation plane matching §2's phase model, and one measurement plane that every phase writes to — the ledger is drawn as infrastructure, not an afterthought, because the audit record *is* the product's evaluation surface.
 
 ### Architecture in plain English
 
