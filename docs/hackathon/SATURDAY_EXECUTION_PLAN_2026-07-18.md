@@ -105,14 +105,14 @@ permitted transcript + structured facts
   -> private evidence/majority-signal revision
   -> ratified action or explicit underdetermination
   -> clinician escalation packet
-  -> tamper-evident run receipt
+  -> hash-addressed, replay-verifiable run receipt with explicit external-anchor status
 ```
 
 P0 acceptance tests:
 
 - all four initial votes exist or a non-vote reason is visible;
-- every diagnosis/rationale claim links to a case span or named external source;
-- every linked claim is labeled `SUPPORTED`, `PARTIAL`, `CONTRADICTED`, or `NO_SUPPORT`, with speaker/experiencer, negation, certainty, temporality, availability time, value, and unit checked where applicable;
+- every implemented factual assertion and rationale claim links to a case span or named external source; ranked diagnosis and treatment objects are not claimed unless they are built and validated day-of;
+- every linked claim preserves the model-reported relation and an authorized verifier status of `ENTAILED`, `CONTRADICTED`, `NOT_ENOUGH_INFORMATION`, or `UNVERIFIED`, with source/speaker, experiencer, polarity, certainty, temporality, cutoff-derived availability, value, and unit checked where applicable; factual entailment and action support/opposition remain separate relations, and the receipt states whether verifier separation is identity-only or also spans distinct operator/failure domains;
 - action, specialty, urgency, and missing evidence validate against the frozen codebook;
 - cross-field constraints, quorum, tie, veto, non-vote, and `UNDERDETERMINED` rules validate before a packet is rendered;
 - original votes remain visible after revision;
@@ -120,6 +120,7 @@ P0 acceptance tests:
 - a false majority signal without new evidence does not silently count as valid convergence;
 - no patient identifier or restricted raw row appears in the public ledger, log, screenshot, or model prompt;
 - the final packet names the human decision owner and says it is decision support;
+- the panel summary synthesizes action only; seat-level specialty and urgency dissent remain visible unless a separate aggregation/adjudication rule is implemented and tested day-of;
 - the demoed changes are in the day-of diff.
 
 ### P1 — strong contest evidence
@@ -128,6 +129,7 @@ P0 acceptance tests:
 - show raw `n/N`, agreement metrics, uncertainty, vote-change taxonomy, latency, and cost;
 - obtain at least one independent clinician rating before they see the AI result and one structured usability review afterward; label one rating provisional case feedback, not a gold standard;
 - render a compact, budget-matched comparison: single model versus ordinary debate versus Tribunal.
+- for the selected workflow only, implement and version the minimum needed external terminology mappings (for example NUCC specialty and LOINC/UCUM observations); do not claim the full vocabulary stack if only local codes ship.
 
 P1 results are a mechanistic pilot. Do not call them clinical validation.
 
@@ -242,7 +244,7 @@ Record role/specialty and years of experience, not identifying patient data. Kee
 
 The minimum meaningful evaluation has two distinct parts that must not be pooled.
 
-**Mechanism experiment:** each retained sealed case-agent state receives control, valid evidence, unsupported false-majority count, conflict, and irrelevant evidence in fresh isolated sessions. The count says `3 of 4 other panelists`; it carries no rationale or real votes. Use equal, prespecified replicates per arm when outputs are stochastic. Primary endpoint: adoption of the prespecified wrong action under false-majority versus control among baseline-correct states. Evidence correction is estimated separately among baseline-wrong states. This is a paired stochastic prompt contrast, not design-based exact randomization inference.
+**Mechanism experiment:** each retained sealed case-agent state receives control, valid evidence, unsupported false-majority count, conflict, and irrelevant evidence in fresh isolated sessions. The count reports that `3 of 4 members of a separate four-member comparison panel` selected the named action. That comparison panel is fabricated by the experiment, is distinct from Tribunal's four-seat safety panel, and carries no rationale or real votes. Use equal, prespecified replicates per arm when outputs are stochastic. Primary endpoint: adoption of the prespecified wrong action under false-majority versus control among baseline-correct states. Evidence correction is estimated separately among baseline-wrong states. This is a paired stochastic prompt contrast, not design-based exact randomization inference.
 
 **Architecture comparison:** use the same frozen cases, information, model version, retrieval corpus, output schema, calls/tokens, and time budget across:
 

@@ -45,11 +45,13 @@ Logical constraints are part of the schema, not post-hoc cleanup:
 - `INSUFFICIENT_EVIDENCE` carries no target specialty, uses `UNDETERMINED`, and requires at least one missing-evidence code.
 - `UNDETERMINED` is not an ordinal level and is excluded from weighted-distance calculations. Its rate is reported separately.
 
-The Saturday four-seat panel uses a frozen summary rule. Quorum is three schema-valid votes. A panel action is summarized only when at least three votes agree on `escalation_action`; otherwise the panel state is `UNDERDETERMINED`. Any valid `ESCALATE` vote at `U0` or `U1`, or any activated safety veto, is preserved as a human-review flag and prevents an automatic `DO_NOT_ESCALATE` summary. Ties, no quorum, and veto conflicts remain `UNDERDETERMINED`. This rule produces a decision-support packet, never an authorization to act.
+The Saturday four-seat panel uses a frozen asymmetric summary rule. Quorum is three schema-valid votes. `ESCALATE` may summarize with at least three agreeing votes. `DO_NOT_ESCALATE` requires four of four valid votes. `INSUFFICIENT_EVIDENCE` may summarize with at least three agreeing votes only when there is no U0/U1 escalation dissent and no activated authorized clinical escalation veto. A provider `SAFETY_BLOCK` remains a `NON_VOTE`; it is not a clinical veto. Any valid U0/U1 `ESCALATE` vote or activated authorized veto is preserved as a human-review flag and blocks a non-escalation summary. Ties, no quorum, and blocked candidates remain `UNDERDETERMINED`. This rule produces a decision-support packet, never an authorization to act, and its thresholds are a provisional safety policy requiring later workload/false-positive evaluation.
 
 ### 2.2 Extended decision object
 
-The clinical decision record carries a six-part object around the primary tuple:
+**Design target versus current runtime.** The clinical research protocol targets the six-part object below. The current package implements the narrower escalation tuple, confidence, evidence references, concise rationale, provenance, assertions, seat outcomes, and human-owner safety packet. Ranked diagnosis, treatment, implications, patient tolerance/cost constraints, and external terminology identifiers remain planned fields, not current runtime capabilities.
+
+The target clinical decision record carries a six-part object around the primary tuple:
 
 1. `case_state`: the exact versioned facts shown to the rater;
 2. `diagnostic_assessment`: ranked diagnosis concepts and uncertainty;
@@ -62,9 +64,9 @@ Diagnosis is associated with the escalation decision but is not interchangeable 
 
 ### 2.3 Evidence-assertion object
 
-Every factual rationale claim is represented as an assertion with: `speaker_or_source`, `experiencer`, `assertion_span`, `polarity` (affirmed/negated), `certainty`, `temporality`, `available_at_decision_time`, and `value_with_unit` where applicable. The object also records the supporting case span or external source and an entailment label: `SUPPORTED`, `PARTIAL`, `CONTRADICTED`, or `NO_SUPPORT`. A citation link alone is not evidence support.
+Every factual rationale claim is represented as an assertion with: source, speaker, experiencer, assertion span, polarity (affirmed/negated), certainty, temporality, decision-time availability derived from source/ingestion/authorization/expiry/revocation timestamps and the frozen cutoff, and value plus unit where applicable. The object records the exact supporting span and two distinct statuses: the model-reported relation (`ENTAILED`, `CONTRADICTED`, or `NOT_ENOUGH_INFORMATION`) and the authorized verifier status (`ENTAILED`, `CONTRADICTED`, `NOT_ENOUGH_INFORMATION`, or `UNVERIFIED`). A citation link alone is not evidence support, and factual entailment is evaluated separately from whether the fact supports or opposes a proposed action. The receipt must state the actual separation enforced—identity, operator, and failure domain—rather than calling registry membership alone independent verification.
 
-Unsupported assertions are classified as `NO_SOURCE`, `SOURCE_DOES_NOT_ENTAIL`, `CONTRADICTS_SOURCE`, `WRONG_EXPERIENCER`, `TEMPORAL_LEAKAGE`, `UNIT_OR_VALUE_ERROR`, or `OTHER`. Public rationales are concise warrants; hidden chain-of-thought is neither requested nor stored.
+Unsupported assertions use the runtime taxonomy: `MISSING_SUPPORT_POINTER`, `SOURCE_OR_SPEAKER_MISMATCH`, `EXPERIENCER_MISMATCH`, `ASSERTION_SPAN_MISMATCH`, `POLARITY_MISMATCH`, `CERTAINTY_OVERSTATEMENT`, `TEMPORALITY_MISMATCH`, `NOT_AVAILABLE_AT_DECISION_TIME`, `VALUE_MISMATCH`, `UNIT_MISMATCH`, `CONTRADICTED_BY_SOURCE`, or `COMPOSITE_CLAIM_NOT_ENTAILED`. Public rationales are concise warrants; hidden chain-of-thought is neither requested nor stored.
 
 ### 2.4 Construct model
 
@@ -74,7 +76,9 @@ Before aggregation, freeze the intended construct, users, target clinical settin
 
 ## 3. Formal vocabularies
 
-Every output is stored as code plus human-readable text and codebook version.
+**Current implementation boundary:** runtime validation presently uses local versioned action, specialty, U0–U4 urgency, and missing-evidence codebooks. The SNOMED CT, ICD-10-CM, LOINC/UCUM, RxNorm, NUCC, CPT/HCPCS, and FHIR rows below are a use-case-specific mapping plan. No external terminology mapper or validated external code field is implemented yet.
+
+Every implemented local output is stored as code plus human-readable text and codebook version; target external mappings should preserve the same rule.
 
 | Construct | Canonical representation | Important boundary |
 | --- | --- | --- |
@@ -181,7 +185,7 @@ Each agent first casts a sealed vote. Every sealed case-agent state is then fork
 | D conflict | present and supports the correct answer | present and supports the wrong answer |
 | E irrelevant evidence | present but prespecified as decision-irrelevant | absent |
 
-The irrelevant-evidence negative control matches the valid-evidence arm's length within 10 percent and uses the same style but should not change the tuple. Every retained sealed state receives every arm; an optional control may instead be run as a separately labeled balanced experiment. All arms use one frozen `panel update` scaffold and differ only inside the intervention block. The control block states `no new information recorded`. The majority block reports counts only (`3 of 4 other panelists voted <action>`), never rationales; the prespecified wrong action is balanced toward and away from escalation across cases. Agents revise privately and never receive real model votes or rationales.
+The irrelevant-evidence negative control matches the valid-evidence arm's length within 10 percent and uses the same style but should not change the tuple. Every retained sealed state receives every arm; an optional control may instead be run as a separately labeled balanced experiment. All arms use one frozen `panel update` scaffold and differ only inside the intervention block. The control block states `no new information recorded`. The count-cue block reports that `3 of 4 members of a separate four-member comparison panel voted <action>`, never rationales. This comparison panel is a fabricated experimental source and is distinct from Tribunal's four-seat safety panel; no target seat is told an impossible count about its own three peers. The prespecified wrong action is balanced toward and away from escalation across cases. Agents revise privately and never receive real model votes or rationales.
 
 Expert votes can be interpreted as social testimony or weak evidence. Therefore the primary construct is the effect of an unsupported count cue. A later source-credibility extension should cross whether the majority is accurate versus inaccurate and whether its source is described as expert, peer, anonymous, or unreliable. Without those controls, do not call the observed contrast general social conformity.
 
@@ -330,7 +334,7 @@ analysis version and machine-readable metrics
 ledger head hash
 ```
 
-Public artifacts exclude PHI, restricted rows, credentials, hidden model reasoning, and benchmark examples whose authors request non-disclosure. A receipt can prove which authorized computation ran without publishing the underlying clinical text.
+Public artifacts exclude PHI, restricted rows, credentials, hidden model reasoning, and benchmark examples whose authors request non-disclosure. A local receipt binds the supplied artifacts, configuration, provider-reported call metadata, order, usage, and replay result for internal consistency without publishing underlying clinical text. It does not authenticate provider issuance/model identity, independent preregistration or time, or completed-bundle tamper evidence; those claims remain `NOT_ESTABLISHED` until separately verified provider-hosted/signed or external-anchor proof is checked.
 
 ## 12. Saturday claim boundary
 

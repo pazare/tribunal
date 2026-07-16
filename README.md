@@ -6,7 +6,7 @@
 
 When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful.
 
-Tribunal replaces sampling with **election**. The output is decoded in atomic surface spans (the disposition, the required disclosure, …), and each span goes through electoral mechanisms adapted from human institutions — **secret ballots** (sealed commitments before reveal), **anonymized cross-examination** with ballot-order rotation, on-the-record vote changes, a binding **safety veto**, ratification under a **named constitutional rule**, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself. The explanation is not attached to the generation — it *is* the generation.
+Tribunal replaces one-shot generation with a recorded election over intended review-unit spans (the disposition, the required disclosure, …). Each span goes through mechanisms adapted from human institutions: **secret ballots** (sealed commitments before reveal), aggregate identity-hidden critique with ballot-order rotation, on-the-record vote changes, safety review, ratification under a named rule, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger**. The current general verifier checks sequence, hash linkage, terminal completion, and final-answer reconstruction; stricter clinical and Decoder protocols add their own schema/state checks. The explanation is not attached after generation—it is part of the recorded procedure.
 
 - **Six chartered seats** (evidence, adversary, law/policy, affected party, safety with veto, concision) — rival AI vendors in live modes, scripted stand-ins offline; cross-vendor seating can reduce correlated failure.
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
@@ -56,8 +56,8 @@ No — different question. Feature attribution explains a **score**; Tribunal ma
 | **When it runs** | Post-hoc, on a decision already made | During decoding — every span is contested and elected before it ships |
 | **Artifact produced** | Feature weights (Shapley values / local surrogate coefficients) | Hash-chained ledger: sealed ballots, anonymous critique, vetoes, named decision rule, preserved dissent |
 | **Free-text / LLM decisions** | Not designed for them (no feature vector over a generated paragraph) | Native — the unit of explanation is an argued, cross-examined span of text |
-| **Gaming resistance** | Adversarial models can fool attribution audits ([Slack et al., AIES 2020](https://dl.acm.org/doi/10.1145/3375627.3375830)) | The record is tamper-evident; editing any event breaks the chain; spoof guards fail trivial rationale (A2/A5) |
-| **Regulator-ready reasons** | Weights must be translated into the "specific reasons" notices require | The verdict ships with verbatim public reasons and the losing arguments — the notice writes itself |
+| **Record-tampering detection** | Adversarial models can fool attribution audits ([Slack et al., AIES 2020](https://dl.acm.org/doi/10.1145/3375627.3375830)) | Editing a committed event breaks the supplied hash chain; A2/A5 add limited anti-triviality heuristics, not strategic-gaming immunity |
+| **Candidate notice material** | Weights must be translated into the "specific reasons" notices require | The verdict preserves public reasons and losing arguments that may support a notice, but clinician/legal review must determine completeness and compliance |
 
 Honest footnote: SHAP/LIME remain the right tool for debugging feature-based scoring models. Tribunal governs the decision *procedure* and can sit on top of any underlying scorer.
 
@@ -69,7 +69,7 @@ The verdict is decoded one atomic surface span at a time. Each span is an electi
 
 1. **Secret ballot** — each seat drafts its candidate span in isolation, without peer material.
 2. **Sealed commitment** — SHA-256 hash of each ballot ledgered **before** reveal (no rewriting after seeing the room).
-3. **Anonymized cross-examination** — critiques with authorship hidden; candidate order rotated per recipient (ballot-order/position-bias control).
+3. **Aggregate identity-hidden critique** — each seat receives structured critique summaries with explicit author identity hidden; candidate order rotates per recipient (a ballot-order/position-bias control). This is Delphi-style feedback and revision, not interactive cross-examination.
 4. **Revision** — answer the strongest objection; steelman the best rival; state what would change your vote — all on the record.
 5. **Safety review** — safety seat may **veto** any candidate with a public reason.
 6. **Election** — a **named** constitutional rule elects the span; public reason on record.
@@ -254,11 +254,39 @@ Details: [`docs/honesty.md`](docs/honesty.md).
 |------|------|
 | `packages/kernel` | Engine, ledger, panel adapters, `verifyLedger()` |
 | `packages/scorecard` | A1–A12 checklist + baseline 0/12 |
-| `packages/packs` | Four live domain cases: lending, insurance, benefits, moderation — each with a planted trap |
+| `packages/packs` | Four constructed/synthetic demonstration cases with real-world problem anchors: lending, insurance, benefits, moderation—each with a planted trap |
 | `apps/server` | Node SSE API, exact seating, intervention queue, safe cancellation, persistence |
 | `apps/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker verify endpoint (ready to deploy) |
 | `runs/` | Replayable real-run ledgers + head hashes for anchoring |
+
+---
+
+## Tribunal Clinical research extension
+
+`packages/clinical-eval` is a research and safety-evaluation layer for a bounded clinician-controlled question: whether a complex case warrants specialist escalation or whether named evidence is insufficient. Each seat also records a proposed specialty and urgency when escalating, but the current panel summary synthesizes action only and preserves specialty/urgency disagreement rather than inventing one destination or time. It is not an autonomous diagnostic, treatment, referral, or medical-advice system.
+
+The package includes:
+
+- a versioned local per-seat escalation tuple and cross-field validation; external terminology mappings and panel-level specialty/urgency synthesis remain planned;
+- deterministic agreement-statistic oracles;
+- a five-arm evidence-versus-unsupported-majority experiment;
+- case-clustered paired analysis with explicit non-vote denominators;
+- a four-seat clinician packet that preserves blind and revised outcomes, exposure, sourced assertions, urgent dissent, vetoes, and underdetermination;
+- complete evidence-record and case-state commitments;
+- human-authority and verifier registries with explicit hash/registry-only trust boundaries; and
+- pre-call manifests, exact per-call receipts, replay verification, and post-run safety-artifact binding without claiming independent provider, time, or anchor authentication.
+
+The committed pre-event mechanism run contains 240 deterministic scripted assignments across eight author-defined fixture families, six programmed policies, and five conditions. It verifies analyzer behavior only; it is not an LLM, clinician, or clinical-performance result.
+
+Start with the [complete technical onboarding and Rao-meeting guide](docs/hackathon/SANTIAGO_ONBOARDING_AND_RAO_PREP_2026-07-17.md), then read the [research methods protocol](docs/hackathon/RESEARCH_METHODS_PROTOCOL_2026-07-16.md) and [Saturday execution plan](docs/hackathon/SATURDAY_EXECUTION_PLAN_2026-07-18.md).
+
+```bash
+npm run experiment:clinical:simulate -- --output /tmp/tribunal-clinical-run
+npm run experiment:clinical:verify -- /tmp/tribunal-clinical-run packages/clinical-eval/fixtures/mechanism-fixtures-v0.1.json
+```
+
+Clinical validity, patient benefit, specialist equivalence, prospective safety, and cost-effectiveness require later independently labeled retrospective, silent-mode, human-factors, and prospective studies. They are not claimed here.
 
 ---
 

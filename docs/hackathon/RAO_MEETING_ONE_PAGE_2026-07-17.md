@@ -41,7 +41,7 @@ Independent unit: case; roles from one model are not independent clinicians.
 
 - The case is the correct independent unit.
 - A fixed planted escalation action is a legitimate mechanism-fixture reference.
-- A neutral `3 of 4 other panelists` cue plus valid/irrelevant evidence controls isolates a useful local effect, even though expert votes may be interpreted as weak evidence.
+- A neutral report that `3 of 4 members of a separate, fabricated comparison panel` selected an action, plus valid/irrelevant evidence controls, isolates a useful local effect—even though a reported comparison-panel count may still be interpreted as weak testimonial evidence.
 - Eight synthetic cases are enough for a harness pilot but support no clinical or general model claim.
 - Agreement should be a diagnostic/process variable, not the validity endpoint.
 - A concise packet plus drill-down ledger is the right clinician surface.

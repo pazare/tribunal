@@ -48,8 +48,8 @@ Filled in the six-element format of the apples-to-apples methodology (arXiv 2605
 ## Frozen safety summary rule for the four-seat demo
 
 - Quorum: three schema-valid votes.
-- Summary action: at least three votes agree on `escalation_action`.
-- Safety exception: any valid U0/U1 escalation vote or activated veto is preserved and prevents an automatic `DO_NOT_ESCALATE` summary.
+- Summary action: `ESCALATE` may pass with at least three agreeing votes; `DO_NOT_ESCALATE` requires four of four valid votes; `INSUFFICIENT_EVIDENCE` may pass with at least three only when no U0/U1 escalation dissent or activated authorized clinical escalation veto exists.
+- Safety exception: any valid U0/U1 escalation vote or activated authorized clinical escalation veto is preserved and blocks a non-escalation summary; a provider `SAFETY_BLOCK` is a `NON_VOTE`, not a veto.
 - Tie, no quorum, schema failure, or veto conflict: `UNDERDETERMINED` and human review.
 - The summary is decision support, not authorization.
 
