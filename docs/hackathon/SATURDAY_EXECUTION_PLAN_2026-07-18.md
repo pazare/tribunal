@@ -280,6 +280,12 @@ Show action, specialty, urgency, missing evidence, patient/resource constraints,
 
 Show the day-of diff, run receipt, small pilot counts/intervals, latency/cost, and one clinician correction made that day. Close with the exact next step: a governed retrospective/silent-mode evaluation with Abridge and an agent-safety study with Anthropic.
 
+### Pitch-ready verified evidence lines (evidence ledger §5b; use verbatim, keep the boundary clause)
+
+1. Silent mode first: "In a clinician-blinded silent trial, a model that scored AUROC 0.90 in development collapsed to 0.50 from dataset drift that retrospective validation never surfaced — and was restored to 0.91–0.92 before any clinician saw an output" (Kwong et al., Frontiers in Digital Health 2022, DOI 10.3389/fdgth.2022.929508; verified, open access). Boundary: pediatric-imaging case study, one team.
+2. Human-first ordering: "In the only randomized timing comparison we verified, clinicians who committed before seeing AI advice performed best — including better rejection of wrong advice" (Yin, Ngiam, Tan, Teo, Management Science 71(11), 2025, DOI 10.1287/mnsc.2022.01454; direction verified at abstract level, effect sizes paywalled-pending). Boundary: ordering changes the form of bias, not its existence — disuse (AAAI-26, DOI 10.1609/aaai.v40i47.41457) and revision bias (Eur Radiol 2026, DOI 10.1007/s00330-026-12666-6) persist in human-first workflows.
+3. Comparator hygiene: "A 2026 scoping review of 120 AI-versus-physician studies found 75.8% retrospective designs, 60.8% with ten or fewer physician readers, 50.8% without time limits, and 20.8% with information asymmetry — our comparator design controls each of these" (Chen et al., IJMI 212:106346, 2026, DOI 10.1016/j.ijmedinf.2026.106346; verified at abstract level; AIPSC item wording pending full text). Boundary: cite the percentages, do not paraphrase unpulled checklist items.
+
 ## 10. Stop/go gates and fallbacks
 
 ### Gate G0 — authorized data

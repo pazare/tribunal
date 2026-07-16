@@ -18,9 +18,9 @@ Origin: 12 prompts drafted by the operator-commissioned Sol brief (local capture
 | 1 | Multi-agent clinical decision support landscape | PARTIALLY DONE pre-recovery ("Performance of multi-agent LLMs in clinical settings" session; MDAgents/Anderson rows in evidence ledger). Remaining: the six named contrasts below. |
 | 2 | Agreement metrics + formal vocabulary | DONE pre-recovery (kappa-baselines and IRR-metrics sessions; M-01…M-11 ledger rows). Do not rerun. |
 | 3 | DRL citation network | OPEN — run after confirming DRL venue with Krishnan (verification memo: venue unproven, treat as preprint). |
-| 4 | Counterfactual/metamorphic clinical AI evaluation | OPEN — highest value for E3 twins. |
+| 4 | Counterfactual/metamorphic clinical AI evaluation | WEB-FALLBACK RUN 2026-07-16 (Scopus AI channel interrupted; bounded Fable open-web pass, results in evidence ledger §5c when integrated). Scopus AI re-run still worthwhile for indexing/venue confirmation. |
 | 5 | Human–AI timing / automation bias | DONE 2026-07-16 (capture: `scopus-ai-2026-07-16-q-timing-automation-bias.md`, 10 grounded refs). Verify Kücking 2024/2026, Cabitza "Judicial AI", Rosbach time-pressure before citing. |
-| 6 | Reliability/resilience/human factors (Rao seed) | OPEN — run with Rao's 2411.08981 as seed; ask for failure units and MTBF critiques. |
+| 6 | Reliability/resilience/human factors (Rao seed) | DONE 2026-07-16 (capture: `scopus-ai-2026-07-16-q-reliability-failure-units.md`) — grounded gap: classical reliability literature only, no direct AI/CDSS transfer in retrieved abstracts; β-factor/α-factor common-cause-failure models retained as candidate framing to put to Rao. |
 | 7 | Ambient clinical AI / evidence provenance | OPEN — most useful immediately before Saturday (Abridge context). |
 | 8 | Specialist scarcity / teleconsultation economics | OPEN — feeds the CBA; not Rao-critical. |
 | 9 | Governance / silent-mode deployment | DONE 2026-07-16 with a documented ungrounded first attempt and a grounded empirical retry (capture: `scopus-ai-2026-07-16-q-silent-mode-governance.md`: CHARTwatch, SAFE-WAIT, Kwong silent-trial bridge). Governance-package phrasing stays UNGROUNDED; use named reporting frameworks instead. |
@@ -46,4 +46,6 @@ Q12-synthesis: "Across multi-agent clinical decision support, agreement measurem
 
 ## Standing verification rule
 
-A Scopus AI synthesis sentence is a lead, not a fact. Before any deck, brief, or protocol cites it: fetch the primary paper, confirm design/N/statistic, record venue and peer-review status, and add the ledger row. Citation counts shown in Scopus AI are directional only.
+A Scopus AI synthesis sentence is a lead, not a fact. Before any deck, brief, or protocol cites it: fetch the primary paper, confirm design/N/statistic, record venue and peer-review status, and add the ledger row. Citation counts shown in Scopus AI proved unreliable in the 2026-07-16 verification pass (several implausible values) and are struck from evidentiary use entirely — use publisher/index records only.
+
+Channel note 2026-07-16: the authenticated Scopus AI browser session was interrupted mid-run (tooling restart, not an access lapse). Q6 was captured before the interruption; Q4 was completed as a labeled open-web fallback. Re-establish the session from this library when resuming; entitlement recovers via the CMU Libraries Scopus link when the header shows "Preview".
