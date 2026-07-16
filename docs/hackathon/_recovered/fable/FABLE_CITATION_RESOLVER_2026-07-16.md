@@ -1,0 +1,69 @@
+# Recovered Fable citation-resolver return
+
+- Account: `pablozavalareina@gmail.com`
+- Surface: Claude CLI 2.1.208
+- Session: `e260e89b-d21f-48a7-8214-e3391fa790e0`
+- Requested model: `claude-fable-5`
+- Runtime-reported model: `claude-fable-5`
+- Requested effort: `max`
+- Fallback: none
+- Started: 2026-07-16 02:16 America/New_York
+- Terminal state: completed with exact ACK
+- Tools: read-only `Read`, `WebSearch`, `WebFetch`
+- Disposition: recovered reviewer input; primary-source claims still require orchestrator verification before presentation
+
+---
+All planned verifications are complete — every resolvable source has been checked directly against PubMed, Europe PMC, or Crossref DOI records. The memo below is the deliverable: 8 of 12 claims verified against primary records (several with narrowed constructs), 2 corrected, 2 held at context-only — including the pooled κ=0.756, whose abstract is unreachable without the CMU entitlement.
+
+---
+
+# Tribunal citation-resolution memo — 2026-07-16
+
+## 1. Invocation boundary
+
+This was a **read-only citation review**. Actions taken: local reads of the two recovered Scopus captures, the recovery ledger, and the validation log; web verification restricted to publisher pages, PubMed, Europe PMC (EMBL-EBI), and Crossref DOI records. No files were created or edited, no shell commands were run, no subagents were created, and no new Scopus queries were issued. The runtime exposes the model identity (`claude-fable-5`, "Fable 5"); it does not expose an effort or reasoning setting, so none is claimed. Every source I could not inspect is marked as such. Nothing in this memo asserts that agreement establishes validity, correctness, safety, clinical benefit, or causal effectiveness — agreement statistics measure reproducibility only.
+
+## 2. Verified claim ledger
+
+| ID | Proposed Tribunal claim | Primary source (DOI / PMID) | Population, setting, construct | Statistic actually supported | Status | Safe wording for Tribunal |
+|---|---|---|---|---|---|---|
+| K-01 | Kappa bands (e.g., 0.61–0.80 "substantial") can label Tribunal results | Landis & Koch, *Biometrics* 1977;33(1):159–74; PMID 843571 (no DOI shown on PubMed; **full text not inspected** — record verified) | Methodological paper; proposed verbal benchmarks for kappa-type statistics | Labels are author-proposed conventions, not empirical thresholds; McHugh (*Biochem Med* 2012;22(3):276–82, PMID 23092060, abstract inspected) argues lenient scales let "a score as low as 0.41" pass in healthcare | context-only | Report numeric values with CIs; if labels are used, cite them as Landis–Koch conventions and note stricter healthcare readings (McHugh 2012) |
+| K-02 | Cohen's kappa is the standard two-rater chance-corrected agreement statistic | Cohen 1960, *Educ Psychol Meas* 20(1):37–46; DOI 10.1177/001316446002000104 (Crossref record verified) | Methodological; two raters, nominal categories, chance correction from the pair's own marginals | Defines pairwise kappa; nothing about validity | verified | "Pairwise chance-corrected agreement (Cohen 1960)" for AI–AI and AI–clinician pairs |
+| K-03 | Scopus Q2: weighted kappa applies to "severity scales in ICD-10" | Cohen 1968, *Psychol Bull* 70(4):213–20; DOI 10.1037/h0026256 (Crossref record verified) | Methodological; ordinal categories with pre-specified disagreement weights | Weighted kappa is supported **for ordinal scales**; ICD-10-CM is a diagnosis classification, not an ordinal severity/urgency scale — the Scopus phrasing conflates them (its cited ref [4] is a 2025 conference item, not the primary source) | corrected | "Weighted kappa (Cohen 1968) on Tribunal's own versioned ordinal urgency vocabulary; never on ICD-10-CM codes, which carry no urgency/treatment/escalation semantics" |
+| K-04 | Fleiss' kappa handles multiple raters | Fleiss 1971, *Psychol Bull* 76(5):378–82; DOI 10.1037/h0031619 (Crossref record verified; full text not inspected) | Methodological; many raters, nominal scale | Multi-rater chance-corrected agreement; it is not a simple extension of Cohen's kappa (different chance model) — confirm exact framing in full text before print | verified | "Multi-rater agreement per Fleiss (1971)"; do not describe it as "Cohen's kappa for many raters" |
+| K-05 | Physicians agree poorly on triage (κ≈0.2), so human baselines are low | Entezarjou et al., *JMIR Med Inform* 2020;8(9):e18930; DOI 10.2196/18930; PMID 32880578 (abstract inspected) | Sweden; 5 primary-care physicians triaging 300 **text-only digitalized e-visit histories** as urgent/non-urgent (binary) | Inter-rater κ=0.2 among the PCPs; intra-rater κ=0.55 (one PCP, 50 reports); physician-majority vs naïve-Bayes ML κ=0.17; authors conclude low agreement limits using PCP decisions as an ML reference standard | verified | "In one study of five PCPs binary-triaging 300 digital histories, inter-rater κ was 0.2" — narrow construct; not "physicians can't triage" |
+| K-06 | Physician–nurse ED triage agreement is substantial (pooled κ=0.756) | Pishbin, Ebrahimi, Mirhaghi, *Notfall Rettungsmed* 2019;22(5):379–85; DOI 10.1007/s10049-019-0580-6 (Crossref record verified; **abstract/full text not accessible this session — the 0.756 and any CI are unverified**) | Meta-analysis of physician-vs-nurse agreement on ED triage scales | Only bibliographic existence confirmed; not in Europe PMC; Crossref carries no abstract | context-only | Do not quote 0.756 until the paper is inspected via CMU access; note it measures **between-profession** agreement on triage scales, a different construct from Tribunal's tuple |
+| K-07 | Mental-health triage agreement is only fair (Fleiss κ=0.312) | Brown, Clarke, Spence, *Open Access Emerg Med* 2015; DOI 10.2147/OAEM.S74646; PMID 27147893 (abstract inspected) | 18 triage nurses, 20 standardized mental-health scenarios, CTAS urgency ratings | Fleiss κ=0.312 (P<0.0001); Kendall's W=0.680; mean accuracy vs expert ratings 54% | verified | "18 nurses rating 20 mental-health scenarios on CTAS: Fleiss κ=0.312, mean accuracy 54%" — nurses, scenario-based; not physicians, not live triage |
+| K-08 | Kappa is prevalence-fragile; Gwet's AC1 is more stable (κ 0–1.00 vs AC1 0.752–1.000) | Wongpakaran et al., *BMC Med Res Methodol* 2013;13:61; DOI 10.1186/1471-2288-13-61; PMID 23627889 (abstract inspected) | 67 patients; 9 raters (7 psychiatrists, 1 resident, 1 social worker); presence/absence of DSM-IV personality-disorder diagnosis | Verbatim: κ ranged "0 to 1.00", AC1 ".752 to 1.000"; AC1 "more stable" and "less affected by prevalence and marginal probability". Note Gwet is a co-author | verified | Quote both ranges with the psychiatric-diagnosis setting; use as motivation for reporting AC1 **alongside** kappa, not for replacing kappa |
+| K-09 | High raw agreement can coexist with low kappa (the kappa paradoxes) | Feinstein & Cicchetti, *J Clin Epidemiol* 1990;43(6):543–9; DOI 10.1016/0895-4356(90)90158-l; PMID 2348207 (abstract inspected) | Methodological; binary agreement tables | Two paradoxes: marginal imbalance can drive kappa down despite high observed agreement; asymmetrical imbalance can raise kappa; κ_max adjustment doesn't fix either | verified | "We report raw agreement, marginals, and prevalence next to every kappa (Feinstein & Cicchetti 1990)" |
+| K-10 | Scopus Q2: Krippendorff's alpha "provides unbiased estimates" and is preferred with missing data | Zapf et al., *BMC Med Res Methodol* 2016;16:93; DOI 10.1186/s12874-016-0200-9; PMID 27495131 (abstract inspected) | Simulation study, nominal data, multiple raters | Fleiss' K and alpha point estimates "did not differ … in all scenarios" (complete data); with missing data alpha "provided stable estimates" while complete-case Fleiss' K was biased; bootstrap CIs recommended; "the asymptotic confidence interval for Fleiss' K should not be used" | corrected | "Krippendorff's alpha with bootstrap CIs for multi-rater data with non-votes (Zapf 2016)" — say "stable under missingness in simulation," not "unbiased" |
+| K-11 | AC1 serves as a prevalence diagnostic | Gwet 2008, *Br J Math Stat Psychol* 61(Pt 1):29–48; DOI 10.1348/000711006X126600; PMID 18482474 (abstract inspected) | Methodological; nominal ratings under high agreement | AC1 proposed as "an alternative and more stable agreement coefficient" where pi/kappa "yield unexpected results … the paradoxes of kappa" | verified | "AC1 reported alongside kappa; κ–AC1 divergence flags prevalence artifacts." AC1 uses a different chance model — never compare AC1 numbers against kappa benchmarks |
+| K-12 | Sim & Wright supports kappa interpretation and sample-size planning (Scopus displayed no journal/year) | Sim & Wright, *Phys Ther* 2005;85(3):257–68; DOI 10.1093/ptj/85.3.257; PMID 15733050 (abstract inspected) | Tutorial for clinician reliability studies | Covers weighted/unweighted kappa, effects of "prevalence, bias, and non-independent ratings," sample-size requirements — resolves the Scopus-side blank field | verified | Cite for pre-specifying the reliability sample size and for prevalence/bias caveats |
+
+## 3. Metric decision
+
+Every metric below measures **reproducibility of ratings under the study conditions**. None measures correctness, validity, safety, or benefit; a panel that is consistently wrong scores perfectly on all of them.
+
+- **Raw pairwise agreement** — measures: interpretable observed concordance; report it always so readers can see the paradox zone (K-09). Does not measure: chance-expected agreement; inflates under skewed prevalence.
+- **n-of-n (unanimity) rate** — measures: how often the whole panel lands on the identical tuple element; a stringent, honest headline. Does not measure: chance correction; shrinks mechanically with panel size, so never compare across panel sizes.
+- **Pairwise Cohen's kappa (K-02)** — measures: two-rater chance-corrected nominal agreement given that pair's marginals. Does not measure: multi-rater consensus; stable behavior under prevalence extremes (K-08, K-09); anything ordinal.
+- **Weighted kappa (K-03)** — measures: ordinal disagreement severity on urgency, with weights **pre-specified in the protocol** (changing weights post hoc changes the number). Does not measure: anything about ICD-10-CM codes; nominal specialty/escalation fields.
+- **Krippendorff's alpha (K-10)** — measures: multi-rater agreement tolerating missing ratings — the right home for refusal/timeout non-votes — with nominal/ordinal variants. Does not measure: freedom from prevalence sensitivity (it is also chance-corrected); non-votes as information (a refusal's *meaning* still needs separate reporting).
+- **Gwet's AC1 (K-08, K-11)** — measures: agreement under an alternative chance model that stays stable at prevalence extremes; use as a mandatory companion diagnostic. Does not measure: the same quantity as kappa — a high AC1 alone must never be presented as "the reliability."
+- **Case-cluster bootstrap CIs (K-10)** — measure: sampling uncertainty when the same case receives multiple ratings, resampling cases as the unit; supported over asymptotic intervals by Zapf's simulations. Do not measure: uncertainty from case-mix shift, prompt changes, or model updates; a tight CI is not evidence of validity.
+
+## 4. Three highest-risk overclaims
+
+1. **"Physicians only reach κ≈0.2, and Tribunal's agents agree more, so Tribunal is at least as good/safe."** K-05 is five PCPs binary-triaging text-only e-visit histories — not Tribunal's escalation tuple, and its own authors read low agreement as a *reference-standard problem*, not a performance bar. Worse, LLM agents share training and failure modes, so inter-agent agreement is correlated evidence and can be high while uniformly wrong. Agreement is never validity.
+2. **"Diagnoses are ICD-coded, so the decision output is formally validated."** ICD-10-CM can code the diagnosis field only. Urgency, specialty, escalation, and treatment need Tribunal's own versioned codebooks (ledger conclusion 3); the Scopus "severity scales in ICD-10" phrasing (K-03) must not survive into any deck.
+3. **Quoting the Scopus AI synthesis as if it were the papers.** One headline number I attempted (pooled κ=0.756, K-06) could not be confirmed anywhere outside the paywalled paper; and the capture's kappa-ladder table invites cross-study comparison that Sim & Wright and Feinstein & Cicchetti explicitly warn against (different scales, raters, prevalence). Cite papers, never the synthesis layer, and never present the ladder as a benchmark Tribunal "beats."
+
+## 5. Open evidence gaps
+
+- **K-06 (pooled κ=0.756 ± CI, study count, scales)**: unresolved after attempts via Springer (bot-walled), Europe PMC (no record), Crossref (no abstract). Needs one CMU-entitled lookup before any use.
+- **Full texts of Landis & Koch 1977, Cohen 1960/1968, Fleiss 1971**: records verified only; do not attribute verbatim wording (e.g., "arbitrary" benchmark language) until the texts are inspected.
+- **Nine remaining Q1 empirical rows** (thyroid CAD 0.43–0.96, low back pain <0.21, LEMG 0.48–0.84, T1LC 0.31, spasticity referral 0.84, MRI referral 0.76–0.82, ANKUTRIAGE >0.8, DOTTS 0.77, NTS ICC 0.73) were **not attempted** in this bounded pass and remain recovered-only.
+- **Q2 refs [4], [8], [10]** (2025–2027 in-press items, incl. the 2027-dated LNCS record): unresolved; low evidentiary weight; the 2027 date needs explicit handling in a 2026 deck.
+- **No published baseline matches Tribunal's exact construct.** After resolution, the nearest neighbor is still K-05's binary urgency. The ledger's planned two-clinician study on the same cases, tuple, and codebook remains the only path to a construct-matched human baseline.
+
+ACK:FABLE_CITATION_RESOLVER_COMPLETE

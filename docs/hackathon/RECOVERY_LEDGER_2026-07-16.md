@@ -1,6 +1,6 @@
 # Tribunal recovery ledger
 
-As of: 2026-07-16 02:03 America/New_York
+As of: 2026-07-16 02:30 America/New_York
 
 Status: active; first preservation checkpoint
 
@@ -25,6 +25,10 @@ Status: active; first preservation checkpoint
 | Five interrupted Fable design agents | Same workflow | recovered partials only | No completed return exists; recover tool outputs/files, never label completed |
 | PR #1 | GitHub + local git | verified_source | Accepted infrastructure substrate |
 | PR #2 | GitHub draft + local remote ref | verified_source | Import for post-meeting revision; not merge-ready unchanged |
+| Fable citation resolver | Claude CLI session `e260e89b-d21f-48a7-8214-e3391fa790e0`; runtime model `claude-fable-5`; visible `max` request; no fallback; exact ACK | recovered, method_checked | Memo preserved; verified/corrected metric claims integrated into the Scopus evidence ledger |
+| Scopus Drive problem report | Drive file `1UG1JO89yd8bnwOoxX17Qvag-LiOvzhUo`; conversation `590602b6-b003-4b6e-b7d5-351f3f64ed0d`; 13 pages, 66 references | recovered | Full extracted text preserved; selected claims checked against primary sources |
+| Research methods protocol | `docs/hackathon/RESEARCH_METHODS_PROTOCOL_2026-07-16.md` | integrated draft | Primary tuple, codebooks, golden set, experiments, analysis, cost and claim boundaries specified |
+| Saturday execution plan | `docs/hackathon/SATURDAY_EXECUTION_PLAN_2026-07-18.md` | integrated draft | Prework/day-of provenance, two-person timeline, partner questions, gates, demo and submission checks specified |
 
 ## First method conclusions
 
@@ -42,3 +46,5 @@ Status: active; first preservation checkpoint
 - The live Scopus AI browser session still needs a stable authenticated handoff for new searches and full capture of the conformity conversation.
 - Several PR #2 claims and recovered citations need primary-paper verification.
 - Raw recovered workflow files contain hidden reasoning and will not be committed; only observable outputs and validated artifacts will be integrated.
+- The exact contest clock time, venue, submission deadline, judging rubric, available data, and reported day-of-only code rule still require organizer confirmation. The public event description recovered so far does not state the day-of-only rule.
+- MIMIC-IV-Ext CDS is the closest real-data match but requires verified PhysioNet credentials, CITI training, and a signed DUA; no local dataset access has been claimed.

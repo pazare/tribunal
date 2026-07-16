@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-07-16T02:03:05-04:00",
+  "as_of": "2026-07-16T02:30:57-04:00",
   "timezone": "America/New_York",
   "accounts": [
     {
@@ -8,6 +8,11 @@
       "surface": "Claude CLI",
       "subscription": "max",
       "authentication": "claude.ai",
+      "permitted_models": [
+        "claude-fable-5 max",
+        "Sonnet 5 max (exact CLI identifier must be verified)",
+        "Opus 4.8 max (exact CLI identifier must be verified)"
+      ],
       "five_hour_limit": {
         "status": "unknown",
         "remaining": null,
@@ -21,10 +26,20 @@
         "evidence": "Not exposed by the non-model Claude CLI commands inspected."
       },
       "fable_limit": {
-        "status": "not_probed",
+        "status": "task_succeeded_exact_remaining_unknown",
         "remaining": null,
         "reset_at": null,
-        "evidence": "No model prompt will be sent only to test quota."
+        "evidence": "Read-only citation resolver session e260e89b-d21f-48a7-8214-e3391fa790e0 completed with exact ACK at approximately 02:25 ET. Runtime transcript reports claude-fable-5; visible command requested max effort and no fallback. The CLI still exposes no five-hour, weekly, or Fable-specific remaining percentage."
+      },
+      "latest_invocation": {
+        "session_id": "e260e89b-d21f-48a7-8214-e3391fa790e0",
+        "task": "Scopus citation resolver",
+        "requested_model": "claude-fable-5",
+        "runtime_model": "claude-fable-5",
+        "requested_effort": "max",
+        "fallback": "none",
+        "status": "acknowledged",
+        "ack": "ACK:FABLE_CITATION_RESOLVER_COMPLETE"
       }
     },
     {
@@ -32,6 +47,9 @@
       "surface": "Claude Desktop",
       "subscription": "max",
       "authentication": "Claude Desktop session",
+      "permitted_models": [
+        "claude-fable-5 max"
+      ],
       "five_hour_limit": {
         "status": "limit_reached_bucket_unspecified",
         "remaining": null,
@@ -56,6 +74,7 @@
     "Unknown is not zero.",
     "Refresh the authenticated usage UI before every Fable invocation.",
     "Never send a prompt merely to probe quota.",
-    "Never downgrade or fall back from claude-fable-5 max."
+    "Never use a model outside the account-specific allowlist or enable fallback.",
+    "Verify the exact visible authenticated account before every invocation."
   ]
 }
