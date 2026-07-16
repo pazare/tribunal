@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 3,
+  "runId": "mechanism-simulator-v0.1-seed18",
+  "startedAt": "2026-07-16T12:28:03.625Z",
+  "completedAt": "2026-07-16T12:28:03.741Z",
+  "protocolVersion": "tribunal-clinical-methods-2026-07-16-v2",
+  "experimentId": "E2_OFFLINE_FALSIFICATION_GATE",
+  "hypothesis": "The analyzer recovers the qualitative behavior programmed into conforming, evidence-following, frozen, and refusing offline providers.",
+  "gitAtStart": {
+    "commit": "315baea43c0e2d4517492fecf5fd0ef741b235ec",
+    "dirty": false,
+    "branch": "pazare/tribunal-hackathon-recovery-20260716"
+  },
+  "dataset": {
+    "id": "tribunal-mechanism-fixtures",
+    "version": "v0.1",
+    "class": "AUTHOR_DEFINED_SYNTHETIC_MECHANISM_FIXTURES_NOT_CLINICIAN_VALIDATED",
+    "source": "repository-authored fixture file",
+    "sha256": "f2887f5e83c1a0c77ca402293c9bac324d29c724e245da6c6507ad67696a314a",
+    "rowCount": 8,
+    "licenseStatus": "REPOSITORY_AUTHORED_SYNTHETIC",
+    "duaStatus": "NOT_APPLICABLE",
+    "deidentificationStatus": "NO_REAL_PATIENT_DATA",
+    "inclusionCriteria": [
+      "schema-valid",
+      "fixed planted action",
+      "balanced majority-pressure direction"
+    ],
+    "exclusionCriteria": [
+      "real patient record",
+      "clinical truth claim",
+      "unsigned fixture interpreted as clinician gold standard"
+    ]
+  },
+  "artifactFiles": {
+    "assignments": "assignments.json",
+    "observations": "observations.jsonl",
+    "results": "results.json"
+  },
+  "codebookVersion": "tribunal-clinical-codebook-v0.1",
+  "promptTemplateVersion": "conformity-two-turn-v0.1",
+  "randomSeed": 18,
+  "assignmentSha256": "68ec610bd7d03e1abb8b7e5c841b6d8ae4091ce63fdccce5dedb202b41c9fb05",
+  "observationSha256": "4abfbe274a82f7677c9242e16a9aa33eca2b68b0f53c5383d02a15d093fe0516",
+  "resultSha256": "bbc1341f3139fb54bed9a736124523cc993d1352b5cff33390320c0c28cda8c0",
+  "design": {
+    "mode": "FULL_E2",
+    "plannedConditions": [
+      "CONTROL",
+      "VALID_EVIDENCE",
+      "FALSE_MAJORITY",
+      "EVIDENCE_VS_FALSE_MAJORITY",
+      "IRRELEVANT_EVIDENCE"
+    ],
+    "agentIds": [
+      "always_conform",
+      "evidence_follower",
+      "frozen",
+      "always_refuse",
+      "majority_only_refuse",
+      "sham_churn"
+    ],
+    "replicates": 1,
+    "assignmentCount": 240
+  },
+  "analysis": {
+    "resultSchemaVersion": 2,
+    "bootstrapReplicates": 2000,
+    "bootstrapSeed": 18
+  },
+  "provider": {
+    "boundary": "Deterministic scripted providers; no LLM and no clinical reasoning.",
+    "providers": [
+      "SCRIPTED_OFFLINE_PROVIDER"
+    ],
+    "models": [
+      "programmed-always-conform",
+      "programmed-always-refuse",
+      "programmed-evidence-follower",
+      "programmed-frozen",
+      "programmed-majority-only-refuse",
+      "programmed-sham-churn"
+    ],
+    "efforts": [
+      "not_applicable"
+    ],
+    "configurationSha256": "ad52f6385bc2e0bb82d7dbea8008fac515374b0fd7573ea5f07ff632f512a67f"
+  },
+  "usage": {
+    "plannedCalls": 240,
+    "completedVotes": 184,
+    "nonVotes": 56,
+    "transportRetries": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "totalLatencyMs": 0,
+    "pricingSource": null,
+    "estimatedCostUsd": 0
+  },
+  "rawProviderErrorsStored": false,
+  "ledgerHead": null,
+  "claimBoundary": "This receipt records hashed artifacts and replay-verified execution metadata for a mechanism experiment. Independent immutability verification additionally requires an external anchor. It does not establish clinical validity, safety, patient benefit, or cost-effectiveness.",
+  "receiptSha256": "cc25cb94bc0e571a8179e6946e7943ed3a7d93bce64f1df473b00c38a90fa015"
+}

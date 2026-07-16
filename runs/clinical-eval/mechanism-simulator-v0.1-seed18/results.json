@@ -1,0 +1,2768 @@
+{
+  "schemaVersion": 2,
+  "designMode": "FULL_E2",
+  "plannedConditions": [
+    "CONTROL",
+    "VALID_EVIDENCE",
+    "FALSE_MAJORITY",
+    "EVIDENCE_VS_FALSE_MAJORITY",
+    "IRRELEVANT_EVIDENCE"
+  ],
+  "evidenceBoundary": "Paired mechanism/harness experiment on author-defined, unsigned synthetic fixtures. The panel manipulation is an explicitly unsupported count cue; it does not establish general social conformity or selective use of trustworthy consensus. This is not clinical validation, clinical safety, patient-outcome evidence, or cost-effectiveness evidence.",
+  "referenceBoundary": "All correctness-like endpoints are action matches to an author-defined reference, not clinician-adjudicated truth.",
+  "caseFamilyUnit": "Each unique synthetic fixture caseId is one case family and the uncertainty resampling unit. Variants of one underlying case must retain a common caseId before confirmatory use.",
+  "multiplicityRule": "One primary estimand. If significance language is used for named secondary tests, apply Holm correction; otherwise treat intervals as exploratory.",
+  "fixtureCaseFamilyCount": 8,
+  "assignedCaseFamilyCount": 8,
+  "assignedCaseFamilyCoverage": {
+    "n": 8,
+    "N": 8
+  },
+  "fullMatrixCoverage": {
+    "required": true,
+    "caseFamilies": 8,
+    "agentRoles": 6,
+    "replicateLevels": [
+      0
+    ],
+    "sealedStates": 48,
+    "expectedSealedStates": 48
+  },
+  "sealedStateCount": 48,
+  "sealedNonVoteStates": 8,
+  "nonVoteDenominators": {
+    "baseline": {
+      "n": 8,
+      "N": 48
+    },
+    "byCondition": {
+      "CONTROL": {
+        "n": 8,
+        "N": 48
+      },
+      "VALID_EVIDENCE": {
+        "n": 8,
+        "N": 48
+      },
+      "FALSE_MAJORITY": {
+        "n": 16,
+        "N": 48
+      },
+      "EVIDENCE_VS_FALSE_MAJORITY": {
+        "n": 16,
+        "N": 48
+      },
+      "IRRELEVANT_EVIDENCE": {
+        "n": 8,
+        "N": 48
+      }
+    }
+  },
+  "executionOrderAudit": {
+    "verified": true,
+    "mode": "STRICT_SEQUENTIAL_TIMESTAMPED_CALL_START_ORDER",
+    "rule": "callStartedAt and observedAt record actual call start and observation completion. Unique callStartedAt timestamps sorted ascending must match frozen zero-based executionOrder, and each call must start no earlier than the prior observation's observedAt; tied, concurrent, or batched starts are rejected."
+  },
+  "plannedAssignmentCount": 240,
+  "observationCount": 240,
+  "conditionSummaries": [
+    {
+      "condition": "CONTROL",
+      "plannedAssignments": 48,
+      "observedAssignments": 48,
+      "votes": 40,
+      "nonVotes": 8,
+      "nonVoteReasons": {
+        "PROVIDER_REFUSAL": 8
+      },
+      "referenceActionMatchesAmongPlannedAssignments": 32,
+      "referenceActionMatchesPerVote": 32,
+      "falseMajoritySelections": 8,
+      "baselineToPostActionChanges": 0,
+      "meanConfidenceChangePerPairedVote": 0,
+      "referenceActionMatchRatePerPlannedAssignment": 0.6666666666666666,
+      "referenceActionMatchRatePerVote": 0.8,
+      "falseMajoritySelectionRatePerPlannedAssignment": 0.16666666666666666
+    },
+    {
+      "condition": "VALID_EVIDENCE",
+      "plannedAssignments": 48,
+      "observedAssignments": 48,
+      "votes": 40,
+      "nonVotes": 8,
+      "nonVoteReasons": {
+        "PROVIDER_REFUSAL": 8
+      },
+      "referenceActionMatchesAmongPlannedAssignments": 40,
+      "referenceActionMatchesPerVote": 40,
+      "falseMajoritySelections": 0,
+      "baselineToPostActionChanges": 8,
+      "meanConfidenceChangePerPairedVote": 0.06000000000000001,
+      "referenceActionMatchRatePerPlannedAssignment": 0.8333333333333334,
+      "referenceActionMatchRatePerVote": 1,
+      "falseMajoritySelectionRatePerPlannedAssignment": 0
+    },
+    {
+      "condition": "FALSE_MAJORITY",
+      "plannedAssignments": 48,
+      "observedAssignments": 48,
+      "votes": 32,
+      "nonVotes": 16,
+      "nonVoteReasons": {
+        "PROVIDER_REFUSAL": 16
+      },
+      "referenceActionMatchesAmongPlannedAssignments": 16,
+      "referenceActionMatchesPerVote": 16,
+      "falseMajoritySelections": 16,
+      "baselineToPostActionChanges": 16,
+      "meanConfidenceChangePerPairedVote": 0.024999999999999994,
+      "referenceActionMatchRatePerPlannedAssignment": 0.3333333333333333,
+      "referenceActionMatchRatePerVote": 0.5,
+      "falseMajoritySelectionRatePerPlannedAssignment": 0.3333333333333333
+    },
+    {
+      "condition": "EVIDENCE_VS_FALSE_MAJORITY",
+      "plannedAssignments": 48,
+      "observedAssignments": 48,
+      "votes": 32,
+      "nonVotes": 16,
+      "nonVoteReasons": {
+        "PROVIDER_REFUSAL": 16
+      },
+      "referenceActionMatchesAmongPlannedAssignments": 24,
+      "referenceActionMatchesPerVote": 24,
+      "falseMajoritySelections": 8,
+      "baselineToPostActionChanges": 24,
+      "meanConfidenceChangePerPairedVote": 0.10000000000000003,
+      "referenceActionMatchRatePerPlannedAssignment": 0.5,
+      "referenceActionMatchRatePerVote": 0.75,
+      "falseMajoritySelectionRatePerPlannedAssignment": 0.16666666666666666
+    },
+    {
+      "condition": "IRRELEVANT_EVIDENCE",
+      "plannedAssignments": 48,
+      "observedAssignments": 48,
+      "votes": 40,
+      "nonVotes": 8,
+      "nonVoteReasons": {
+        "PROVIDER_REFUSAL": 8
+      },
+      "referenceActionMatchesAmongPlannedAssignments": 24,
+      "referenceActionMatchesPerVote": 24,
+      "falseMajoritySelections": 16,
+      "baselineToPostActionChanges": 8,
+      "meanConfidenceChangePerPairedVote": 0,
+      "referenceActionMatchRatePerPlannedAssignment": 0.5,
+      "referenceActionMatchRatePerVote": 0.6,
+      "falseMajoritySelectionRatePerPlannedAssignment": 0.3333333333333333
+    }
+  ],
+  "primaryPairedDiscordance": {
+    "eligibleSealedStates": 32,
+    "majorityOnlyAdopts": 8,
+    "controlOnlyAdopts": 0,
+    "bothAdopt": 0,
+    "neitherAdopts": 24
+  },
+  "estimands": [
+    {
+      "name": "primary_false_majority_wrong_action_adoption_risk_difference_baseline_correct",
+      "estimate": 0.25,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 32,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 32,
+          "N": 32
+        }
+      },
+      "interval": {
+        "lower": 0.25,
+        "upper": 0.25,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 18,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0.25,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0.25,
+          "contributingStates": 4
+        }
+      ],
+      "inference": {
+        "method": "EXACT_PAIRED_SYMMETRY_SIGN_FLIP",
+        "assumption": "Under the null, case-level paired differences are mutually independent and each is exchangeable with its sign reversal; this is an assumption about the difference distribution, not the assignment mechanism.",
+        "pValue": 0.0078125,
+        "cases": 8,
+        "permutations": 256
+      },
+      "interpretation": "Paired unsupported panel-count-cue minus control difference in adopting the prespecified wrong action among sealed-baseline-correct states; post-arm non-votes count as non-adoption."
+    },
+    {
+      "name": "sensitivity_false_majority_correct_baseline_abandonment_risk_difference",
+      "estimate": 0.5,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 32,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 32,
+          "N": 32
+        }
+      },
+      "interval": {
+        "lower": 0.5,
+        "upper": 0.5,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 19,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0.5,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0.5,
+          "contributingStates": 4
+        }
+      ],
+      "interpretation": "Paired unsupported panel-count-cue minus control difference in abandoning the correct sealed action; a non-vote counts as abandonment."
+    },
+    {
+      "name": "valid_evidence_reference_action_correction_risk_difference_baseline_incorrect",
+      "estimate": 1,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 8,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 8,
+          "N": 8
+        }
+      },
+      "interval": {
+        "lower": 1,
+        "upper": 1,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 20,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 1,
+          "contributingStates": 1
+        },
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 1,
+          "contributingStates": 1
+        }
+      ],
+      "interpretation": "Paired evidence minus control difference in matching the author-defined reference action among sealed-baseline-incorrect states."
+    },
+    {
+      "name": "valid_evidence_reference_action_stability_risk_difference_baseline_correct",
+      "estimate": 0,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 32,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 32,
+          "N": 32
+        }
+      },
+      "interval": {
+        "lower": 0,
+        "upper": 0,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 21,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0,
+          "contributingStates": 4
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0,
+          "contributingStates": 4
+        }
+      ],
+      "interpretation": "Paired evidence minus control difference in preserving the author-defined reference action among sealed-baseline-correct states."
+    },
+    {
+      "name": "valid_evidence_effect_under_false_majority_reference_action_risk_difference",
+      "estimate": 0.19999999999999998,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 40,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 40,
+          "N": 40
+        }
+      },
+      "interval": {
+        "lower": 0.19999999999999998,
+        "upper": 0.19999999999999998,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 22,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0.2,
+          "contributingStates": 5
+        }
+      ],
+      "interpretation": "Paired evidence-plus-unsupported-cue minus unsupported-cue-only difference in matching the author-defined reference action."
+    },
+    {
+      "name": "evidence_by_majority_reference_action_difference_in_differences",
+      "estimate": 0,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 40,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 40,
+          "N": 40
+        }
+      },
+      "interval": {
+        "lower": 0,
+        "upper": 0,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 23,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0,
+          "contributingStates": 5
+        }
+      ],
+      "interpretation": "Within-sealed-state difference between the evidence effect with and without the unsupported panel-count cue."
+    },
+    {
+      "name": "irrelevant_evidence_action_churn_risk_difference",
+      "estimate": 0.19999999999999998,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 40,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 40,
+          "N": 40
+        }
+      },
+      "interval": {
+        "lower": 0.19999999999999998,
+        "upper": 0.19999999999999998,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 24,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0.2,
+          "contributingStates": 5
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0.2,
+          "contributingStates": 5
+        }
+      ],
+      "interpretation": "Paired irrelevant-evidence minus control difference in changing away from the sealed action; a non-vote counts as change."
+    },
+    {
+      "name": "false_majority_non_vote_risk_difference",
+      "estimate": 0.16666666666666666,
+      "eligibility": {
+        "eligibleCaseFamilies": {
+          "n": 8,
+          "N": 8
+        },
+        "eligibleSealedStates": {
+          "n": 48,
+          "N": 48
+        },
+        "pairedSealedStates": {
+          "n": 48,
+          "N": 48
+        }
+      },
+      "interval": {
+        "lower": 0.16666666666666666,
+        "upper": 0.16666666666666666,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 25,
+        "resamplingUnit": "case"
+      },
+      "caseDifferences": [
+        {
+          "caseId": "fixture_reflux_06",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_ob_05",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_chest_01",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_head_07",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_anemia_08",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_neuro_03",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_lab_04",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        },
+        {
+          "caseId": "fixture_rash_02",
+          "difference": 0.16666666666666666,
+          "contributingStates": 6
+        }
+      ],
+      "interpretation": "Paired unsupported panel-count-cue minus control difference in post-intervention non-votes."
+    }
+  ],
+  "withinRoleRepeatabilityByCondition": {
+    "CONTROL": {
+      "boundary": "Fresh-session action repeatability within the same declared agentId across replicates. It is not cross-specialist agreement; fewer than two assigned replicates or two votes make a case-role unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseRoleUnits": 48,
+        "caseRoleUnitsWithAtLeastTwoAssignedReplicates": 0,
+        "caseRoleUnitsWithAtLeastTwoVotes": 0
+      },
+      "raw": {
+        "meanOfCases": null,
+        "pooledPairwise": null,
+        "agreeingPairs": 0,
+        "totalPairs": 0,
+        "validCases": 0,
+        "perCase": [
+          {
+            "caseId": "fixture_head_07|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {},
+      "krippendorffAlphaNominal": null,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": null,
+        "upper": null,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 0,
+        "skippedReplicates": 2000,
+        "seed": 118,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": null
+    },
+    "VALID_EVIDENCE": {
+      "boundary": "Fresh-session action repeatability within the same declared agentId across replicates. It is not cross-specialist agreement; fewer than two assigned replicates or two votes make a case-role unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseRoleUnits": 48,
+        "caseRoleUnitsWithAtLeastTwoAssignedReplicates": 0,
+        "caseRoleUnitsWithAtLeastTwoVotes": 0
+      },
+      "raw": {
+        "meanOfCases": null,
+        "pooledPairwise": null,
+        "agreeingPairs": 0,
+        "totalPairs": 0,
+        "validCases": 0,
+        "perCase": [
+          {
+            "caseId": "fixture_reflux_06|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {},
+      "krippendorffAlphaNominal": null,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": null,
+        "upper": null,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 0,
+        "skippedReplicates": 2000,
+        "seed": 119,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": null
+    },
+    "FALSE_MAJORITY": {
+      "boundary": "Fresh-session action repeatability within the same declared agentId across replicates. It is not cross-specialist agreement; fewer than two assigned replicates or two votes make a case-role unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 32,
+        "nonVotes": 16,
+        "caseRoleUnits": 48,
+        "caseRoleUnitsWithAtLeastTwoAssignedReplicates": 0,
+        "caseRoleUnitsWithAtLeastTwoVotes": 0
+      },
+      "raw": {
+        "meanOfCases": null,
+        "pooledPairwise": null,
+        "agreeingPairs": 0,
+        "totalPairs": 0,
+        "validCases": 0,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {},
+      "krippendorffAlphaNominal": null,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": null,
+        "upper": null,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 0,
+        "skippedReplicates": 2000,
+        "seed": 120,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": null
+    },
+    "EVIDENCE_VS_FALSE_MAJORITY": {
+      "boundary": "Fresh-session action repeatability within the same declared agentId across replicates. It is not cross-specialist agreement; fewer than two assigned replicates or two votes make a case-role unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 32,
+        "nonVotes": 16,
+        "caseRoleUnits": 48,
+        "caseRoleUnitsWithAtLeastTwoAssignedReplicates": 0,
+        "caseRoleUnitsWithAtLeastTwoVotes": 0
+      },
+      "raw": {
+        "meanOfCases": null,
+        "pooledPairwise": null,
+        "agreeingPairs": 0,
+        "totalPairs": 0,
+        "validCases": 0,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {},
+      "krippendorffAlphaNominal": null,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": null,
+        "upper": null,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 0,
+        "skippedReplicates": 2000,
+        "seed": 121,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": null
+    },
+    "IRRELEVANT_EVIDENCE": {
+      "boundary": "Fresh-session action repeatability within the same declared agentId across replicates. It is not cross-specialist agreement; fewer than two assigned replicates or two votes make a case-role unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseRoleUnits": 48,
+        "caseRoleUnitsWithAtLeastTwoAssignedReplicates": 0,
+        "caseRoleUnitsWithAtLeastTwoVotes": 0
+      },
+      "raw": {
+        "meanOfCases": null,
+        "pooledPairwise": null,
+        "agreeingPairs": 0,
+        "totalPairs": 0,
+        "validCases": 0,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_anemia_08|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_lab_04|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_rash_02|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=frozen",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_reflux_06|role=always_conform",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_chest_01|role=always_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_neuro_03|role=sham_churn",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_head_07|role=evidence_follower",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          },
+          {
+            "caseId": "fixture_ob_05|role=majority_only_refuse",
+            "agreement": null,
+            "agreeingPairs": 0,
+            "totalPairs": 0
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {},
+      "krippendorffAlphaNominal": null,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": null,
+        "upper": null,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 0,
+        "skippedReplicates": 2000,
+        "seed": 122,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": null
+    }
+  },
+  "crossRoleConcordanceByCondition": {
+    "CONTROL": {
+      "boundary": "Action concordance across declared agentIds within the same case and replicate. Shared base models, prompts, or retrieval make these dependent roles rather than independent specialists; fewer than two assigned roles or two votes make a case-replicate unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseReplicateUnits": 8,
+        "caseReplicateUnitsWithAtLeastTwoAssignedRoles": 8,
+        "caseReplicateUnitsWithAtLeastTwoVotes": 8
+      },
+      "raw": {
+        "meanOfCases": 0.6,
+        "pooledPairwise": 0.6,
+        "agreeingPairs": 48,
+        "totalPairs": 80,
+        "validCases": 8,
+        "perCase": [
+          {
+            "caseId": "fixture_head_07|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_anemia_08|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_ob_05|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_lab_04|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_neuro_03|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_chest_01|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_rash_02|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_reflux_06|replicate=0",
+            "agreement": 0.6,
+            "agreeingPairs": 6,
+            "totalPairs": 10
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {
+        "4-of-5": 8
+      },
+      "krippendorffAlphaNominal": 0.3747494989979959,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": 0.10086455331412092,
+        "upper": 0.4135338345864662,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 218,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": 0.41871026339691186
+    },
+    "VALID_EVIDENCE": {
+      "boundary": "Action concordance across declared agentIds within the same case and replicate. Shared base models, prompts, or retrieval make these dependent roles rather than independent specialists; fewer than two assigned roles or two votes make a case-replicate unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseReplicateUnits": 8,
+        "caseReplicateUnitsWithAtLeastTwoAssignedRoles": 8,
+        "caseReplicateUnitsWithAtLeastTwoVotes": 8
+      },
+      "raw": {
+        "meanOfCases": 1,
+        "pooledPairwise": 1,
+        "agreeingPairs": 80,
+        "totalPairs": 80,
+        "validCases": 8,
+        "perCase": [
+          {
+            "caseId": "fixture_reflux_06|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_ob_05|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_head_07|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_anemia_08|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_rash_02|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_lab_04|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_neuro_03|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_chest_01|replicate=0",
+            "agreement": 1,
+            "agreeingPairs": 10,
+            "totalPairs": 10
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {
+        "5-of-5": 8
+      },
+      "krippendorffAlphaNominal": 1,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": 1,
+        "upper": 1,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 1992,
+        "skippedReplicates": 8,
+        "seed": 219,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": 1
+    },
+    "FALSE_MAJORITY": {
+      "boundary": "Action concordance across declared agentIds within the same case and replicate. Shared base models, prompts, or retrieval make these dependent roles rather than independent specialists; fewer than two assigned roles or two votes make a case-replicate unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 32,
+        "nonVotes": 16,
+        "caseReplicateUnits": 8,
+        "caseReplicateUnitsWithAtLeastTwoAssignedRoles": 8,
+        "caseReplicateUnitsWithAtLeastTwoVotes": 8
+      },
+      "raw": {
+        "meanOfCases": 0.3333333333333333,
+        "pooledPairwise": 0.3333333333333333,
+        "agreeingPairs": 16,
+        "totalPairs": 48,
+        "validCases": 8,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_ob_05|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_neuro_03|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_lab_04|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_anemia_08|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_head_07|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_rash_02|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_reflux_06|replicate=0",
+            "agreement": 0.3333333333333333,
+            "agreeingPairs": 2,
+            "totalPairs": 6
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {
+        "2-of-4": 8
+      },
+      "krippendorffAlphaNominal": -0.04641350210970452,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": -0.29166666666666674,
+        "upper": -0.03333333333333344,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 220,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": 0.0357815442561205
+    },
+    "EVIDENCE_VS_FALSE_MAJORITY": {
+      "boundary": "Action concordance across declared agentIds within the same case and replicate. Shared base models, prompts, or retrieval make these dependent roles rather than independent specialists; fewer than two assigned roles or two votes make a case-replicate unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 32,
+        "nonVotes": 16,
+        "caseReplicateUnits": 8,
+        "caseReplicateUnitsWithAtLeastTwoAssignedRoles": 8,
+        "caseReplicateUnitsWithAtLeastTwoVotes": 8
+      },
+      "raw": {
+        "meanOfCases": 0.5,
+        "pooledPairwise": 0.5,
+        "agreeingPairs": 24,
+        "totalPairs": 48,
+        "validCases": 8,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_reflux_06|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_lab_04|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_head_07|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_rash_02|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_neuro_03|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_anemia_08|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          },
+          {
+            "caseId": "fixture_ob_05|replicate=0",
+            "agreement": 0.5,
+            "agreeingPairs": 3,
+            "totalPairs": 6
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {
+        "3-of-4": 8
+      },
+      "krippendorffAlphaNominal": 0.22257053291536055,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": -0.03333333333333299,
+        "upper": 0.26843657817109146,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 221,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": 0.27375886524822696
+    },
+    "IRRELEVANT_EVIDENCE": {
+      "boundary": "Action concordance across declared agentIds within the same case and replicate. Shared base models, prompts, or retrieval make these dependent roles rather than independent specialists; fewer than two assigned roles or two votes make a case-replicate unit unassessable.",
+      "coverage": {
+        "assignedRatings": 48,
+        "voteRatings": 40,
+        "nonVotes": 8,
+        "caseReplicateUnits": 8,
+        "caseReplicateUnitsWithAtLeastTwoAssignedRoles": 8,
+        "caseReplicateUnitsWithAtLeastTwoVotes": 8
+      },
+      "raw": {
+        "meanOfCases": 0.39999999999999997,
+        "pooledPairwise": 0.4,
+        "agreeingPairs": 32,
+        "totalPairs": 80,
+        "validCases": 8,
+        "perCase": [
+          {
+            "caseId": "fixture_chest_01|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_anemia_08|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_rash_02|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_lab_04|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_head_07|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_neuro_03|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_ob_05|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          },
+          {
+            "caseId": "fixture_reflux_06|replicate=0",
+            "agreement": 0.4,
+            "agreeingPairs": 4,
+            "totalPairs": 10
+          }
+        ]
+      },
+      "unanimityAmongUnitsWithAtLeastTwoVotes": {
+        "3-of-5": 8
+      },
+      "krippendorffAlphaNominal": 0.056451612903225756,
+      "krippendorffAlphaCaseClusterBootstrap95": {
+        "lower": -0.1116389548693586,
+        "upper": 0.09477756286266925,
+        "confidence": 0.95,
+        "requestedReplicates": 2000,
+        "validReplicates": 2000,
+        "skippedReplicates": 0,
+        "seed": 222,
+        "resamplingUnit": "case"
+      },
+      "gwetAc1": 0.13043478260869562
+    }
+  }
+}
