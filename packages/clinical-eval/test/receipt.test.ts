@@ -713,3 +713,41 @@ test("a pre-call safety schema/template commitment binds the generated safety pa
   assert.equal(body.safetyPacketTemplateSha256, "e".repeat(64));
   assert.notEqual(execution.safetyPacketArtifactSha256, body.safetyPacketTemplateSha256);
 });
+
+test("legacy schema-3 receipts without execution provenance stay replay-verifiable", () => {
+  const run = makeValidRun();
+  const receipt = JSON.parse(readFileSync(resolve(run.directory, "receipt.json"), "utf8")) as Record<string, unknown>;
+  receipt.schemaVersion = 3;
+  delete receipt.executionProvenance;
+  writeReceipt(run.directory, receipt);
+  const verification = verifyRunDirectory(run.directory, fixturesPath);
+  assert.deepEqual(verification.errors, []);
+  assert.equal(verification.valid, true);
+});
+
+test("the committed pre-event falsification run remains replay-verifiable", () => {
+  const committedRun = resolve("..", "..", "runs", "clinical-eval", "mechanism-simulator-v0.1-seed18");
+  const verification = verifyRunDirectory(committedRun, fixturesPath);
+  assert.deepEqual(verification.errors, []);
+  assert.equal(verification.valid, true);
+});
+
+test("a schema-3 receipt cannot carry execution provenance and unknown versions fail closed", () => {
+  const provenanceRun = makeValidRun();
+  const provenanceReceipt = JSON.parse(readFileSync(resolve(provenanceRun.directory, "receipt.json"), "utf8")) as Record<string, unknown>;
+  provenanceReceipt.schemaVersion = 3;
+  writeReceipt(provenanceRun.directory, provenanceReceipt);
+  assert.match(
+    verifyRunDirectory(provenanceRun.directory, fixturesPath).errors.join(" "),
+    /executionProvenance requires schemaVersion 4/u,
+  );
+
+  const unknownRun = makeValidRun();
+  const unknownReceipt = JSON.parse(readFileSync(resolve(unknownRun.directory, "receipt.json"), "utf8")) as Record<string, unknown>;
+  unknownReceipt.schemaVersion = 5;
+  writeReceipt(unknownRun.directory, unknownReceipt);
+  assert.match(
+    verifyRunDirectory(unknownRun.directory, fixturesPath).errors.join(" "),
+    /schemaVersion is unsupported/u,
+  );
+});

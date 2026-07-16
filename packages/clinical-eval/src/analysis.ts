@@ -1,4 +1,4 @@
-import { PROMPT_TEMPLATE_VERSION } from "./codebooks.js";
+import { SUPPORTED_PROMPT_TEMPLATE_VERSIONS } from "./codebooks.js";
 import { renderBaselinePrompt, renderRevisionPrompt } from "./design.js";
 import {
   caseClusterBootstrap,
@@ -465,11 +465,14 @@ function validateManifestAndBuildStates(
     if (!caseMap.has(assignment.caseId)) throw new Error(`assignment has unknown case: ${assignment.caseId}`);
     if (assignmentsById.has(assignment.assignmentId)) throw new Error(`duplicate assignment: ${assignment.assignmentId}`);
     if (executionOrders.has(assignment.executionOrder)) throw new Error(`duplicate execution order: ${assignment.executionOrder}`);
-    if (assignment.promptTemplateVersion !== PROMPT_TEMPLATE_VERSION) {
+    if (!SUPPORTED_PROMPT_TEMPLATE_VERSIONS.includes(assignment.promptTemplateVersion)) {
       throw new Error(`assignment prompt version mismatch: ${assignment.assignmentId}`);
     }
     assignmentsById.set(assignment.assignmentId, assignment);
     executionOrders.add(assignment.executionOrder);
+  }
+  if (new Set(assignments.map((item) => item.promptTemplateVersion)).size > 1) {
+    throw new Error("assignment manifest mixes prompt template versions");
   }
   const sortedOrders = [...executionOrders].sort((left, right) => left - right);
   if (sortedOrders.some((order, index) => order !== index)) {
@@ -563,7 +566,9 @@ function validateManifestAndBuildStates(
     revisionSessions.add(observation.revisionSessionId);
     const caseSpec = caseMap.get(observation.caseId) as SyntheticCaseSpec;
     const expectedBaselineHash = sha256(renderBaselinePrompt(caseSpec));
-    const expectedRevisionHash = sha256(renderRevisionPrompt(caseSpec, observation.baseline, observation.condition));
+    const expectedRevisionHash = sha256(
+      renderRevisionPrompt(caseSpec, observation.baseline, observation.condition, observation.promptTemplateVersion),
+    );
     if (observation.baselinePromptHash !== expectedBaselineHash) {
       throw new Error(`baseline prompt hash mismatch: ${observation.assignmentId}`);
     }

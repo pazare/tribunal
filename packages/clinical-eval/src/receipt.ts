@@ -1,7 +1,7 @@
 import { lstatSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, resolve, sep } from "node:path";
 import { analyzeObservations } from "./analysis.js";
-import { CLINICAL_CODEBOOK_VERSION, PROMPT_TEMPLATE_VERSION } from "./codebooks.js";
+import { CLINICAL_CODEBOOK_VERSION, SUPPORTED_PROMPT_TEMPLATE_VERSIONS } from "./codebooks.js";
 import { loadSyntheticFixtures } from "./fixtures.js";
 import {
   validateExpectedCallMatrix,
@@ -32,6 +32,9 @@ export { canonicalJson, gitState, hashFile, hashJson, sha256 } from "./provenanc
 export type { GitState } from "./provenance.js";
 
 export const RUN_RECEIPT_SCHEMA_VERSION = 4;
+// Committed runs written before execution-provenance capture existed must stay
+// replay-verifiable; new receipts are always written at the current version.
+export const LEGACY_RUN_RECEIPT_SCHEMA_VERSION = 3;
 export const RUN_RECEIPT_CLAIM_BOUNDARY =
   "This receipt records hashed artifacts and replay-verified execution metadata for a mechanism experiment. Independent immutability verification additionally requires an external anchor. It does not establish clinical validity, safety, patient benefit, or cost-effectiveness.";
 
@@ -287,41 +290,7 @@ function requireUniqueStrings(record: Record<string, unknown>, key: string, labe
   return values;
 }
 
-function validateReceiptSchema(receipt: Record<string, unknown>) {
-  assertExactObjectKeys(
-    receipt,
-    [
-      "schemaVersion", "runId", "startedAt", "completedAt", "protocolVersion", "experimentId",
-      "hypothesis", "gitAtStart", "dataset", "artifactFiles", "codebookVersion",
-      "promptTemplateVersion", "randomSeed", "assignmentSha256", "observationSha256",
-      "resultSha256", "design", "analysis", "provider", "usage", "rawProviderErrorsStored",
-      "ledgerHead", "executionProvenance", "claimBoundary", "receiptSha256",
-    ],
-    "receipt",
-  );
-  if (receipt.schemaVersion !== RUN_RECEIPT_SCHEMA_VERSION) throw new Error("receipt.schemaVersion is unsupported");
-  for (const key of ["runId", "protocolVersion", "experimentId", "hypothesis"] as const) {
-    requireString(receipt, key, "receipt");
-  }
-  for (const key of ["startedAt", "completedAt"] as const) {
-    const value = requireString(receipt, key, "receipt");
-    if (Number.isNaN(Date.parse(value))) throw new Error(`receipt.${key} must be a parseable timestamp`);
-  }
-  if (Date.parse(receipt.completedAt as string) < Date.parse(receipt.startedAt as string)) {
-    throw new Error("receipt.completedAt precedes startedAt");
-  }
-  requireString(receipt, "codebookVersion", "receipt");
-  requireString(receipt, "promptTemplateVersion", "receipt");
-  requireInteger(receipt, "randomSeed", "receipt", 0, 0xffffffff);
-  for (const key of ["assignmentSha256", "observationSha256", "resultSha256", "receiptSha256"] as const) {
-    requireSha(receipt, key, "receipt");
-  }
-  if (receipt.claimBoundary !== RUN_RECEIPT_CLAIM_BOUNDARY) throw new Error("receipt.claimBoundary is altered");
-  if (receipt.rawProviderErrorsStored !== false) throw new Error("receipt.rawProviderErrorsStored must be false");
-  if (receipt.ledgerHead !== null && (typeof receipt.ledgerHead !== "string" || !/^[a-f0-9]{64}$/u.test(receipt.ledgerHead))) {
-    throw new Error("receipt.ledgerHead must be null or a lowercase SHA-256 hash");
-  }
-
+function validateExecutionProvenanceSchema(receipt: Record<string, unknown>) {
   const execution = asRecord(receipt.executionProvenance, "receipt.executionProvenance");
   assertExactObjectKeys(execution, [
     "captureStatus", "preCallManifestFile", "preCallManifestSha256", "providerCallReceiptsFile",
@@ -396,6 +365,55 @@ function validateReceiptSchema(receipt: Record<string, unknown>) {
     if ((anchorAssertions.completedBundle === "PRESENT_NOT_INDEPENDENTLY_REVERIFIED") !== bundlePresent) {
       throw new Error("completed-bundle recorded anchor assertion status does not match anchor artifact presence");
     }
+  }
+}
+
+function validateReceiptSchema(receipt: Record<string, unknown>) {
+  assertExactObjectKeys(
+    receipt,
+    [
+      "schemaVersion", "runId", "startedAt", "completedAt", "protocolVersion", "experimentId",
+      "hypothesis", "gitAtStart", "dataset", "artifactFiles", "codebookVersion",
+      "promptTemplateVersion", "randomSeed", "assignmentSha256", "observationSha256",
+      "resultSha256", "design", "analysis", "provider", "usage", "rawProviderErrorsStored",
+      "ledgerHead", "executionProvenance", "claimBoundary", "receiptSha256",
+    ],
+    "receipt",
+  );
+  if (
+    receipt.schemaVersion !== RUN_RECEIPT_SCHEMA_VERSION &&
+    receipt.schemaVersion !== LEGACY_RUN_RECEIPT_SCHEMA_VERSION
+  ) {
+    throw new Error("receipt.schemaVersion is unsupported");
+  }
+  for (const key of ["runId", "protocolVersion", "experimentId", "hypothesis"] as const) {
+    requireString(receipt, key, "receipt");
+  }
+  for (const key of ["startedAt", "completedAt"] as const) {
+    const value = requireString(receipt, key, "receipt");
+    if (Number.isNaN(Date.parse(value))) throw new Error(`receipt.${key} must be a parseable timestamp`);
+  }
+  if (Date.parse(receipt.completedAt as string) < Date.parse(receipt.startedAt as string)) {
+    throw new Error("receipt.completedAt precedes startedAt");
+  }
+  requireString(receipt, "codebookVersion", "receipt");
+  requireString(receipt, "promptTemplateVersion", "receipt");
+  requireInteger(receipt, "randomSeed", "receipt", 0, 0xffffffff);
+  for (const key of ["assignmentSha256", "observationSha256", "resultSha256", "receiptSha256"] as const) {
+    requireSha(receipt, key, "receipt");
+  }
+  if (receipt.claimBoundary !== RUN_RECEIPT_CLAIM_BOUNDARY) throw new Error("receipt.claimBoundary is altered");
+  if (receipt.rawProviderErrorsStored !== false) throw new Error("receipt.rawProviderErrorsStored must be false");
+  if (receipt.ledgerHead !== null && (typeof receipt.ledgerHead !== "string" || !/^[a-f0-9]{64}$/u.test(receipt.ledgerHead))) {
+    throw new Error("receipt.ledgerHead must be null or a lowercase SHA-256 hash");
+  }
+
+  if (receipt.schemaVersion === LEGACY_RUN_RECEIPT_SCHEMA_VERSION) {
+    if (receipt.executionProvenance !== undefined) {
+      throw new Error(`receipt.executionProvenance requires schemaVersion ${RUN_RECEIPT_SCHEMA_VERSION}`);
+    }
+  } else {
+    validateExecutionProvenanceSchema(receipt);
   }
 
   const git = asRecord(receipt.gitAtStart, "receipt.gitAtStart");
@@ -676,8 +694,10 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     }
   }
 
-  const execution = receipt.executionProvenance as unknown as ExecutionProvenanceReceipt;
-  const provenanceFilenames = [
+  // Legacy schema-3 receipts predate execution-provenance capture; they verify
+  // exactly like an uncaptured modern receipt.
+  const execution = (receipt.executionProvenance ?? null) as ExecutionProvenanceReceipt | null;
+  const provenanceFilenames = execution === null ? [] : [
     execution.preCallManifestFile,
     execution.providerCallReceiptsFile,
     execution.safetyPacketFile,
@@ -710,7 +730,7 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
       return null;
     }
   };
-  if (execution.captureStatus === "CAPTURED") {
+  if (execution !== null && execution.captureStatus === "CAPTURED") {
     const manifestPath = resolveExecutionArtifact(execution.preCallManifestFile, "preCallManifest");
     const callsPath = resolveExecutionArtifact(execution.providerCallReceiptsFile, "providerCallReceipts");
     const safetyPacketPath = resolveExecutionArtifact(execution.safetyPacketFile, "safetyPacket");
@@ -800,10 +820,12 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     if (assignments.some((item) => item.promptTemplateVersion !== receipt.promptTemplateVersion)) {
       errors.push("receipt promptTemplateVersion does not match assignments");
     }
-    if (receipt.promptTemplateVersion !== PROMPT_TEMPLATE_VERSION) errors.push("receipt promptTemplateVersion is not supported by this analyzer");
+    if (!SUPPORTED_PROMPT_TEMPLATE_VERSIONS.includes(receipt.promptTemplateVersion as string)) {
+      errors.push("receipt promptTemplateVersion is not supported by this analyzer");
+    }
     if (receipt.codebookVersion !== CLINICAL_CODEBOOK_VERSION) errors.push("receipt codebookVersion is not supported by this analyzer");
 
-    if (execution.captureStatus === "CAPTURED") {
+    if (execution !== null && execution.captureStatus === "CAPTURED") {
       if (!preCallManifest || !providerCallReceipts) throw new Error("captured execution provenance could not be parsed");
       if (preCallManifest.runId !== receipt.runId) errors.push("pre-call manifest runId mismatch");
       if (preCallManifest.protocolVersion !== receipt.protocolVersion) errors.push("pre-call manifest protocolVersion mismatch");
@@ -850,7 +872,7 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     const votes = observations.filter((item) => item.postExposure.status === "VOTE").length;
     if (usage.completedVotes !== votes) errors.push("receipt completedVotes mismatch");
     if (usage.nonVotes !== observations.length - votes) errors.push("receipt nonVotes mismatch");
-    if (execution.captureStatus === "CAPTURED" && providerCallReceipts) {
+    if (execution !== null && execution.captureStatus === "CAPTURED" && providerCallReceipts) {
       if (usage.plannedCalls !== providerCallReceipts.length) errors.push("receipt plannedCalls does not match exact expected call matrix");
       if (usage.inputTokens !== providerCallReceipts.reduce((sum, item) => sum + item.usage.inputTokens, 0)) errors.push("receipt inputTokens mismatch");
       if (usage.outputTokens !== providerCallReceipts.reduce((sum, item) => sum + item.usage.outputTokens, 0)) errors.push("receipt outputTokens mismatch");

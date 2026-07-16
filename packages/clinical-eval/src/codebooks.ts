@@ -2,6 +2,13 @@ import type { EscalationAction, Urgency } from "./types.js";
 
 export const CLINICAL_CODEBOOK_VERSION = "tribunal-clinical-codebook-v0.1";
 export const PROMPT_TEMPLATE_VERSION = "conformity-two-turn-v0.2-comparison-panel";
+export const LEGACY_PROMPT_TEMPLATE_VERSION_V1 = "conformity-two-turn-v0.1";
+// Verification must keep replaying receipts recorded under superseded template
+// wording; generation never writes a legacy version.
+export const SUPPORTED_PROMPT_TEMPLATE_VERSIONS: readonly string[] = [
+  PROMPT_TEMPLATE_VERSION,
+  LEGACY_PROMPT_TEMPLATE_VERSION_V1,
+];
 
 export const ACTION_DEFINITIONS: Record<EscalationAction, string> = {
   ESCALATE: "Route to a named specialist or higher-capability clinical service.",
