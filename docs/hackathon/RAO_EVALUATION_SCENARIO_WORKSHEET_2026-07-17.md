@@ -3,6 +3,19 @@
 Date: 2026-07-17
 Status: working specification for expert review; not a validated clinical workflow
 
+## AI Use Case Worksheet — six-element fill (Rao's format)
+
+Filled in the six-element format of the apples-to-apples methodology (arXiv 2605.07986 — a NIST–CMU collaboration whose demo domain is financial services); the evaluation-scenario table below expands it into a detailed scenario, which is exactly the expansion step his methodology prescribes.
+
+| Element | Fill |
+| --- | --- |
+| Use case | Complex-case specialist escalation and consult preparation: from a point-in-time patient evidence package, decide `ESCALATE` / `DO_NOT_ESCALATE` / `INSUFFICIENT_EVIDENCE`, with specialty, urgency `U0–U4`, and explicit missing evidence |
+| Sector | Hospital emergency and inpatient care; specialty consultation; resource-constrained clinics |
+| Direct and indirect users | Direct: attending physician or advanced-practice clinician, consulting specialist, escalation coordinator. Indirect: patient and caregiver, hospital, payer, downstream care team |
+| Intended outcomes | Correct and timely escalation; more complete consult packets; preserved material dissent; reduced clinician reconstruction burden; calibrated abstention |
+| Positive and negative impacts | Positive: faster access to expertise, better must-not-miss coverage, less duplicated information gathering, more transparent decisions. Negative: false consensus, automation bias, cognitive overload, privacy risk, inequitable resource optimization, unnecessary escalation, cost |
+| KPIs / metrics | Must-not-miss sensitivity; inappropriate-escalation rate; time to specialist; clinician review time; evidence-supported claim rate; calibration; unsupported capitulation rate; cost per case |
+
 ## Working scenario
 
 | Field | Frozen working answer | Decision requested from Rao |
@@ -42,12 +55,18 @@ Status: working specification for expert review; not a validated clinical workfl
 
 ## Six decisions to record verbatim
 
+Numbering is canonical across the one-pager, this worksheet, the spoken script, and the evidence ledger's "(Rao decision N)" section labels.
+
 1. Is the proposed deliberative-adequacy construct formative or reflective?
-2. What is the correct independent unit when cases share templates and agents share a model? (Evidence note 4: correct or replace our common-cause-failure candidate framing.)
-3. Which hazard-analysis method and stop threshold should govern silent mode? (Evidence notes 3–4.)
+2. What is the correct independent unit and failure event when cases share templates and agents share a model? (Evidence note 4: correct or replace our common-cause-failure candidate framing.)
+3. Which compute, information, tool, and time controls make the human/AI comparator apples-to-apples? (Evidence note 1.)
 4. Which UI ordering best limits automation bias while preserving measurable human judgment? (Evidence note 2.)
-5. Which compute, information, tool, and time controls make the human/AI comparator apples-to-apples? (Evidence note 1.)
+5. Which hazard-analysis method and stop threshold should govern silent mode? (Evidence notes 3–4.)
 6. Should the clinician's evaluation target be the diagnostic assessment, the proposed action, or both separately — and in which order? (Added 2026-07-16: the meeting notes treat diagnosis and treatment as distinct evaluation loci.)
+   - Frozen working answer: both, separately, assessment first — the clinician rates the diagnostic assessment blind to the proposed action, then rates the proposed action with the full packet. The action-tuple rating is primary (the tuple is the committed output); the assessment rating is secondary. Separate loci prevent one judgment anchoring the other.
+   - Fallback if he rejects the separation: rate the proposed action only (it is the system's committed output) and record the diagnostic-assessment rating as deferred.
+
+Fallback rule: any decision Rao does not reach or does not answer is recorded as `DEFER — frozen working answer stands` (working answers live in the scenario table above and, for decision 6, in its sub-lines).
 
 ## Post-meeting disposition
 

@@ -1,7 +1,7 @@
 # Anand Rao decision brief
 
 Meeting: 2026-07-17
-Objective: leave with five decisions that make the Tribunal evaluation hospital-governance credible
+Objective: leave with six recorded decisions (five requested live, a sixth carried by the worksheet) that make the Tribunal evaluation hospital-governance credible
 
 Bring the filled [evaluation-scenario worksheet](./RAO_EVALUATION_SCENARIO_WORKSHEET_2026-07-17.md) and record changes against its exact fields.
 
@@ -29,10 +29,10 @@ Primary tuple: escalation action, specialty, urgency, and missing evidence.
 Primary E2 endpoint: paired wrong-action adoption under an unsupported panel-count cue versus control among correct sealed baselines.
 Independent unit: case; roles from one model are not independent clinicians.
 
-## Five decisions requested
+## Five decisions requested (decision 6 rides on the worksheet)
 
 1. **Construct** — Should the primary construct be appropriate escalation, clinician decision benefit, deliberative integrity, or a specified hierarchy? Is the umbrella formative or reflective?
-2. **Failure unit** — Is failure best counted per decision point, commitment span, patient episode, or loss of a required safety function when cases share templates and agents share a model?
+2. **Failure unit** — When cases share templates and agents share a model: is the independent unit the decision point, the case, or the case-family — and is the failure event one wrong tuple, one unsafe ratification, or loss of a required safety function? (Correlated same-provider failure: β-factor common-cause supplement below.)
 3. **Apples-to-apples comparator** — Which information, tools, time, action space, calls/tokens, retrieval, and adjudication must be identical for AI and human panels?
 4. **Human timing and interface** — Is commit-then-reveal worth its workflow burden, or should the first hospital study be silent mode? Which UI ordering best limits automation bias?
 5. **Governance threshold** — Which hazard-analysis method, evidence package, and prespecified stop threshold should govern a bounded silent-mode evaluation?

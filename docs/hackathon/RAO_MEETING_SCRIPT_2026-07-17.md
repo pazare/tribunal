@@ -1,13 +1,13 @@
 # Rao conversation — engagement script
 
-Date: 2026-07-17 meeting; script frozen 2026-07-16
+Date: 2026-07-17 meeting; script frozen 2026-07-16 (same-day coherence pass before the meeting: decision numbering canonicalized to the one-pager/ledger scheme, two evidence rows disambiguated; no position changes)
 Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't read it aloud), `RAO_EVALUATION_SCENARIO_WORKSHEET_2026-07-17.md` (open on screen when he engages), evidence ledger §5b (citations on demand only).
 
 **Window: assume 30 minutes. We speak ≤ 5. The meeting succeeds if he leaves fingerprints on five decisions.**
 
 **Objective:** Rao is the evaluation-methodology and reliability referee. We are not asking "is this good?" — we are asking him to adjudicate five prespecified design decisions and to attack our frozen working answers. Every decision has a written fallback, so any answer he gives is progress.
 
-**Posture:** yesterday Krishnan adjudicated the construct question at the clinical level (escalation tuple, formal vocabulary, kappa panel, stronger-than-Delphi experimental design — all now implemented or preregistered). Today is the measurement-engineering layer: units, failure definitions, comparators, timing, and the governance evidence bar. Bring the worksheet filled in; take his edits verbatim.
+**Posture:** on Wednesday Krishnan adjudicated the construct question at the clinical level (escalation tuple, formal vocabulary, kappa panel, stronger-than-Delphi experimental design — all now implemented or preregistered). Today is the measurement-engineering layer: units, failure definitions, comparators, timing, and the governance evidence bar. Bring the worksheet filled in; take his edits verbatim.
 
 ---
 
@@ -33,9 +33,9 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 >
 > **One — construct.** We treat 'clinical deliberative adequacy' as a formative umbrella — evidence support, safety, uncertainty, feasibility, dissent preservation, reviewability — and we report dimensions separately, no composite score. Is formative right, or is any composite defensible?
 >
-> **Two — the unit.** Cases share templates; agents share model weights. For agreement statistics and for failure counting: is the decision point, the case, or the case-family the right independent unit — and what is the failure event for a stochastic panel: one wrong tuple, one unsafe ratification, or loss of a guaranteed function like the veto path?
+> **Two — the unit and the failure event.** Cases share templates; agents share model weights. For agreement statistics and for failure counting: is the decision point, the case, or the case-family the right independent unit — and what is the failure event for a stochastic panel: one wrong tuple, one unsafe ratification, or loss of a guaranteed function like the veto path? For same-provider agents our candidate framing is a common-cause-failure model — β-factor style — because independence is exactly what we cannot assume. Is that the right import, or would you model it differently?
 >
-> **Three — correlated failure.** Our candidate framing for same-provider agents is a common-cause-failure model — β-factor style — because independence is exactly what we cannot assume. Is that the right import, or would you model it differently?
+> **Three — the comparator.** For an AI-panel-versus-human-panel comparison to persuade a governance committee: which of information, tools, time, action space, calls and tokens, retrieval, and adjudication must be identical? The one scoping review we verified found most published comparisons fail this — three-quarters retrospective, half with no time limit. And are documented historical specialist groups — tumor boards, MDT records — an admissible comparator alongside recruited raters, given their confounds?
 >
 > **Four — timing.** The verified literature says clinician-first commit-then-reveal performed best in the only randomized timing comparison we found, and that ordering changes the *form* of bias rather than removing it. We've designed for silent mode first, commit-then-reveal second. Where would you put the human, and what would make you move them?
 >
@@ -56,10 +56,10 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 | If he probes | One line, with source |
 | --- | --- |
 | Timing evidence | Yin/Ngiam/Tan/Teo, *Management Science* 2025 (10.1287/mnsc.2022.01454): randomized; ex post advice best, better wrong-advice rejection — direction verified, effect sizes paywalled-pending |
-| Human-first residual costs | AAAI-26 (10.1609/aaai.v40i47.41457): disuse dominates, appropriate reliance <50%; *Eur Radiol* 2026 (10.1007/s00330-026-12666-6): revision bias 33.9% in wrong-AI cases, XAI reduces to ~17% but does not eliminate |
+| Human-first residual costs | AAAI-26 (10.1609/aaai.v40i47.41457): disuse dominates, appropriate reliance <50%; *Eur Radiol* 2026 (10.1007/s00330-026-12666-6): in wrong-AI cases anchoring bias 33.9%→17.2% and automation bias 36.1%→17.8% with XAI — reduced, not eliminated |
 | Comparator hygiene | Chen et al., *IJMI* 2026 (10.1016/j.ijmedinf.2026.106346), 120 studies: 75.8% retrospective, 60.8% ≤10 readers, 50.8% no time limits, 20.8% information asymmetry; AIPSC item wording pending full text — say so if asked |
 | Silent-trial precedent | Kwong et al., *Front Digit Health* 2022 (10.3389/fdgth.2022.929508): dev AUROC 0.90 → 0.50 in clinician-blinded silent trial (drift), restored to 0.91–0.92 before exposure; CHARTwatch ran ~10 months silent with no formal go/no-go thresholds — the gap our template fills |
-| Conformity mechanism | Krishnan-group findings (attack taxonomy; unfaithful capitulation — arXiv 2602.13093 / 2605.29087, preprints) motivated the sealed-versus-private-vote contrast; our E2 measures a local count-cue susceptibility, not general immunity |
+| Conformity mechanism | Two Krishnan-group preprints motivated the sealed-versus-private-vote contrast — multi-turn attack taxonomy across nine reasoning models: arXiv 2602.13093; "unfaithful capitulation" (reasoning holds, emitted answer folds): arXiv 2605.29087. Our E2 measures a local count-cue susceptibility, not general immunity |
 | Harness integrity | Receipted falsification run on clean history: six scripted policies, each recovered exactly; receipts replay the analysis; scripted providers — analyzer behavior, not an LLM result |
 
 ## Contingencies

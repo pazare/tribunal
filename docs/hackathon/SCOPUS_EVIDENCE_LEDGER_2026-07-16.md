@@ -125,6 +125,10 @@ Governance template distilled from S-01…S-03 (what verified papers actually di
 
 A same-day Scopus AI query on reliability engineering for AI/CDSS returned a **grounded gap**: retrieved abstracts were classical reliability literature, with Scopus AI itself stating no direct AI/CDSS application was present. Transferable leads pending verification: β-factor/α-factor common-cause-failure models for correlated same-provider agents; domain-specific failure units (e.g., DSC in AI contouring) as precedent for tuple-level failure definitions. Capture: `_recovered/scopus/scopus-ai-2026-07-16-q-reliability-failure-units.md`.
 
+## 5c. Q4 counterfactual-evaluation pass (web-fallback) — reserved
+
+Destination section for the 2026-07-16 Q4 counterfactual-evaluation pass (bounded open-web fallback; the Scopus AI channel was interrupted mid-session, so this pass is labeled web-fallback, not Scopus AI). No rows yet: integration is gated on primary-source checks of the recovered leads. Nothing from that pass may be presented before verified rows land here.
+
 ## 6. Differential Reasoning Learning transfer decision
 
 Liu et al., *Closing Reasoning Gaps in Clinical Agents with Differential Reasoning Learning*, is an [arXiv v1 preprint](https://arxiv.org/abs/2602.09945) submitted 2026-02-10, DOI [`10.48550/arXiv.2602.09945`](https://doi.org/10.48550/arXiv.2602.09945). The public record shows no conference or journal reference. Until separate acceptance evidence exists, do not call it a KDD or peer-reviewed paper.
