@@ -43,6 +43,8 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 
 *(Silence. Let him pick the thread. Do not fill pauses.)*
 
+*(If time allows, the worksheet carries a sixth, smaller decision — whether the clinician evaluates the diagnostic assessment, the proposed action, or both separately, and in which order. Take it only after the five above have answers.)*
+
 ### Close — only when he winds down (~30 seconds)
 
 > "Two small asks. First: your worksheet method expands use cases into evaluation scenarios through repeated human review — we'd like to use exactly that process to generate our counterfactual twin families, and we'd value your red-line on the first batch. Second: what's the right way to follow up after Saturday's build — and is there a student or collaborator who should be at the table?"
@@ -90,7 +92,7 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 
 ## Post-meeting protocol (same day)
 
-1. Record each of the five answers as `ADOPT` / `TEST` / `DEFER` / `REJECT` with the exact protocol section affected (worksheet's disposition rule).
+1. Record each of the six worksheet answers as `ADOPT` / `TEST` / `DEFER` / `REJECT` with the exact protocol section affected (worksheet's disposition rule).
 2. Issue a dated decision addendum to `RESEARCH_METHODS_PROTOCOL_2026-07-16.md` — never silently rewrite the preregistration.
 3. Update the failure taxonomy and governance evidence ladder; freeze the Saturday issue set and demo claim card.
 4. Send verification leads he names into the evidence-ledger queue before citing them anywhere.
