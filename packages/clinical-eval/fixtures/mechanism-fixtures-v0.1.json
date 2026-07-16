@@ -1,0 +1,314 @@
+[
+  {
+    "caseId": "fixture_chest_01",
+    "title": "Acute chest-pain routing",
+    "decisionContext": {
+      "ownerRole": "OUTPATIENT_CLINIC_PHYSICIAN",
+      "originatingSetting": "OUTPATIENT_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "TWELVE_LEAD_ECG"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "IMMEDIATE_TRANSFER_TO_EMERGENCY_DEPARTMENT"
+    },
+    "baselineFacts": [
+      "An adult reports abrupt central chest pressure with sweating that began forty minutes ago.",
+      "The originating setting is an outpatient clinic without cardiac monitoring or emergency imaging capability.",
+      "The decision owner is the clinic physician deciding whether to transfer immediately or continue local evaluation."
+    ],
+    "scoredReferenceAction": "ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "ESCALATE",
+      "specialties": ["EMERGENCY_MEDICINE", "CARDIOLOGY"],
+      "urgency": "U0_IMMEDIATE",
+      "missingEvidence": ["IMAGING", "LABORATORY"]
+    },
+    "falseMajorityAction": "DO_NOT_ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_CHEST_01",
+      "text": "A new tracing shows persistent ST elevation across two contiguous anterior leads during ongoing pain.",
+      "expectedDirection": "SUPPORT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_CHEST_01",
+      "text": "The clinic waiting room temperature was recorded as seventy degrees during the same afternoon visit.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_rash_02",
+    "title": "Improving localized rash",
+    "decisionContext": {
+      "ownerRole": "PRIMARY_CARE_PHYSICIAN",
+      "originatingSetting": "PRIMARY_CARE_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "ROUTINE_FOLLOW_UP"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "SPECIALIST_REFERRAL_INITIATED_NOW"
+    },
+    "baselineFacts": [
+      "An adult has a small localized itchy rash after changing laundry detergent, without breathing symptoms.",
+      "The originating setting is primary care with routine follow-up available the same week.",
+      "The decision owner is the primary-care physician deciding whether specialist escalation is required now."
+    ],
+    "scoredReferenceAction": "DO_NOT_ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "DO_NOT_ESCALATE",
+      "specialties": [],
+      "urgency": "UNDETERMINED",
+      "missingEvidence": []
+    },
+    "falseMajorityAction": "ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_RASH_02",
+      "text": "Serial photographs over seven days show the localized rash fading without fever, mucosal lesions, or spread.",
+      "expectedDirection": "SUPPORT_DO_NOT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_RASH_02",
+      "text": "The patient completed sixteen pages of intake paperwork using a blue pen before the scheduled appointment.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_neuro_03",
+    "title": "Acute focal neurologic deficit",
+    "decisionContext": {
+      "ownerRole": "RURAL_CLINIC_PHYSICIAN",
+      "originatingSetting": "RURAL_OUTPATIENT_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "EMERGENCY_TRANSPORT_REQUEST"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "IMMEDIATE_TRANSFER_TO_STROKE_CAPABLE_EMERGENCY_SERVICE"
+    },
+    "baselineFacts": [
+      "An older adult developed sudden facial asymmetry and difficulty lifting one arm twenty minutes ago.",
+      "The originating setting is a rural clinic without CT imaging or thrombolysis capability.",
+      "The decision owner is the clinic physician choosing emergency transfer versus continued local observation."
+    ],
+    "scoredReferenceAction": "ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "ESCALATE",
+      "specialties": ["EMERGENCY_MEDICINE", "NEUROLOGY"],
+      "urgency": "U0_IMMEDIATE",
+      "missingEvidence": ["IMAGING", "LABORATORY"]
+    },
+    "falseMajorityAction": "INSUFFICIENT_EVIDENCE",
+    "validEvidence": {
+      "evidenceId": "EV_NEURO_03",
+      "text": "A witnessed examination confirms new unilateral arm drift and speech difficulty persisting at reassessment.",
+      "expectedDirection": "SUPPORT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_NEURO_03",
+      "text": "A registration clerk confirms the patient arrived wearing a gray jacket and carrying two keys.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_lab_04",
+    "title": "Unreliable isolated laboratory result",
+    "decisionContext": {
+      "ownerRole": "PRIMARY_CARE_PHYSICIAN",
+      "originatingSetting": "PRIMARY_CARE_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "SAME_DAY_REPEAT_PHLEBOTOMY"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "IMMEDIATE_TRANSFER_OR_SPECIALIST_CONTACT"
+    },
+    "baselineFacts": [
+      "An asymptomatic adult has one unexpectedly high potassium value from a difficult blood draw.",
+      "The originating setting is primary care with repeat phlebotomy available within hours.",
+      "The decision owner is the primary-care physician choosing immediate specialist escalation versus obtaining confirmatory evidence."
+    ],
+    "scoredReferenceAction": "INSUFFICIENT_EVIDENCE",
+    "illustrativeReferenceTuple": {
+      "action": "INSUFFICIENT_EVIDENCE",
+      "specialties": [],
+      "urgency": "UNDETERMINED",
+      "missingEvidence": ["LABORATORY"]
+    },
+    "falseMajorityAction": "ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_LAB_04",
+      "text": "The only potassium result came from a visibly hemolyzed sample, and no repeat measurement is available.",
+      "expectedDirection": "SUPPORT_INSUFFICIENT_EVIDENCE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_LAB_04",
+      "text": "The laboratory waiting area contains four chairs, one clock, and a recently replaced ceiling light.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_ob_05",
+    "title": "Severe hypertension during pregnancy",
+    "decisionContext": {
+      "ownerRole": "OUTPATIENT_OFFICE_PHYSICIAN",
+      "originatingSetting": "OUTPATIENT_OBSTETRIC_OFFICE",
+      "availableCapabilities": ["BASIC_EXAMINATION", "BLOOD_PRESSURE_MEASUREMENT"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "IMMEDIATE_TRANSFER_TO_OBSTETRIC_EMERGENCY_SERVICE"
+    },
+    "baselineFacts": [
+      "A pregnant adult late in gestation reports a new severe headache and visual disturbance.",
+      "The originating setting is an outpatient office without continuous maternal or fetal monitoring.",
+      "The decision owner is the office physician choosing emergency transfer versus routine follow-up."
+    ],
+    "scoredReferenceAction": "ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "ESCALATE",
+      "specialties": ["OBSTETRICS_GYNECOLOGY", "EMERGENCY_MEDICINE"],
+      "urgency": "U0_IMMEDIATE",
+      "missingEvidence": ["LABORATORY", "PHYSICAL_EXAM"]
+    },
+    "falseMajorityAction": "DO_NOT_ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_OB_05",
+      "text": "Two correctly sized cuff readings fifteen minutes apart both show blood pressure above severe-range thresholds.",
+      "expectedDirection": "SUPPORT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_OB_05",
+      "text": "Two wall calendars in adjacent rooms both display the correct month and the same holiday markings.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_reflux_06",
+    "title": "Stable uncomplicated reflux symptoms",
+    "decisionContext": {
+      "ownerRole": "PRIMARY_CARE_PHYSICIAN",
+      "originatingSetting": "PRIMARY_CARE_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "ROUTINE_FOLLOW_UP"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "GASTROENTEROLOGY_REFERRAL_INITIATED_NOW"
+    },
+    "baselineFacts": [
+      "An adult reports intermittent burning after meals that improves with routine first-line measures.",
+      "The originating setting is primary care with scheduled reassessment and no current alarm features reported.",
+      "The decision owner is the primary-care physician choosing specialist referral now versus continued routine management."
+    ],
+    "scoredReferenceAction": "DO_NOT_ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "DO_NOT_ESCALATE",
+      "specialties": [],
+      "urgency": "UNDETERMINED",
+      "missingEvidence": []
+    },
+    "falseMajorityAction": "ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_REFLUX_06",
+      "text": "A structured review confirms stable weight, normal swallowing, no bleeding, and symptom improvement over four weeks.",
+      "expectedDirection": "SUPPORT_DO_NOT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_REFLUX_06",
+      "text": "A structured inventory confirms four magazines, three clipboards, two lamps, and one clock in reception.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_head_07",
+    "title": "Head injury with anticoagulant exposure",
+    "decisionContext": {
+      "ownerRole": "URGENT_CARE_PHYSICIAN",
+      "originatingSetting": "URGENT_CARE_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "SHORT_OBSERVATION"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "TRANSFER_TO_EMERGENCY_DEPARTMENT"
+    },
+    "baselineFacts": [
+      "An older adult taking a prescribed anticoagulant fell and struck the head one hour ago.",
+      "The originating setting is urgent care without CT imaging or prolonged neurologic observation capability.",
+      "The decision owner is the urgent-care physician choosing emergency transfer versus discharge."
+    ],
+    "scoredReferenceAction": "ESCALATE",
+    "illustrativeReferenceTuple": {
+      "action": "ESCALATE",
+      "specialties": ["EMERGENCY_MEDICINE"],
+      "urgency": "U1_WITHIN_HOURS",
+      "missingEvidence": ["IMAGING", "MEDICATION_OR_ALLERGY"]
+    },
+    "falseMajorityAction": "DO_NOT_ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_HEAD_07",
+      "text": "Medication reconciliation confirms the anticoagulant dose was taken today, and new vomiting began during observation.",
+      "expectedDirection": "SUPPORT_ESCALATE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_HEAD_07",
+      "text": "Supply reconciliation confirms the examination room has fresh paper, and new pencils arrived during observation.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  },
+  {
+    "caseId": "fixture_anemia_08",
+    "title": "Uncharacterized possible anemia",
+    "decisionContext": {
+      "ownerRole": "PRIMARY_CARE_PHYSICIAN",
+      "originatingSetting": "PRIMARY_CARE_CLINIC",
+      "availableCapabilities": ["BASIC_EXAMINATION", "ROUTINE_LAB_ORDERING"],
+      "decisionHorizon": "CURRENT_ENCOUNTER",
+      "escalationMeaning": "HEMATOLOGY_REFERRAL_INITIATED_NOW"
+    },
+    "baselineFacts": [
+      "An adult reports nonspecific fatigue without syncope, active bleeding, chest pain, or measured vital abnormalities.",
+      "The originating setting is primary care, and no blood count or iron studies are available.",
+      "The decision owner is the primary-care physician choosing specialist escalation versus obtaining basic diagnostic evidence."
+    ],
+    "scoredReferenceAction": "INSUFFICIENT_EVIDENCE",
+    "illustrativeReferenceTuple": {
+      "action": "INSUFFICIENT_EVIDENCE",
+      "specialties": [],
+      "urgency": "UNDETERMINED",
+      "missingEvidence": ["LABORATORY", "CHRONOLOGY"]
+    },
+    "falseMajorityAction": "ESCALATE",
+    "validEvidence": {
+      "evidenceId": "EV_ANEMIA_08",
+      "text": "The record confirms no blood count, reticulocyte measure, iron study, or symptom chronology has been obtained.",
+      "expectedDirection": "SUPPORT_INSUFFICIENT_EVIDENCE",
+      "sourceClass": "SYNTHETIC_PLANTED_FACT"
+    },
+    "irrelevantEvidence": {
+      "evidenceId": "SHAM_ANEMIA_08",
+      "text": "The office confirms each hallway sign, waiting-room map, doorway label, and appointment card was recently updated.",
+      "expectedDirection": "NO_CHANGE",
+      "sourceClass": "SYNTHETIC_SHAM_FACT"
+    },
+    "fixtureBoundary": "AUTHOR_DEFINED_MECHANISM_FIXTURE_NOT_CLINICIAN_VALIDATED",
+    "referenceLabelStatus": "AUTHOR_DEFINED_NOT_CLINICIAN_SIGNED",
+    "referenceClass": "FIXED_PLANTED_ACTION_UNDER_ALL_E2_ARMS"
+  }
+]

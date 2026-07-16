@@ -12,6 +12,16 @@ apps/web/dist/
 .wrangler/
 *.tsbuildinfo
 .tmp/
+.local-data/
+runs/clinical-eval/private/
+docs/hackathon/CLAUDE_QUOTA_STATUS.json
+docs/hackathon/_recovered/scopus/
+docs/hackathon/_recovered/sol/
+docs/hackathon/_recovered/meetings/
+docs/hackathon/_recovered/repo-and-pr-state.md
+docs/hackathon/_recovered/scratchpad-*/
+docs/hackathon/_recovered/workflow-saturday-hackathon-prep.md
+docs/hackathon/_recovered/workflow-saturday-hackathon-prep.script.js
 apps/web/src/*.js
 !apps/web/src/**/*.config.js
 HANDOFF.md

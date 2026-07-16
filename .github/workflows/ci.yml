@@ -15,9 +15,11 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run test --workspaces --if-present
       - run: npm run typecheck --workspaces --if-present
+      - run: npm run build
+      - run: npm run smoke --workspace @tribunal/web
       # Every committed ledger must verify AND match its published anchor —
       # anchor drift (rewrite or forgotten re-anchor) fails the build.
       - run: npx tsx scripts/check_anchors.ts
