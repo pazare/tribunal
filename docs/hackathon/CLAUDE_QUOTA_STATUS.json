@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-07-16T02:03:05-04:00",
+  "timezone": "America/New_York",
+  "accounts": [
+    {
+      "account": "pablozavalareina@gmail.com",
+      "surface": "Claude CLI",
+      "subscription": "max",
+      "authentication": "claude.ai",
+      "five_hour_limit": {
+        "status": "unknown",
+        "remaining": null,
+        "reset_at": null,
+        "evidence": "Claude CLI auth status exposes account and subscription, but not quota percentages."
+      },
+      "weekly_limit": {
+        "status": "unknown",
+        "remaining": null,
+        "reset_at": null,
+        "evidence": "Not exposed by the non-model Claude CLI commands inspected."
+      },
+      "fable_limit": {
+        "status": "not_probed",
+        "remaining": null,
+        "reset_at": null,
+        "evidence": "No model prompt will be sent only to test quota."
+      }
+    },
+    {
+      "account": "pablomzavalapz@gmail.com",
+      "surface": "Claude Desktop",
+      "subscription": "max",
+      "authentication": "Claude Desktop session",
+      "five_hour_limit": {
+        "status": "limit_reached_bucket_unspecified",
+        "remaining": null,
+        "reset_at": "2026-07-16T05:10:00-04:00",
+        "evidence": "Desktop UI shows Usage limit reached; failed Fable sessions reported reset at 5:10am America/New_York. The UI detail panel has not yet identified the exhausted bucket."
+      },
+      "weekly_limit": {
+        "status": "unknown",
+        "remaining": null,
+        "reset_at": null,
+        "evidence": "Exact weekly quota was not visible in the captured Desktop screen."
+      },
+      "fable_limit": {
+        "status": "blocked_until_live_refresh",
+        "remaining": null,
+        "reset_at": "2026-07-16T05:10:00-04:00",
+        "evidence": "Two exact claude-fable-5 max invocations were rejected before generation with the same reset time; no fallback was accepted."
+      }
+    }
+  ],
+  "rules": [
+    "Unknown is not zero.",
+    "Refresh the authenticated usage UI before every Fable invocation.",
+    "Never send a prompt merely to probe quota.",
+    "Never downgrade or fall back from claude-fable-5 max."
+  ]
+}
