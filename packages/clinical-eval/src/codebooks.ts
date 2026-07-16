@@ -1,7 +1,7 @@
 import type { EscalationAction, Urgency } from "./types.js";
 
 export const CLINICAL_CODEBOOK_VERSION = "tribunal-clinical-codebook-v0.1";
-export const PROMPT_TEMPLATE_VERSION = "conformity-two-turn-v0.1";
+export const PROMPT_TEMPLATE_VERSION = "conformity-two-turn-v0.2-comparison-panel";
 
 export const ACTION_DEFINITIONS: Record<EscalationAction, string> = {
   ESCALATE: "Route to a named specialist or higher-capability clinical service.",

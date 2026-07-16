@@ -4,6 +4,16 @@ import { analyzeObservations } from "./analysis.js";
 import { CLINICAL_CODEBOOK_VERSION, PROMPT_TEMPLATE_VERSION } from "./codebooks.js";
 import { loadSyntheticFixtures } from "./fixtures.js";
 import {
+  validateExpectedCallMatrix,
+  validateExternalAnchorReceipt,
+  validatePreCallManifest,
+  validateProviderCallReceipt,
+  verifyProviderCallReceipts,
+  type ExternalAnchorReceipt,
+  type PreCallManifest,
+  type ProviderCallReceipt,
+} from "./execution-receipts.js";
+import {
   canonicalJson,
   gitState,
   hashFile,
@@ -21,7 +31,7 @@ import { assertExactObjectKeys } from "./validate.js";
 export { canonicalJson, gitState, hashFile, hashJson, sha256 } from "./provenance.js";
 export type { GitState } from "./provenance.js";
 
-export const RUN_RECEIPT_SCHEMA_VERSION = 3;
+export const RUN_RECEIPT_SCHEMA_VERSION = 4;
 export const RUN_RECEIPT_CLAIM_BOUNDARY =
   "This receipt records hashed artifacts and replay-verified execution metadata for a mechanism experiment. Independent immutability verification additionally requires an external anchor. It does not establish clinical validity, safety, patient benefit, or cost-effectiveness.";
 
@@ -31,6 +41,37 @@ export interface ProviderReceiptSummary {
   models: string[];
   efforts: string[];
   configurationSha256: string;
+}
+
+export type RecordedExternalEvidenceLevel = "NOT_ESTABLISHED";
+export type RecordedAnchorAssertionStatus =
+  | "ABSENT"
+  | "PRESENT_NOT_INDEPENDENTLY_REVERIFIED";
+
+export interface ExecutionProvenanceReceipt {
+  captureStatus: "NOT_CAPTURED" | "CAPTURED";
+  preCallManifestFile: string | null;
+  preCallManifestSha256: string | null;
+  providerCallReceiptsFile: string | null;
+  providerCallReceiptsSha256: string | null;
+  safetyPacketFile: string | null;
+  safetyPacketArtifactSha256: string | null;
+  safetyContextFile: string | null;
+  preCallAnchorFile: string | null;
+  preCallAnchorSha256: string | null;
+  completedBundleSha256: string | null;
+  completedBundleAnchorFile: string | null;
+  completedBundleAnchorSha256: string | null;
+  recordedAnchorAssertions: {
+    preCall: RecordedAnchorAssertionStatus;
+    completedBundle: RecordedAnchorAssertionStatus;
+  };
+  claims: {
+    independentPreregistrationEvidence: RecordedExternalEvidenceLevel;
+    independentTimeEvidence: RecordedExternalEvidenceLevel;
+    completedBundleTamperEvidence: RecordedExternalEvidenceLevel;
+    providerIssuanceEvidence: RecordedExternalEvidenceLevel;
+  };
 }
 
 export interface RunReceiptInput {
@@ -92,6 +133,47 @@ export interface RunReceiptInput {
   };
   rawProviderErrorsStored: false;
   ledgerHead: string | null;
+  executionProvenance?: ExecutionProvenanceReceipt;
+}
+
+export function completedExecutionBundleSha256(input: {
+  preCallManifestSha256: string;
+  providerCallReceiptsSha256: string;
+  assignmentSha256: string;
+  observationSha256: string;
+  resultSha256: string;
+  safetyPacketArtifactSha256: string | null;
+  safetyContextArtifactSha256: string | null;
+}): string {
+  return hashJson(input);
+}
+
+function uncapturedExecutionProvenance(): ExecutionProvenanceReceipt {
+  return {
+    captureStatus: "NOT_CAPTURED",
+    preCallManifestFile: null,
+    preCallManifestSha256: null,
+    providerCallReceiptsFile: null,
+    providerCallReceiptsSha256: null,
+    safetyPacketFile: null,
+    safetyPacketArtifactSha256: null,
+    safetyContextFile: null,
+    preCallAnchorFile: null,
+    preCallAnchorSha256: null,
+    completedBundleSha256: null,
+    completedBundleAnchorFile: null,
+    completedBundleAnchorSha256: null,
+    recordedAnchorAssertions: {
+      preCall: "ABSENT",
+      completedBundle: "ABSENT",
+    },
+    claims: {
+      independentPreregistrationEvidence: "NOT_ESTABLISHED",
+      independentTimeEvidence: "NOT_ESTABLISHED",
+      completedBundleTamperEvidence: "NOT_ESTABLISHED",
+      providerIssuanceEvidence: "NOT_ESTABLISHED",
+    },
+  };
 }
 
 function sortedUnique(values: string[]): string[] {
@@ -152,6 +234,7 @@ export function buildRunReceipt(input: RunReceiptInput) {
     usage: input.usage,
     rawProviderErrorsStored: input.rawProviderErrorsStored,
     ledgerHead: input.ledgerHead,
+    executionProvenance: input.executionProvenance ?? uncapturedExecutionProvenance(),
     claimBoundary: RUN_RECEIPT_CLAIM_BOUNDARY,
   };
   return { ...receiptBody, receiptSha256: hashJson(receiptBody) };
@@ -212,7 +295,7 @@ function validateReceiptSchema(receipt: Record<string, unknown>) {
       "hypothesis", "gitAtStart", "dataset", "artifactFiles", "codebookVersion",
       "promptTemplateVersion", "randomSeed", "assignmentSha256", "observationSha256",
       "resultSha256", "design", "analysis", "provider", "usage", "rawProviderErrorsStored",
-      "ledgerHead", "claimBoundary", "receiptSha256",
+      "ledgerHead", "executionProvenance", "claimBoundary", "receiptSha256",
     ],
     "receipt",
   );
@@ -237,6 +320,82 @@ function validateReceiptSchema(receipt: Record<string, unknown>) {
   if (receipt.rawProviderErrorsStored !== false) throw new Error("receipt.rawProviderErrorsStored must be false");
   if (receipt.ledgerHead !== null && (typeof receipt.ledgerHead !== "string" || !/^[a-f0-9]{64}$/u.test(receipt.ledgerHead))) {
     throw new Error("receipt.ledgerHead must be null or a lowercase SHA-256 hash");
+  }
+
+  const execution = asRecord(receipt.executionProvenance, "receipt.executionProvenance");
+  assertExactObjectKeys(execution, [
+    "captureStatus", "preCallManifestFile", "preCallManifestSha256", "providerCallReceiptsFile",
+    "providerCallReceiptsSha256", "safetyPacketFile", "safetyPacketArtifactSha256", "safetyContextFile", "preCallAnchorFile",
+    "preCallAnchorSha256", "completedBundleSha256", "completedBundleAnchorFile",
+    "completedBundleAnchorSha256", "recordedAnchorAssertions", "claims",
+  ], "receipt.executionProvenance");
+  if (execution.captureStatus !== "NOT_CAPTURED" && execution.captureStatus !== "CAPTURED") {
+    throw new Error("receipt.executionProvenance.captureStatus is invalid");
+  }
+  const filenameKeys = [
+    "preCallManifestFile", "providerCallReceiptsFile", "safetyPacketFile", "safetyContextFile",
+    "preCallAnchorFile", "completedBundleAnchorFile",
+  ] as const;
+  const hashKeys = [
+    "preCallManifestSha256", "providerCallReceiptsSha256", "preCallAnchorSha256",
+    "completedBundleSha256", "completedBundleAnchorSha256", "safetyPacketArtifactSha256",
+  ] as const;
+  for (const key of filenameKeys) {
+    if (execution[key] !== null && (typeof execution[key] !== "string" || execution[key].length === 0)) {
+      throw new Error(`receipt.executionProvenance.${key} must be null or a non-empty string`);
+    }
+  }
+  for (const key of hashKeys) {
+    if (execution[key] !== null && (typeof execution[key] !== "string" || !/^[a-f0-9]{64}$/u.test(execution[key] as string))) {
+      throw new Error(`receipt.executionProvenance.${key} must be null or a lowercase SHA-256 hash`);
+    }
+  }
+  const claims = asRecord(execution.claims, "receipt.executionProvenance.claims");
+  assertExactObjectKeys(claims, [
+    "independentPreregistrationEvidence", "independentTimeEvidence", "completedBundleTamperEvidence", "providerIssuanceEvidence",
+  ], "receipt.executionProvenance.claims");
+  for (const key of ["independentPreregistrationEvidence", "independentTimeEvidence", "completedBundleTamperEvidence", "providerIssuanceEvidence"] as const) {
+    if (claims[key] !== "NOT_ESTABLISHED") {
+      throw new Error(`receipt.executionProvenance.claims.${key} is invalid`);
+    }
+  }
+  const anchorAssertions = asRecord(execution.recordedAnchorAssertions, "receipt.executionProvenance.recordedAnchorAssertions");
+  assertExactObjectKeys(anchorAssertions, ["preCall", "completedBundle"], "receipt.executionProvenance.recordedAnchorAssertions");
+  for (const key of ["preCall", "completedBundle"] as const) {
+    if (anchorAssertions[key] !== "ABSENT" && anchorAssertions[key] !== "PRESENT_NOT_INDEPENDENTLY_REVERIFIED") {
+      throw new Error(`receipt.executionProvenance.recordedAnchorAssertions.${key} is invalid`);
+    }
+  }
+  if (execution.captureStatus === "NOT_CAPTURED") {
+    for (const key of [...filenameKeys, ...hashKeys] as const) {
+      if (execution[key] !== null) throw new Error(`receipt.executionProvenance.${key} must be null when not captured`);
+    }
+    if (Object.values(claims).some((value) => value !== "NOT_ESTABLISHED")) {
+      throw new Error("uncaptured execution provenance cannot establish external evidence claims");
+    }
+    if (Object.values(anchorAssertions).some((value) => value !== "ABSENT")) {
+      throw new Error("uncaptured execution provenance cannot record anchor assertions");
+    }
+  } else {
+    for (const key of ["preCallManifestFile", "providerCallReceiptsFile", "preCallManifestSha256", "providerCallReceiptsSha256", "completedBundleSha256"] as const) {
+      if (execution[key] === null) throw new Error(`receipt.executionProvenance.${key} is required when captured`);
+    }
+    const preCallAnchorFields = [execution.preCallAnchorFile, execution.preCallAnchorSha256];
+    if (preCallAnchorFields.some((value) => value === null) !== preCallAnchorFields.every((value) => value === null)) {
+      throw new Error("receipt.executionProvenance pre-call anchor file/hash must both be present or absent");
+    }
+    const bundleAnchorFields = [execution.completedBundleAnchorFile, execution.completedBundleAnchorSha256];
+    if (bundleAnchorFields.some((value) => value === null) !== bundleAnchorFields.every((value) => value === null)) {
+      throw new Error("receipt.executionProvenance completed-bundle anchor file/hash must both be present or absent");
+    }
+    const preCallPresent = execution.preCallAnchorFile !== null;
+    if ((anchorAssertions.preCall === "PRESENT_NOT_INDEPENDENTLY_REVERIFIED") !== preCallPresent) {
+      throw new Error("pre-call recorded anchor assertion status does not match anchor artifact presence");
+    }
+    const bundlePresent = execution.completedBundleAnchorFile !== null;
+    if ((anchorAssertions.completedBundle === "PRESENT_NOT_INDEPENDENTLY_REVERIFIED") !== bundlePresent) {
+      throw new Error("completed-bundle recorded anchor assertion status does not match anchor artifact presence");
+    }
   }
 
   const git = asRecord(receipt.gitAtStart, "receipt.gitAtStart");
@@ -325,12 +484,99 @@ function parseObservationJsonl(path: string): AgentObservation[] {
     });
 }
 
+function parseProviderCallReceiptJsonl(path: string): ProviderCallReceipt[] {
+  return readFileSync(path, "utf8")
+    .split(/\r?\n/u)
+    .filter((line) => line.trim().length > 0)
+    .map((line, index) => {
+      try {
+        const receipt: unknown = JSON.parse(line);
+        validateProviderCallReceipt(receipt);
+        return receipt;
+      } catch (error) {
+        throw new Error(`provider call receipt line ${index + 1} is invalid: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    });
+}
+
 function safeJsonValue(value: unknown): unknown {
   return JSON.parse(JSON.stringify(value)) as unknown;
 }
 
 function sameStrings(left: string[], right: string[]): boolean {
   return JSON.stringify([...left].sort()) === JSON.stringify([...right].sort());
+}
+
+function observationRequestedConfiguration(observation: AgentObservation) {
+  return {
+    provider: observation.provider,
+    model: observation.model,
+    effort: observation.effort,
+    systemPromptSha256: observation.systemPromptHash,
+    toolConfigurationSha256: observation.toolConfigurationHash,
+    retrievalMode: observation.retrievalMode,
+    retrievalCorpusSha256: observation.retrievalCorpusHash,
+    temperature: observation.temperature,
+  };
+}
+
+function validateCallsAgainstObservations(
+  manifest: PreCallManifest,
+  calls: ProviderCallReceipt[],
+  observations: AgentObservation[],
+): void {
+  const callsById = new Map(calls.map((call) => [call.expectedCallId, call]));
+  const observationsByAssignment = new Map(observations.map((row) => [row.assignmentId, row]));
+  const observationsByState = new Map<string, AgentObservation>();
+  for (const observation of observations) {
+    if (!observationsByState.has(observation.sealedStateId)) observationsByState.set(observation.sealedStateId, observation);
+  }
+  for (const expected of manifest.expectedCalls) {
+    const call = callsById.get(expected.expectedCallId) as ProviderCallReceipt;
+    const observation = expected.phase === "BASELINE"
+      ? observationsByState.get(expected.sealedStateId)
+      : observationsByAssignment.get(expected.assignmentId as string);
+    if (!observation) throw new Error(`call ${expected.expectedCallId} has no matching observation`);
+    const expectedConfig = observationRequestedConfiguration(observation);
+    if (canonicalJson(expected.requested) !== canonicalJson(expectedConfig)) {
+      throw new Error(`call ${expected.expectedCallId} configuration does not match observation`);
+    }
+    if (expected.phase === "BASELINE") {
+      if (call.providerSessionId !== observation.baselineSessionId) {
+        throw new Error(`baseline call ${expected.expectedCallId} session does not match observation`);
+      }
+      if (call.promptSha256 !== observation.baselinePromptHash) {
+        throw new Error(`baseline call ${expected.expectedCallId} prompt does not match observation`);
+      }
+      if (call.outputSha256 !== hashJson(observation.baseline)) {
+        throw new Error(`baseline call ${expected.expectedCallId} output does not match sealed baseline`);
+      }
+      const revisions = observations
+        .filter((row) => row.sealedStateId === expected.sealedStateId)
+        .map((row) => callsById.get(`REVISION:${row.assignmentId}`) as ProviderCallReceipt);
+      if (revisions.some((revision) => Date.parse(revision.callStartedAt) < Date.parse(call.callCompletedAt))) {
+        throw new Error(`baseline call ${expected.expectedCallId} completed after a revision began`);
+      }
+    } else {
+      if (call.providerSessionId !== observation.revisionSessionId) {
+        throw new Error(`revision call ${expected.expectedCallId} session does not match observation`);
+      }
+      if (call.promptSha256 !== observation.revisionPromptHash) {
+        throw new Error(`revision call ${expected.expectedCallId} prompt does not match observation`);
+      }
+      if (call.outputSha256 !== hashJson(observation.postExposure)) {
+        throw new Error(`revision call ${expected.expectedCallId} output does not match observation`);
+      }
+      if (call.callStartedAt !== observation.callStartedAt || call.callCompletedAt !== observation.observedAt) {
+        throw new Error(`revision call ${expected.expectedCallId} timestamps do not match observation`);
+      }
+      if (call.usage.latencyMs !== observation.latencyMs ||
+          call.usage.inputTokens !== (observation.inputTokens ?? 0) ||
+          call.usage.outputTokens !== (observation.outputTokens ?? 0)) {
+        throw new Error(`revision call ${expected.expectedCallId} usage does not match observation`);
+      }
+    }
+  }
 }
 
 export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
@@ -430,6 +676,93 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     }
   }
 
+  const execution = receipt.executionProvenance as unknown as ExecutionProvenanceReceipt;
+  const provenanceFilenames = [
+    execution.preCallManifestFile,
+    execution.providerCallReceiptsFile,
+    execution.safetyPacketFile,
+    execution.safetyContextFile,
+    execution.preCallAnchorFile,
+    execution.completedBundleAnchorFile,
+  ].filter((value): value is string => value !== null);
+  if (new Set([...Object.values(files), ...provenanceFilenames]).size !== Object.values(files).length + provenanceFilenames.length) {
+    errors.push("all run and execution provenance artifact filenames must be distinct");
+  }
+  let preCallManifest: PreCallManifest | null = null;
+  let providerCallReceipts: ProviderCallReceipt[] | null = null;
+  let preCallAnchor: ExternalAnchorReceipt | null = null;
+  let completedBundleAnchor: ExternalAnchorReceipt | null = null;
+  const resolveExecutionArtifact = (file: string | null, label: string): string | null => {
+    if (file === null) return null;
+    if (isAbsolute(file) || basename(file) !== file || dirname(resolve(directory, file)) !== directory) {
+      errors.push(`execution provenance artifact filename escapes run directory: ${label}`);
+      return null;
+    }
+    try {
+      const path = resolve(directory, file);
+      const stat = lstatSync(path);
+      if (stat.isSymbolicLink() || !stat.isFile()) throw new Error("must be a regular file, not a symlink");
+      const realPath = realpathSync(path);
+      if (!realPath.startsWith(`${realDirectory}${sep}`)) throw new Error("resolves outside run directory");
+      return realPath;
+    } catch (error) {
+      errors.push(`execution provenance artifact invalid (${label}): ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  };
+  if (execution.captureStatus === "CAPTURED") {
+    const manifestPath = resolveExecutionArtifact(execution.preCallManifestFile, "preCallManifest");
+    const callsPath = resolveExecutionArtifact(execution.providerCallReceiptsFile, "providerCallReceipts");
+    const safetyPacketPath = resolveExecutionArtifact(execution.safetyPacketFile, "safetyPacket");
+    const safetyContextPath = resolveExecutionArtifact(execution.safetyContextFile, "safetyContext");
+    const preCallAnchorPath = resolveExecutionArtifact(execution.preCallAnchorFile, "preCallAnchor");
+    const bundleAnchorPath = resolveExecutionArtifact(execution.completedBundleAnchorFile, "completedBundleAnchor");
+    try {
+      if (!manifestPath || !callsPath) throw new Error("captured provenance requires manifest and provider call receipt artifacts");
+      const manifestValue: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
+      validatePreCallManifest(manifestValue);
+      preCallManifest = manifestValue;
+      if (execution.preCallManifestSha256 !== preCallManifest.manifestSha256) {
+        errors.push("receipt preCallManifestSha256 does not match manifest self-hash");
+      }
+      providerCallReceipts = parseProviderCallReceiptJsonl(callsPath);
+      if (execution.providerCallReceiptsSha256 !== hashJson(providerCallReceipts)) {
+        errors.push("receipt providerCallReceiptsSha256 does not match parsed call receipts");
+      }
+      if (preCallManifest.safetyPacketSchemaVersion === null) {
+        if (execution.safetyPacketFile !== null || execution.safetyPacketArtifactSha256 !== null) {
+          errors.push("safety packet artifact supplied without a pre-call schema/template commitment");
+        }
+      } else if (!safetyPacketPath || execution.safetyPacketArtifactSha256 === null ||
+          hashFile(safetyPacketPath) !== execution.safetyPacketArtifactSha256) {
+        errors.push("pre-call-declared safety packet output is missing or post-run hash-mismatched");
+      }
+      if (preCallManifest.safetyContextArtifactSha256 === null) {
+        if (execution.safetyContextFile !== null) errors.push("safety context file supplied but pre-call manifest did not declare its hash");
+      } else if (!safetyContextPath || hashFile(safetyContextPath) !== preCallManifest.safetyContextArtifactSha256) {
+        errors.push("declared safety context artifact is missing or hash-mismatched");
+      }
+      if (preCallAnchorPath) {
+        const anchorValue: unknown = JSON.parse(readFileSync(preCallAnchorPath, "utf8"));
+        validateExternalAnchorReceipt(anchorValue);
+        preCallAnchor = anchorValue;
+        if (execution.preCallAnchorSha256 !== preCallAnchor.anchorReceiptSha256) {
+          errors.push("receipt preCallAnchorSha256 does not match anchor self-hash");
+        }
+      }
+      if (bundleAnchorPath) {
+        const anchorValue: unknown = JSON.parse(readFileSync(bundleAnchorPath, "utf8"));
+        validateExternalAnchorReceipt(anchorValue);
+        completedBundleAnchor = anchorValue;
+        if (execution.completedBundleAnchorSha256 !== completedBundleAnchor.anchorReceiptSha256) {
+          errors.push("receipt completedBundleAnchorSha256 does not match anchor self-hash");
+        }
+      }
+    } catch (error) {
+      errors.push(`execution provenance validation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
   try {
     const assignmentsPath = safePaths.get("assignments");
     const observationsPath = safePaths.get("observations");
@@ -470,6 +803,45 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     if (receipt.promptTemplateVersion !== PROMPT_TEMPLATE_VERSION) errors.push("receipt promptTemplateVersion is not supported by this analyzer");
     if (receipt.codebookVersion !== CLINICAL_CODEBOOK_VERSION) errors.push("receipt codebookVersion is not supported by this analyzer");
 
+    if (execution.captureStatus === "CAPTURED") {
+      if (!preCallManifest || !providerCallReceipts) throw new Error("captured execution provenance could not be parsed");
+      if (preCallManifest.runId !== receipt.runId) errors.push("pre-call manifest runId mismatch");
+      if (preCallManifest.protocolVersion !== receipt.protocolVersion) errors.push("pre-call manifest protocolVersion mismatch");
+      if (preCallManifest.codebookVersion !== receipt.codebookVersion) errors.push("pre-call manifest codebookVersion mismatch");
+      if (preCallManifest.promptTemplateVersion !== receipt.promptTemplateVersion) errors.push("pre-call manifest promptTemplateVersion mismatch");
+      if (preCallManifest.datasetSha256 !== dataset.sha256) errors.push("pre-call manifest datasetSha256 mismatch");
+      if (preCallManifest.assignmentSha256 !== receipt.assignmentSha256) errors.push("pre-call manifest assignmentSha256 mismatch");
+      validateExpectedCallMatrix(preCallManifest, assignments);
+      verifyProviderCallReceipts(preCallManifest, providerCallReceipts);
+      validateCallsAgainstObservations(preCallManifest, providerCallReceipts, observations);
+      const expectedBundleSha256 = completedExecutionBundleSha256({
+        preCallManifestSha256: preCallManifest.manifestSha256,
+        providerCallReceiptsSha256: hashJson(providerCallReceipts),
+        assignmentSha256: receipt.assignmentSha256 as string,
+        observationSha256: receipt.observationSha256 as string,
+        resultSha256: receipt.resultSha256 as string,
+        safetyPacketArtifactSha256: execution.safetyPacketArtifactSha256,
+        safetyContextArtifactSha256: preCallManifest.safetyContextArtifactSha256,
+      });
+      if (execution.completedBundleSha256 !== expectedBundleSha256) errors.push("receipt completedBundleSha256 mismatch");
+      const earliestCallStart = Math.min(...providerCallReceipts.map((call) => Date.parse(call.callStartedAt)));
+      const latestBundleTime = Math.max(...providerCallReceipts.map((call) => Date.parse(call.bundledAt)));
+      if (Date.parse(preCallManifest.createdAt) > earliestCallStart) {
+        errors.push("pre-call manifest createdAt is after calls began; local timestamp is internally inconsistent");
+      }
+      if (Date.parse(receipt.startedAt as string) > earliestCallStart) errors.push("receipt startedAt is after calls began");
+      if (Date.parse(receipt.completedAt as string) < latestBundleTime) errors.push("receipt completedAt precedes call bundling");
+
+      if (preCallAnchor) {
+        if (preCallAnchor.targetSha256 !== preCallManifest.manifestSha256) errors.push("pre-call anchor does not target the pre-call manifest hash");
+        if (Date.parse(preCallAnchor.anchoredAt) > earliestCallStart) errors.push("pre-call anchor timestamp is after calls began");
+      }
+      if (completedBundleAnchor) {
+        if (completedBundleAnchor.targetSha256 !== expectedBundleSha256) errors.push("completed-bundle anchor does not target the completed bundle hash");
+        if (Date.parse(completedBundleAnchor.anchoredAt) < latestBundleTime) errors.push("completed-bundle anchor timestamp precedes bundle completion");
+      }
+    }
+
     const provider = receipt.provider as unknown as ProviderReceiptSummary;
     const observedProvider = providerReceiptSummary(observations, provider.boundary);
     if (canonicalJson(provider) !== canonicalJson(observedProvider)) errors.push("receipt provider summary does not match observations");
@@ -478,15 +850,22 @@ export function verifyRunDirectory(runDirectory: string, datasetPath: string) {
     const votes = observations.filter((item) => item.postExposure.status === "VOTE").length;
     if (usage.completedVotes !== votes) errors.push("receipt completedVotes mismatch");
     if (usage.nonVotes !== observations.length - votes) errors.push("receipt nonVotes mismatch");
-    if ((usage.plannedCalls as number) < observations.length) errors.push("receipt plannedCalls is below observed calls");
-    if (usage.inputTokens !== observations.reduce((sum, item) => sum + (item.inputTokens ?? 0), 0)) {
-      errors.push("receipt inputTokens mismatch");
-    }
-    if (usage.outputTokens !== observations.reduce((sum, item) => sum + (item.outputTokens ?? 0), 0)) {
-      errors.push("receipt outputTokens mismatch");
-    }
-    if (usage.totalLatencyMs !== observations.reduce((sum, item) => sum + item.latencyMs, 0)) {
-      errors.push("receipt totalLatencyMs mismatch");
+    if (execution.captureStatus === "CAPTURED" && providerCallReceipts) {
+      if (usage.plannedCalls !== providerCallReceipts.length) errors.push("receipt plannedCalls does not match exact expected call matrix");
+      if (usage.inputTokens !== providerCallReceipts.reduce((sum, item) => sum + item.usage.inputTokens, 0)) errors.push("receipt inputTokens mismatch");
+      if (usage.outputTokens !== providerCallReceipts.reduce((sum, item) => sum + item.usage.outputTokens, 0)) errors.push("receipt outputTokens mismatch");
+      if (usage.totalLatencyMs !== providerCallReceipts.reduce((sum, item) => sum + item.usage.latencyMs, 0)) errors.push("receipt totalLatencyMs mismatch");
+      if (usage.transportRetries !== providerCallReceipts.reduce((sum, item) => sum + item.usage.transportRetries, 0)) errors.push("receipt transportRetries mismatch");
+      const costs = providerCallReceipts.map((item) => item.usage.estimatedCostUsd);
+      const expectedCost = costs.some((cost) => cost === null)
+        ? null
+        : costs.reduce<number>((sum, cost) => sum + (cost as number), 0);
+      if (usage.estimatedCostUsd !== expectedCost) errors.push("receipt estimatedCostUsd mismatch");
+    } else {
+      if ((usage.plannedCalls as number) < observations.length) errors.push("receipt plannedCalls is below observed calls");
+      if (usage.inputTokens !== observations.reduce((sum, item) => sum + (item.inputTokens ?? 0), 0)) errors.push("receipt inputTokens mismatch");
+      if (usage.outputTokens !== observations.reduce((sum, item) => sum + (item.outputTokens ?? 0), 0)) errors.push("receipt outputTokens mismatch");
+      if (usage.totalLatencyMs !== observations.reduce((sum, item) => sum + item.latencyMs, 0)) errors.push("receipt totalLatencyMs mismatch");
     }
   } catch (error) {
     errors.push(`semantic receipt verification failed: ${error instanceof Error ? error.message : String(error)}`);

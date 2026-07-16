@@ -142,6 +142,7 @@ export interface ConditionPayload {
     action: EscalationAction;
     count: 3;
     panelSize: 4;
+    source: "FABRICATED_INDEPENDENT_COMPARISON_PANEL";
     rationaleShown: false;
   };
 }

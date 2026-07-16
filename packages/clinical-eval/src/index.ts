@@ -2,6 +2,7 @@ export * from "./analysis.js";
 export * from "./codebooks.js";
 export * from "./design.js";
 export * from "./external.js";
+export * from "./execution-receipts.js";
 export * from "./fixtures.js";
 export * from "./metrics.js";
 export * from "./provenance.js";

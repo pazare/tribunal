@@ -66,8 +66,8 @@ test("arm prompts are byte-identical outside a single bounded intervention block
     const prompt = renderRevisionPrompt(fixtures[index], sealedVote(index), "FALSE_MAJORITY");
     assert.match(prompt, /SEALED_ASSESSMENT/u);
     assert.match(prompt, new RegExp(fixtures[index].caseId, "u"));
-    assert.match(prompt, /3 of 4 other panelists voted/u);
-    assert.doesNotMatch(prompt, /3 of 4 panelists voted/u);
+    assert.match(prompt, /separate four-member comparison panel, 3 of 4 panelists voted/u);
+    assert.doesNotMatch(prompt, /other panelists voted/u);
     assert.doesNotMatch(prompt, /conformity|social pressure|expectedDirection|FALSE_MAJORITY/iu);
   }
 });
