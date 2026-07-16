@@ -118,3 +118,7 @@ Meeting guidance: anchor on items 1–2 (both verified, both his own); the six-e
 | web.archive.org snapshot of the CDC page | 1 | fetch not permitted by tooling |
 
 All other sources in this memo were fetched successfully on 2026-07-16.
+
+## 8. Addendum (2026-07-16, orchestrating session) — CDC page resolved
+
+Row 13a is upgraded UNREACHABLE → **VERIFIED**: the CDC ICD-10-CM page was opened in the operator's real browser (the 403 was an automated-fetch bot block only). Page text fetched 2026-07-16: "ICD-10-CM—the International Classification of Diseases, Tenth Revision, Clinical Modification—is used to code and classify medical diagnoses… based on ICD-10, the system used to code and classify mortality data from death certificates," and "CDC's National Center for Health Statistics (NCHS) is responsible for the clinical modification of ICD-10 for use in the United States." This fully supports the Sol brief's claim. Final Task A tally: **13 of 13 candidates resolve; zero fabrications.**

@@ -42,7 +42,7 @@ Method: independent Fable 5 audit agent enumerated every distinct idea in the op
 
 ## Sol-brief verification highlights (full memo in `_recovered/fable/FABLE_SOL_BRIEF_VERIFICATION_2026-07-16.md`)
 
-- 12 of 13 checked citation candidates VERIFIED against live primary sources; zero fabricated citations; CDC ICD-10-CM page UNREACHABLE (403) — needs one manual browser check.
+- 13 of 13 checked citation candidates VERIFIED against live primary sources (the CDC ICD-10-CM page initially returned 403 to automated fetch and was verified through the operator's real browser the same day); zero fabricated citations.
 - Two load-bearing corrections: "unfaithful capitulation" is defined in arXiv 2605.29087 ("The Chain Holds, the Answer Folds"), not 2602.13093 as the Sol brief implies; the DRL paper's "KDD" venue is unverified — cite as preprint and confirm with Krishnan (consistent with the Scopus ledger §6 ruling).
 - Only 2 of the 10 arXiv items are peer-reviewed/accepted (generalized Fleiss kappa — Behavior Research Methods 2025; pathology automation-bias — MELBA); label the rest preprints.
 - The "second paper" Pablo did not catch: high confidence the hallucination-detection remark refers to the DRL paper itself (hallucinated-node discrepancy class); candidate alternates ranked in the memo; confirm with Krishnan by email.

@@ -80,6 +80,51 @@ The most useful adjacent records were checked against their primary publication 
 
 The Anderson and MDAgents studies are the strongest architecture-experiment precedents. None validates Tribunal's unsupported-count-cue construct, clinician workflow, clinical safety, or patient benefit.
 
+## 5b. Rao-prep primary-source verifications (2026-07-16)
+
+Two bounded Fable verification passes checked the 2026-07-16 Scopus AI captures against primary records. Scopus-AI-displayed citation counts proved unreliable in this pass (several implausible values) and are struck from evidentiary use; only publisher/index records count.
+
+### Human–AI timing and bias (Rao decision 4)
+
+| ID | Paper | Verified core | Status | Safe use |
+| --- | --- | --- | --- | --- |
+| T-01 | Yin, Ngiam, Tan, Teo, *Management Science* 71(11), 2025, DOI `10.1287/mnsc.2022.01454` (expanded from ICIS 2020 "Work Design in Healthcare AI Applications") | Randomized timing manipulation with physicians: ex post (clinician-first) advice yielded the **best** performance of three conditions and better discrimination of wrong AI advice | verified (direction; Ns/effects paywalled → pending) | Strongest single citation for commit-then-reveal; contradicts the assumed accuracy trade-off of human-first ordering |
+| T-02 | Kücking et al., *IJMI* 207:106223, 2026, DOI `10.1016/j.ijmedinf.2025.106223` | 223 physicians+nurses, 1,338 wound-care decisions: correct AI advice OR = 10.0 (p<0.001) toward correct decisions; incorrect advice reduced accuracy correspondingly | verified (abstract level) | Symmetric-influence evidence; wound-care vignettes only; same group as T-03 — one research program, not two replications |
+| T-03 | Kücking et al., *Stud Health Technol Inform* 317, 2024, DOI `10.3233/SHTI240871` | N=210; diagnostic performance, training, profession reduced false agreement with wrong AI; perceived benefit increased it | verified (abstract level) | Moderator evidence only; GMDS proceedings tier |
+| T-04 | Gaube et al., *Sci Rep* 2023, DOI `10.1038/s41598-023-28633-w` (OA, full text) | 223 physicians; ALL advice correct; annotated advice OR 2.30 (p=.002); non-task experts +5.66pp (p=.042) | verified | Correct-advice-only design — supports XAI benefit, says nothing about wrong-advice harm |
+| T-05 | Cabitza et al., AAAI-26, DOI `10.1609/aaai.v40i47.41457` (OA) | >300 professionals, 6 settings, all human-first: appropriate reliance <50%; **disuse dominates misuse**; advice ≈ +2pp accuracy | verified; context-only for any ordering claim (no AI-first arm) | The honest cost of human-first: correct advice often ignored |
+| T-06 | Cabitza et al., IUI 2025 "From Oracular to Judicial", DOI `10.1145/3708359.3712157` | N=16 spine surgeons/radiologists; contrasting explanations, no recommendation; experienced users +0.24 accuracy (p=.045) | context-only (pilot N; bias-rate wording needs full text) | Dissent-preserving presentation analogue for Tribunal packets; do not say "reduces automation bias" yet |
+| T-07 | Pesapane et al., *Eur Radiol* 2026, DOI `10.1007/s00330-026-12666-6` | 6 radiologists × 200 mammograms; wrong-AI cases: automation bias 36.1%→17.8% and anchoring 33.9%→17.2% with XAI (aOR 0.56 / 0.61, p<0.001) | corrected | XAI "reduced, but did not eliminate" bias, strongest among less-experienced readers; deliberately perturbed AI, single center |
+| T-08 | Rosbach et al., BVM 2025 (Informatik aktuell), DOI `10.1007/978-3-658-47422-5_27`; arXiv:2411.00998 | n=28 pathologists; 7% automation-bias rate; time pressure raised bias **severity, not frequency** | corrected | Time-pressure claim must say severity; estimation task, workshop venue |
+| T-09 | Bach et al., CHI 2023, DOI `10.1145/3544548.3581513` | Qualitative (8 ophthalmologists): perceptions of anchoring mitigation; feared time cost | context-only | Design/acceptability evidence only — measured no bias reduction |
+| T-10 | Brunyé, Mitroff, Elmore, *JAMIA* 33(2), 2026, DOI `10.1093/jamia/ocaf123` | Research agenda naming advice timing as an open question | verified (agenda) | Framing citation; carries no effect estimates |
+| T-11 | Goddard, Roudsari, Wyatt, *JAMIA* 19(1):121–127, 2012, DOI `10.1136/amiajnl-2011-000089` | Systematic review (74 studies): automation-bias mediators and mitigators incl. information-rather-than-recommendation | verified | Mechanism/definitions; 2012 → not current prevalence |
+
+Bottom line for the meeting: ordering changes the **form** of bias, not its existence — human-first performed best in the only randomized timing comparison (T-01), while its residual costs are disuse (T-05) and revision/anchoring bias (T-07, T-08). Silent mode remains the only ordering with no exposure risk.
+
+### Apples-to-apples comparators (Rao decision 3)
+
+| ID | Paper | Verified core | Status | Safe use |
+| --- | --- | --- | --- | --- |
+| C-01 | Chen et al., *IJMI* 212:106346, 2026, DOI `10.1016/j.ijmedinf.2026.106346` | Scoping review, 120 studies (2020–2025): 75.8% retrospective; 20.8% information asymmetry; 60.8% ≤10 physician readers; 50.8% no time limits; proposes the AI vs. Physician Study Checklist (AIPSC) | verified (abstract level); AIPSC item wording pending full text | The four percentages + AIPSC as design-appraisal framing; do not paraphrase specific checklist items until the full text is pulled |
+| C-02 | Gupta et al., *ICM Experimental*, 2025, DOI `10.1186/s40635-025-00791-3` (OA) | 6 ARF-CDS studies: median DECIDE-AI coverage 3.5/17 (21%); none reported AI errors or fairness | verified | Reporting-quality gap evidence, not an efficacy comparison |
+| C-03 | Gopi et al., *Genetics and Molecular Research*, 2025 | Venue on pre-2017 predatory list with documented journal hijacking | **reject** | Never cite; example of venue screening only |
+
+### Silent-trial precedents (Rao decision 5)
+
+| ID | Paper | Verified core | Status | Safe use |
+| --- | --- | --- | --- | --- |
+| S-01 | Pou-Prom et al., *Front Digit Health* 2022, DOI `10.3389/fdgth.2022.932123` (OA) | CHARTwatch: ~10-month silent deployment, outputs hidden from clinicians; silent-phase composite AUC 0.786; deployment 0.759; caught pipeline breakages (troponin assay change, DB drops) | verified | Long-silent-phase exemplar; paper set **no formal prespecified go/no-go thresholds** — do not imply it did |
+| S-02 | Kwong et al., *Front Digit Health* 2022, DOI `10.3389/fdgth.2022.929508` (OA) | Hydronephrosis model: development AUROC 0.90 → 0.50 in clinician-blinded silent trial 1 (dataset drift: age, laterality, PNG→JPEG); fixed, then 0.91–0.92 in silent trial 2 before any exposure | verified | Flagship "why silent mode exists" case: the collapse was invisible to retrospective validation |
+| S-03 | Hoang et al., MEDINFO 2025 (SHTI), DOI `10.3233/SHTI250851` | SAFE-WAIT sepsis silent trial vs SIRS alert: earlier prediction, better subgroup performance; companion cohort 108,401 patients | verified (design); subgroup numbers pending (paywalled) | Preliminary, single-center, proceedings-level |
+| S-04 | "LLM Recommendations for Empiric Antibiotics Versus Clinician Prescribing…", *Antibiotics* 15(4):368, DOI `10.3390/antibiotics15040368` | Paired retrospective shadow-mode stewardship benchmark: 85.4% LLM vs 73.2% clinician regimens met criteria (McNemar p=1.6×10⁻¹⁰) | verified (identified) | Offline rubric concordance only — no outcomes; single center; the served LLM identity unconfirmed |
+
+Governance template distilled from S-01…S-03 (what verified papers actually did): (1) run silent with outputs hidden for a defined window; (2) compare silent performance against the development benchmark and the incumbent alert, treating material gaps as stop signals; (3) advance only after silent-phase performance is restored and stable and operational issues are resolved.
+
+### Reliability-engineering gap (Rao decision 2)
+
+A same-day Scopus AI query on reliability engineering for AI/CDSS returned a **grounded gap**: retrieved abstracts were classical reliability literature, with Scopus AI itself stating no direct AI/CDSS application was present. Transferable leads pending verification: β-factor/α-factor common-cause-failure models for correlated same-provider agents; domain-specific failure units (e.g., DSC in AI contouring) as precedent for tuple-level failure definitions. Capture: `_recovered/scopus/scopus-ai-2026-07-16-q-reliability-failure-units.md`.
+
 ## 6. Differential Reasoning Learning transfer decision
 
 Liu et al., *Closing Reasoning Gaps in Clinical Agents with Differential Reasoning Learning*, is an [arXiv v1 preprint](https://arxiv.org/abs/2602.09945) submitted 2026-02-10, DOI [`10.48550/arXiv.2602.09945`](https://doi.org/10.48550/arXiv.2602.09945). The public record shows no conference or journal reference. Until separate acceptance evidence exists, do not call it a KDD or peer-reviewed paper.
