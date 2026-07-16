@@ -12,7 +12,7 @@ Tribunal replaces sampling with **election**. The output is decoded in atomic su
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point). Three committed live runs score an honest **11/12** — the panel refused to ratify STOP, and [the ledger shows exactly why](docs/honesty.md#the-scorecard-fails-our-own-live-runs--on-purpose).
 
-Tests: **52** kernel · **8** decoder server · **9** decoder UI · **14** scorecard · **2** packs (`npm test`).
+Tests: **52** kernel · **8** decoder server · **9** decoder UI · **14** scorecard · **2** packs · **51** clinical-eval (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -96,7 +96,7 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 52 kernel + 8 server + 9 web + 2 packs + 14 scorecard tests
+npm test                 # 52 kernel + 8 server + 9 web + 2 packs + 14 scorecard + 51 clinical-eval tests
 npm run smoke --workspace @tribunal/web  # isolated offline UI/API browser gate
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
