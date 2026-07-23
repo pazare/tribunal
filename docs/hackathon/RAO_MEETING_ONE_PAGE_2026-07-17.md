@@ -39,7 +39,7 @@ Independent unit: case; roles from one model are not independent clinicians.
 
 ## Ask him to attack these assumptions
 
-- The case is the correct independent unit.
+- The originating case family is the provisional conservative clustering unit; exchangeability or independence across case families remains an assumption that Rao should challenge.
 - A fixed planted escalation action is a legitimate mechanism-fixture reference.
 - A neutral report that `3 of 4 members of a separate, fabricated comparison panel` selected an action, plus valid/irrelevant evidence controls, isolates a useful local effect—even though a reported comparison-panel count may still be interpreted as weak testimonial evidence.
 - Eight synthetic cases are enough for a harness pilot but support no clinical or general model claim.

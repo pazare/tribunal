@@ -1,6 +1,7 @@
 export * from "./types.js";
 export * from "./hash.js";
 export * from "./ledger.js";
+export * from "./ledger-structure.js";
 export * from "./charters.js";
 export * from "./feedback.js";
 export * from "./ratify.js";
@@ -15,9 +16,13 @@ export type {
   ProposeResult,
   ReviseRequest,
   ReviseResult,
+  SafetyReviewRequest,
+  SafetyReviewResult,
 } from "./providers/base.js";
+export { extractJSON, extractStrictJSON } from "./providers/base.js";
 export { OfflinePanelClient } from "./providers/offline.js";
 export { CliPanelClient } from "./providers/cli.js";
+export { minimalCliEnvironment } from "./providers/cli-environment.js";
 export {
   DecoderCliClient,
   DECODER_CLI_RUNTIME_DEFAULTS,

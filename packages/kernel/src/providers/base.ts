@@ -1,9 +1,11 @@
 import type {
   FeedbackCandidateSummary,
+  Objection,
   PanelistCaseView,
   Proposal,
   Provider,
   Revision,
+  SafetyVerdict,
   ScoredCandidate,
   Society,
   UsageRecord,
@@ -13,15 +15,14 @@ import type {
  * The panel/model boundary. A `PanelClient` is one seat's connection to a real
  * model (via a spawned CLI, an HTTP API, or the deterministic offline stub).
  *
- * The two methods correspond to the two live rounds:
+ * The methods correspond to two deliberation rounds plus a dedicated safety gate:
  *   propose()  — blind round-1 (no peer material in the request, by construction)
- *   revise()   — round-2 after anonymized Delphi feedback
+ *   revise()   — round-2 after controlled feedback
+ *   reviewSafety() — candidate-level safety verdict for every eligible finalist
  *
- * Adapters MUST return structured objects. When a model returns malformed or
- * partial JSON, adapters may coerce/repair — but they MUST report how many fields
- * were repaired via `usage`-adjacent counters (the engine records this, and the
- * scorecard fails the "public warrant" / "revision answers objection" items if a
- * run was kept alive by back-filling empty rationale). Honesty over green checks.
+ * Adapters MUST return structured objects. A parser may construct a diagnostic
+ * repaired object, but any nonzero repair count is a typed `incomplete` non-vote;
+ * it can never enter quorum, safety review, or ratification.
  */
 export interface ProposeRequest {
   view: PanelistCaseView;
@@ -36,6 +37,8 @@ export interface ReviseRequest {
   /** Anonymized feedback in this recipient's (position-bias-controlled) order. */
   feedback: FeedbackCandidateSummary[];
   guidance: string;
+  /** True when author identity was withheld; false for the identity-visible control arm. */
+  feedbackAnonymized?: boolean;
   seed: number;
   /** Cancels an in-flight provider call when the operator stops the run. */
   signal?: AbortSignal;
@@ -53,6 +56,21 @@ export interface ReviseResult {
   repaired: number;
 }
 
+export interface SafetyReviewRequest {
+  view: PanelistCaseView;
+  candidate: ScoredCandidate;
+  /** The safety seat's public objections from its immediately prior revision. */
+  maintainedObjections: Objection[];
+  seed: number;
+  signal?: AbortSignal;
+}
+
+export interface SafetyReviewResult {
+  verdict: SafetyVerdict;
+  usage: UsageRecord;
+  repaired: number;
+}
+
 export interface PanelClient {
   readonly provider: Provider;
   readonly model: string;
@@ -62,6 +80,8 @@ export interface PanelClient {
   readonly society: Society;
   propose(req: ProposeRequest): Promise<ProposeResult>;
   revise(req: ReviseRequest): Promise<ReviseResult>;
+  /** Dedicated candidate-level safety decision; every eligible finalist is reviewed. */
+  reviewSafety(req: SafetyReviewRequest): Promise<SafetyReviewResult>;
 }
 
 /**
@@ -91,6 +111,81 @@ export function extractJSON(text: string): any {
     }
   }
   throw new Error("no parseable JSON object in model output");
+}
+
+/**
+ * Parse the provider contract literally. Panel adapters use this strict path so
+ * prose wrappers, fences, trailing commas, and other repaired JSON never become
+ * an eligible vote. The tolerant extractor remains exported for non-voting UI
+ * utilities and backwards compatibility.
+ */
+export function extractStrictJSON(text: string): any {
+  if (!text || !text.trim()) throw new Error("empty model output");
+  const raw = text.trim();
+  const value = JSON.parse(raw);
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("model output must be one JSON object");
+  }
+  const duplicates = duplicateJsonKeys(raw);
+  if (duplicates.length) throw new Error(`model output contains duplicate JSON key(s): ${duplicates.join(", ")}`);
+  return value;
+}
+
+function duplicateJsonKeys(raw: string): string[] {
+  let index = 0;
+  const duplicates: string[] = [];
+  const skipWhitespace = () => {
+    while (index < raw.length && /[\u0020\u000a\u000d\u0009]/.test(raw[index])) index++;
+  };
+  const readString = (): string => {
+    const start = index++;
+    while (index < raw.length) {
+      if (raw[index] === '"') {
+        index++;
+        return JSON.parse(raw.slice(start, index)) as string;
+      }
+      index += raw[index] === "\\" ? (raw[index + 1] === "u" ? 6 : 2) : 1;
+    }
+    throw new Error("unterminated JSON string");
+  };
+  const parseValue = (path: string): void => {
+    skipWhitespace();
+    if (raw[index] === "{") {
+      index++;
+      skipWhitespace();
+      const keys = new Set<string>();
+      if (raw[index] === "}") { index++; return; }
+      for (;;) {
+        skipWhitespace();
+        const key = readString();
+        const child = `${path}.${key}`;
+        if (keys.has(key)) duplicates.push(child);
+        keys.add(key);
+        skipWhitespace();
+        index++; // colon; JSON.parse already established valid syntax.
+        parseValue(child);
+        skipWhitespace();
+        if (raw[index] === "}") { index++; return; }
+        index++; // comma
+      }
+    }
+    if (raw[index] === "[") {
+      index++;
+      skipWhitespace();
+      if (raw[index] === "]") { index++; return; }
+      let item = 0;
+      for (;;) {
+        parseValue(`${path}[${item++}]`);
+        skipWhitespace();
+        if (raw[index] === "]") { index++; return; }
+        index++;
+      }
+    }
+    if (raw[index] === '"') { readString(); return; }
+    while (index < raw.length && !/[\u0020\u000a\u000d\u0009,\]}]/.test(raw[index])) index++;
+  };
+  parseValue("$");
+  return duplicates;
 }
 
 function lastBalancedObject(s: string): string | null {

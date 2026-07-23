@@ -18,7 +18,13 @@ const seats: PanelSeat[] = societies
   .filter((s) => !only || only.includes(s.provider))
   .map((s) => ({
     seatId: `seat_${s.i + 1}_${s.society}`,
-    client: new CliPanelClient(`seat_${s.i + 1}_${s.society}`, s.society, s.provider, { timeoutMs: 150_000 }),
+    // This smoke uses the committed public synthetic lending fixture. It may
+    // exercise legacy probe-only argv transports, so it must never be repurposed
+    // for protected or patient data.
+    client: new CliPanelClient(`seat_${s.i + 1}_${s.society}`, s.society, s.provider, {
+      timeoutMs: 150_000,
+      protectedData: false,
+    }),
   }));
 
 console.log(`Panel: ${seats.map((s) => `${s.client.society}=${s.client.provider}`).join(", ")}`);

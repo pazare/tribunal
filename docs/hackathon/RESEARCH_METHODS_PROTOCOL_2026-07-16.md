@@ -22,7 +22,7 @@ Agreement alone answers only the first question. It does not establish correctne
 
 ## 2. Unit of analysis and output object
 
-The stored observation unit is one `case_id × rater_or_agent_id × condition × round` row. For E2 causal inference, the case is the independent unit; multiple roles or replicates from one model are aggregated within case and are not treated as independent clinicians.
+The stored observation unit is one `case_id × rater_or_agent_id × condition × round` row. For E2, the conservative primary clustering unit is the **case family**: templates, paraphrases, roles, conditions, and replicates derived from one family remain in the same cluster. Multiple roles or runs from one model are never treated as independent clinicians. Independence or exchangeability across case families is still an assumption to probe with Rao, not a fact created by aggregation.
 
 ### 2.1 Primary escalation tuple
 
@@ -66,7 +66,7 @@ Diagnosis is associated with the escalation decision but is not interchangeable 
 
 Every factual rationale claim is represented as an assertion with: source, speaker, experiencer, assertion span, polarity (affirmed/negated), certainty, temporality, decision-time availability derived from source/ingestion/authorization/expiry/revocation timestamps and the frozen cutoff, and value plus unit where applicable. The object records the exact supporting span and two distinct statuses: the model-reported relation (`ENTAILED`, `CONTRADICTED`, or `NOT_ENOUGH_INFORMATION`) and the authorized verifier status (`ENTAILED`, `CONTRADICTED`, `NOT_ENOUGH_INFORMATION`, or `UNVERIFIED`). A citation link alone is not evidence support, and factual entailment is evaluated separately from whether the fact supports or opposes a proposed action. The receipt must state the actual separation enforced—identity, operator, and failure domain—rather than calling registry membership alone independent verification.
 
-Unsupported assertions use the runtime taxonomy: `MISSING_SUPPORT_POINTER`, `SOURCE_OR_SPEAKER_MISMATCH`, `EXPERIENCER_MISMATCH`, `ASSERTION_SPAN_MISMATCH`, `POLARITY_MISMATCH`, `CERTAINTY_OVERSTATEMENT`, `TEMPORALITY_MISMATCH`, `NOT_AVAILABLE_AT_DECISION_TIME`, `VALUE_MISMATCH`, `UNIT_MISMATCH`, `CONTRADICTED_BY_SOURCE`, or `COMPOSITE_CLAIM_NOT_ENTAILED`. Public rationales are concise warrants; hidden chain-of-thought is neither requested nor stored.
+Accepted packet assertions use four audit codes: `MISSING_SUPPORT_POINTER`, `NOT_AVAILABLE_AT_DECISION_TIME`, `CONTRADICTED_BY_SOURCE`, and `COMPOSITE_CLAIM_NOT_ENTAILED`. Attribute-mismatched or malformed inputs—wrong source/speaker, experiencer, span, polarity, certainty, temporality, value, or unit—fail packet validation before acceptance; they are not mislabeled as valid packet assertions. The current runtime does not preserve those rejected inputs in a separate rejection ledger, so do not claim measured rates for those mismatch classes. Public rationales are concise warrants; hidden chain-of-thought is neither requested nor stored.
 
 ### 2.4 Construct model
 
@@ -161,7 +161,7 @@ Use an Abridge transcript or linked record only if the organizers explicitly pro
 
 **Conditions:**
 
-1. two or more same-specialty agents in independent sessions with retrieval disabled or the identical frozen corpus;
+1. two or more same-specialty agent roles in fresh, peer-isolated sessions with retrieval disabled or the identical frozen corpus;
 2. a heterogeneous agent panel with explicit roles;
 3. two same-specialty clinicians where available;
 4. two cross-specialty clinicians where available.
@@ -169,7 +169,7 @@ Use an Abridge transcript or linked record only if the organizers explicitly pro
 All raters receive the same frozen case view, tools, time budget, retrieval corpus, and output schema. Retrieval diversity is a separate source-dependence experiment because varying it here would confound the reliability comparison. Compare within-group reliability and cross-group concordance. Published clinician kappas are context only unless the cases, raters, codebook, and statistic match. Agents sharing a base model, prompt template, or retrieval source are dependent replicates, not independent specialists.
 
 **Primary endpoint:** agreement on `escalation_action`.
-**Secondary:** exact tuple match, specialty multi-label similarity, weighted urgency disagreement, missing-evidence overlap, non-vote rate, and run-to-run stability.
+**Planned secondary endpoints:** exact tuple match, specialty multi-label similarity, weighted urgency disagreement, missing-evidence overlap, non-vote rate, and run-to-run stability. The current analyzer emits action-level raw agreement/unanimity, nominal Krippendorff alpha with a case-cluster bootstrap, and Gwet AC1. It does not yet emit tuple/specialty/urgency/missing-evidence endpoints or intervals for every panel statistic.
 
 ### E2 — evidence versus conformity factorial experiment
 
@@ -242,7 +242,7 @@ This experiment requires an explicit ethics/consent determination and institutio
 
 ### 7.1 Reliability and agreement
 
-Report all of the following because no single coefficient is sufficient:
+The full research protocol should report all of the following because no single coefficient is sufficient. **Current runtime boundary:** the analyzer presently emits action-level raw agreement, unanimity, nominal Krippendorff alpha with a case-cluster bootstrap, and Gwet AC1. Cohen/weighted kappa and Jaccard exist as tested helpers but are not yet integrated analysis outputs; raw agreement, unanimity, and AC1 do not yet receive cluster intervals. Treat the remaining bullets as implementation requirements, not completed results.
 
 - raw agreement and exact `n/N` panel counts for interpretability;
 - pairwise Cohen kappa when exactly two raters classify the same units;
@@ -296,7 +296,7 @@ For Saturday, show raw counts and intervals even when they are wide. Small `N` i
 - Do not tune prompts on the reported test cases.
 - Treat benchmark contamination as plausible for public cases and report it.
 - Analyze provider failures and refusals as outcomes, not infrastructure noise to delete.
-- Before an E2 model call, byte-diff every arm prompt to prove that it is identical outside the intervention block; verify that no arm name, assignment metadata, expected-direction content, or real panel vote appears in any payload, filename, or system prompt; disable retrieval or use a frozen recorded corpus.
+- Before an E2 model call, byte-diff every rendered **user prompt** to verify that it is identical outside the intervention block. The current analyzer recomputes user-prompt hashes but only checks caller-supplied system-prompt and tool-configuration hashes for equality across arms. Therefore full no-leakage status for system prompts, tool payloads, filenames, and retrieval is `NOT_ESTABLISHED` until their exact canonical bytes are precommitted, scanned for arm/label leakage, and verified. Disable retrieval or use a frozen recorded corpus.
 - Run scripted always-conform, evidence-following, frozen, and always-refuse providers through the full E2 pipeline and require the analyzer to recover their programmed effects exactly before consuming model quota.
 - Keep the subject-facing instruction neutral: do not name conformity, pressure, trustworthiness, the expected effect, or the scoring matrix. Treat direct warning, reverse framing, or audit awareness as separate randomized calibration arms rather than evidence about hidden intent.
 
@@ -306,7 +306,7 @@ The initial analysis is micro-costing, not a cost-effectiveness study.
 
 Per case record:
 
-- input/output tokens and published model price at run time;
+- provider-reported input/output tokens and caller-recorded estimated price, with source/date/currency; call it estimated model-use cost unless a frozen pricing table or provider invoice is independently checked;
 - retrieval and infrastructure cost;
 - wall-clock latency and retry count;
 - clinician review minutes;
@@ -341,7 +341,7 @@ Public artifacts exclude PHI, restricted rows, credentials, hidden model reasoni
 Saturday can truthfully demonstrate:
 
 - an executable audited deliberation mechanism;
-- independent sealed votes and explicit non-votes;
+- separately generated, peer-isolated sealed votes and explicit non-votes;
 - a versioned escalation vocabulary;
 - evidence and false-majority interventions on synthetic cases;
 - calculated agreement and uncertainty from the observed run;

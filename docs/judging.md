@@ -1,6 +1,9 @@
 # Judging demo script (~3 minutes)
 
 Beat-by-beat guide for live presentation. Assume `npm run dev` is running (UI `:5173`, API `:8787`).
+Before the demo, set `TRIBUNAL_OPERATOR_TOKEN` to at least 32 bytes and unlock
+the browser session in Decoder Lab; the resulting HttpOnly `/api` cookie covers
+the run, intervention, ledger, and verification controls below.
 
 ## 0:00 — Hook (15 s)
 
@@ -51,6 +54,7 @@ Beat-by-beat guide for live presentation. Assume `npm run dev` is running (UI `:
 ```bash
 curl -s -X POST http://localhost:8787/api/verify \
   -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TRIBUNAL_OPERATOR_TOKEN" \
   -d '{"runId":"<id>"}'
 ```
 

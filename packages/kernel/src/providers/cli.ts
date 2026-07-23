@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
@@ -10,17 +10,20 @@ import type {
 } from "../types.js";
 import { candidateKey } from "../types.js";
 import { stableId } from "../hash.js";
-import { proposePrompt, revisePrompt } from "../prompt.js";
+import { proposePrompt, revisePrompt, safetyPrompt } from "../prompt.js";
 import {
   asString,
   clamp01,
-  extractJSON,
+  extractStrictJSON,
   type PanelClient,
   type ProposeRequest,
   type ProposeResult,
   type ReviseRequest,
   type ReviseResult,
+  type SafetyReviewRequest,
+  type SafetyReviewResult,
 } from "./base.js";
+import { minimalCliEnvironment } from "./cli-environment.js";
 
 /**
  * Spawns a locally-installed, already-authenticated agent CLI as one panel seat.
@@ -42,14 +45,31 @@ interface CliSpec {
   bin: string;
   buildArgs: (prompt: string) => string[];
   inputMode: "stdin" | "argv";
+  /** True only when reviewed stdin, tool-surface, session, and filesystem controls exist. */
+  protectedDataIsolation: boolean;
+  environment?: Record<string, string>;
   model: string;
 }
 
 const CLI: Record<string, CliSpec> = {
   openai: {
     bin: "codex",
-    buildArgs: () => ["exec", "--skip-git-repo-check", "-"],
+    buildArgs: () => [
+      "exec",
+      "--ephemeral",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--skip-git-repo-check",
+      "--color",
+      "never",
+      "--sandbox",
+      "read-only",
+      "-c",
+      "mcp_servers={}",
+      "-",
+    ],
     inputMode: "stdin",
+    protectedDataIsolation: true,
     model: "openai/codex-cli",
   },
   xai: {
@@ -58,20 +78,35 @@ const CLI: Record<string, CliSpec> = {
     bin: existsSync(join(homedir(), ".grok/bin/agent")) ? join(homedir(), ".grok/bin/agent") : "agent",
     buildArgs: (p) => ["-p", p],
     inputMode: "argv",
+    protectedDataIsolation: false,
     model: "xai/grok-cli",
   },
   anthropic: {
     // Model is pinned explicitly (operator requirement: never the default alias).
     bin: "claude",
-    buildArgs: (p) => [
+    buildArgs: () => [
       "-p",
-      p,
       "--max-turns",
       "1",
       "--model",
       process.env.TRIBUNAL_CLAUDE_MODEL ?? "sonnet",
+      "--safe-mode",
+      "--no-session-persistence",
+      "--prompt-suggestions",
+      "false",
+      "--tools",
+      "",
+      "--permission-mode",
+      "dontAsk",
+      "--output-format",
+      "text",
     ],
-    inputMode: "argv",
+    inputMode: "stdin",
+    protectedDataIsolation: true,
+    environment: {
+      ANTHROPIC_SMALL_FAST_MODEL: process.env.TRIBUNAL_CLAUDE_MODEL ?? "sonnet",
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1",
+    },
     model: `anthropic/${process.env.TRIBUNAL_CLAUDE_MODEL ?? "sonnet"}`,
   },
   cursor: {
@@ -81,6 +116,7 @@ const CLI: Record<string, CliSpec> = {
         ? ["-p", p, "--output-format", "text", "--model", process.env.TRIBUNAL_CURSOR_MODEL]
         : ["-p", p, "--output-format", "text"],
     inputMode: "argv",
+    protectedDataIsolation: false,
     model: `cursor/${process.env.TRIBUNAL_CURSOR_MODEL ?? "default"}`,
   },
 };
@@ -92,6 +128,13 @@ const TERMINATE_FALLBACK_MS = 2_000;
 export interface CliOptions {
   timeoutMs?: number;
   modelLabel?: string;
+  /** Test/custom executable override; never derived from case data. */
+  bin?: string;
+  /**
+   * Defaults true. False is permitted only for explicitly public/synthetic
+   * probes and may use a provider's legacy argv prompt transport.
+   */
+  protectedData?: boolean;
 }
 
 export class CliPanelClient implements PanelClient {
@@ -109,7 +152,13 @@ export class CliPanelClient implements PanelClient {
   ) {
     const spec = CLI[provider];
     if (!spec) throw new Error(`no CLI adapter for provider ${provider}`);
-    this.spec = spec;
+    const protectedData = opts.protectedData ?? true;
+    if (protectedData && !spec.protectedDataIsolation) {
+      throw new Error(
+        `${provider} CLI is disabled for protected-data runs: reviewed stdin, tool-surface, session, and filesystem controls are not established`,
+      );
+    }
+    this.spec = opts.bin ? { ...spec, bin: opts.bin } : spec;
     this.model = opts.modelLabel ?? spec.model;
     this.timeoutMs = opts.timeoutMs ?? 120_000;
   }
@@ -150,7 +199,13 @@ export class CliPanelClient implements PanelClient {
   }
 
   async revise(req: ReviseRequest): Promise<ReviseResult> {
-    const { system, user } = revisePrompt(req.view, req.ownRound1, req.feedback, req.guidance);
+    const { system, user } = revisePrompt(
+      req.view,
+      req.ownRound1,
+      req.feedback,
+      req.guidance,
+      req.feedbackAnonymized ?? true,
+    );
     const prompt = `${system}\n\n${user}`;
     const t0 = Date.now();
     const raw = await this.run(prompt, req.signal);
@@ -187,159 +242,190 @@ export class CliPanelClient implements PanelClient {
     };
   }
 
-  private run(prompt: string, signal?: AbortSignal): Promise<string> {
+  async reviewSafety(req: SafetyReviewRequest): Promise<SafetyReviewResult> {
+    const expectedKey = candidateKey(req.candidate.candidate);
+    const { system, user } = safetyPrompt(req.view, expectedKey, req.candidate.candidate.text);
+    const t0 = Date.now();
+    const raw = await this.run(`${system}\n\n${user}`, req.signal);
+    const parsed = parseSafetyVerdict(raw, expectedKey);
+    return {
+      repaired: parsed.repaired,
+      usage: {
+        provider: this.provider,
+        model: this.model,
+        modelSource: this.modelSource,
+        latencyMs: Date.now() - t0,
+        status: "ok",
+        transport: "cli",
+        tokensOut: approxTokens(raw),
+      },
+      verdict: parsed.verdict,
+    };
+  }
+
+  private async run(prompt: string, signal?: AbortSignal): Promise<string> {
     signal?.throwIfAborted();
     const args = this.spec.buildArgs(prompt);
     const cwd = mkdtempSync(join(tmpdir(), "tribunal-"));
-    return new Promise<string>((resolve, reject) => {
-      const child = spawn(this.spec.bin, args, {
-        cwd,
-        env: { ...process.env, NO_COLOR: "1", CI: "1" },
-        stdio: ["pipe", "pipe", "pipe"],
-        // A dedicated POSIX process group lets cancellation terminate any
-        // descendants spawned by an agent CLI, not only its wrapper process.
-        detached: process.platform !== "win32",
-      });
-      let out = "";
-      let err = "";
-      let settled = false;
-      let terminationError: Error | null = null;
-      let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
-      let forceKillTimer: ReturnType<typeof setTimeout> | undefined;
-      let postKillSettleTimer: ReturnType<typeof setTimeout> | undefined;
-      let settleFallbackTimer: ReturnType<typeof setTimeout> | undefined;
-      let childClosed = false;
-      let forceKillSent = false;
+    try {
+      return await new Promise<string>((resolve, reject) => {
+        const child = spawn(this.spec.bin, args, {
+          cwd,
+          env: minimalCliEnvironment(this.spec.environment),
+          stdio: ["pipe", "pipe", "pipe"],
+          // A dedicated POSIX process group lets cancellation terminate any
+          // descendants spawned by an agent CLI, not only its wrapper process.
+          detached: process.platform !== "win32",
+        });
+        let out = "";
+        let err = "";
+        let settled = false;
+        let terminationError: Error | null = null;
+        let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
+        let forceKillTimer: ReturnType<typeof setTimeout> | undefined;
+        let postKillSettleTimer: ReturnType<typeof setTimeout> | undefined;
+        let settleFallbackTimer: ReturnType<typeof setTimeout> | undefined;
+        let childClosed = false;
+        let forceKillSent = false;
 
-      const signalProcessGroup = (killSignal: NodeJS.Signals) => {
-        if (!child.pid) return;
-        if (process.platform !== "win32") {
+        const signalProcessGroup = (killSignal: NodeJS.Signals) => {
+          if (!child.pid) return;
+          if (process.platform !== "win32") {
+            try {
+              process.kill(-child.pid, killSignal);
+              return;
+            } catch (error: any) {
+              // ESRCH means the group already exited. For other errors, fall back
+              // to the direct child so cancellation still makes best effort.
+              if (error?.code === "ESRCH") return;
+            }
+          }
           try {
-            process.kill(-child.pid, killSignal);
-            return;
+            child.kill(killSignal);
+          } catch {
+            // The bounded fallback below still settles if Node never emits close.
+          }
+        };
+        const processGroupIsAlive = () => {
+          if (process.platform === "win32" || !child.pid) return false;
+          try {
+            process.kill(-child.pid, 0);
+            return true;
           } catch (error: any) {
-            // ESRCH means the group already exited. For other errors, fall back
-            // to the direct child so cancellation still makes best effort.
-            if (error?.code === "ESRCH") return;
+            return error?.code !== "ESRCH";
           }
-        }
-        try {
-          child.kill(killSignal);
-        } catch {
-          // The bounded fallback below still settles if Node never emits close.
-        }
-      };
-      const processGroupIsAlive = () => {
-        if (process.platform === "win32" || !child.pid) return false;
-        try {
-          process.kill(-child.pid, 0);
-          return true;
-        } catch (error: any) {
-          return error?.code !== "ESRCH";
-        }
-      };
-      const cleanup = () => {
-        if (timeoutTimer) clearTimeout(timeoutTimer);
-        if (forceKillTimer) clearTimeout(forceKillTimer);
-        if (postKillSettleTimer) clearTimeout(postKillSettleTimer);
-        if (settleFallbackTimer) clearTimeout(settleFallbackTimer);
-        signal?.removeEventListener("abort", onAbort);
-      };
-      const fail = (error: Error) => {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        reject(error);
-      };
-      const succeed = (value: string) => {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        resolve(value);
-      };
+        };
+        const cleanup = () => {
+          if (timeoutTimer) clearTimeout(timeoutTimer);
+          if (forceKillTimer) clearTimeout(forceKillTimer);
+          if (postKillSettleTimer) clearTimeout(postKillSettleTimer);
+          if (settleFallbackTimer) clearTimeout(settleFallbackTimer);
+          signal?.removeEventListener("abort", onAbort);
+        };
+        const fail = (error: Error) => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          reject(error);
+        };
+        const succeed = (value: string) => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(value);
+        };
 
-      const terminate = (error: Error) => {
-        if (settled || terminationError) return;
-        terminationError = error;
-        signalProcessGroup("SIGTERM");
-        forceKillTimer = setTimeout(() => {
-          forceKillSent = true;
-          signalProcessGroup("SIGKILL");
-          if (childClosed) {
-            postKillSettleTimer = setTimeout(() => fail(error), 50);
-          }
-        }, TERMINATE_GRACE_MS);
-        // Normally `close` settles after every stdio handle closes. Bound that
-        // wait so a broken CLI cannot leave the Tribunal run stuck forever.
-        settleFallbackTimer = setTimeout(() => fail(error), TERMINATE_FALLBACK_MS);
-      };
+        const terminate = (error: Error) => {
+          if (settled || terminationError) return;
+          terminationError = error;
+          signalProcessGroup("SIGTERM");
+          forceKillTimer = setTimeout(() => {
+            forceKillSent = true;
+            signalProcessGroup("SIGKILL");
+            if (childClosed) {
+              postKillSettleTimer = setTimeout(() => fail(error), 50);
+            }
+          }, TERMINATE_GRACE_MS);
+          // Normally `close` settles after every stdio handle closes. Bound that
+          // wait so a broken CLI cannot leave the Tribunal run stuck forever.
+          settleFallbackTimer = setTimeout(() => fail(error), TERMINATE_FALLBACK_MS);
+        };
 
-      const onAbort = () =>
-        terminate(
-          signal?.reason instanceof Error
-            ? signal.reason
-            : new DOMException("Run cancelled", "AbortError"),
-        );
+        const onAbort = () =>
+          terminate(
+            signal?.reason instanceof Error
+              ? signal.reason
+              : new DOMException("Run cancelled", "AbortError"),
+          );
 
-      child.stdout.on("data", (d) => (out += d.toString()));
-      child.stderr.on("data", (d) => (err += d.toString()));
-      child.stdin.on("error", (e) => {
-        // Killing a CLI can close its stdin while buffered prompt bytes remain.
-        // That EPIPE is part of cancellation; outside termination it is a real
-        // transport failure and should not become an unhandled stream error.
-        if (!terminationError) fail(new Error(`${this.spec.bin} stdin failed: ${e.message}`));
-      });
-      child.on("error", (e) => {
-        fail(new Error(`${this.spec.bin} spawn failed: ${e.message}`));
-      });
-      child.on("close", (code) => {
-        if (settled) return;
-        childClosed = true;
-        if (terminationError) {
-          // The wrapper can close before a descendant that ignored SIGTERM. Keep
-          // waiting until the group disappears or the force-kill path runs.
-          if (processGroupIsAlive() && !forceKillSent) return;
-          if (forceKillSent) {
-            postKillSettleTimer = setTimeout(() => fail(terminationError!), 50);
+        child.stdout.on("data", (d) => (out += d.toString()));
+        child.stderr.on("data", (d) => (err += d.toString()));
+        child.stdin.on("error", (e) => {
+          // Killing a CLI can close its stdin while buffered prompt bytes remain.
+          // That EPIPE is part of cancellation; outside termination it is a real
+          // transport failure and should not become an unhandled stream error.
+          if (!terminationError) fail(new Error(`${this.spec.bin} stdin failed: ${e.message}`));
+        });
+        child.on("error", (e) => {
+          fail(new Error(`${this.spec.bin} spawn failed: ${e.message}`));
+        });
+        child.on("close", (code) => {
+          if (settled) return;
+          childClosed = true;
+          if (terminationError) {
+            // The wrapper can close before a descendant that ignored SIGTERM. Keep
+            // waiting until the group disappears or the force-kill path runs.
+            if (processGroupIsAlive() && !forceKillSent) return;
+            if (forceKillSent) {
+              postKillSettleTimer = setTimeout(() => fail(terminationError!), 50);
+              return;
+            }
+            fail(terminationError);
             return;
           }
-          fail(terminationError);
-          return;
+          const clean = out.replace(ANSI, "").trim();
+          if (!clean && code !== 0) {
+            fail(new Error(`${this.spec.bin} exited ${code}: ${err.slice(0, 200)}`));
+            return;
+          }
+          succeed(clean);
+        });
+
+        timeoutTimer = setTimeout(
+          () => terminate(new Error(`${this.spec.bin} timed out after ${this.timeoutMs}ms`)),
+          this.timeoutMs,
+        );
+        signal?.addEventListener("abort", onAbort, { once: true });
+        if (signal?.aborted) onAbort();
+
+        if (!terminationError && this.spec.inputMode === "stdin") {
+          child.stdin.write(prompt);
         }
-        const clean = out.replace(ANSI, "").trim();
-        if (!clean && code !== 0) {
-          fail(new Error(`${this.spec.bin} exited ${code}: ${err.slice(0, 200)}`));
-          return;
-        }
-        succeed(clean);
+        child.stdin.end();
       });
-
-      timeoutTimer = setTimeout(
-        () => terminate(new Error(`${this.spec.bin} timed out after ${this.timeoutMs}ms`)),
-        this.timeoutMs,
-      );
-      signal?.addEventListener("abort", onAbort, { once: true });
-      if (signal?.aborted) onAbort();
-
-      if (!terminationError && this.spec.inputMode === "stdin") {
-        child.stdin.write(prompt);
-      }
-      child.stdin.end();
-    });
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
   }
 }
 
-// --- parsing (tolerant; counts repairs for honest scorecard behavior) --------
+// --- parsing (strict eligibility; repaired structures are recorded but do not vote) ---
 
 function parseProposal(raw: string, society: Society, spanIndex: number) {
   let repaired = 0;
-  const obj = extractJSON(raw);
+  const obj = extractStrictJSON(raw);
+  if (!hasExactKeys(obj, ["candidates", "rejectedAlternatives", "publicWarrant", "objections"])) repaired++;
   const rawCands: any[] = Array.isArray(obj.candidates) ? obj.candidates : [];
+  if (!Array.isArray(obj.candidates) || obj.candidates.length === 0) repaired++;
+  for (const candidate of rawCands) if (!validRawScored(candidate)) repaired++;
   const scored: ScoredCandidate[] = rawCands.length
     ? rawCands.map((c) => coerceScored(c, () => repaired++))
     : [coerceScored({ isStop: true, warrant: "" }, () => repaired++)];
 
-  const objections: Objection[] = (Array.isArray(obj.objections) ? obj.objections : [])
+  if (!Array.isArray(obj.objections)) repaired++;
+  const rawObjections: any[] = Array.isArray(obj.objections) ? obj.objections : [];
+  if (rawObjections.some((objection) => !validRawObjection(objection))) repaired++;
+  const objections: Objection[] = rawObjections
     .filter((o: any) => o && (o.text || o.targetKey))
     .map((o: any) => ({
       id: stableId("obj", society, asString(o.targetKey), asString(o.text), spanIndex),
@@ -355,7 +441,10 @@ function parseProposal(raw: string, society: Society, spanIndex: number) {
     publicWarrant = scored[0]?.warrant || "(no public warrant returned)";
     repaired++;
   }
-  const rejected = (Array.isArray(obj.rejectedAlternatives) ? obj.rejectedAlternatives : [])
+  if (!Array.isArray(obj.rejectedAlternatives)) repaired++;
+  const rawRejected: any[] = Array.isArray(obj.rejectedAlternatives) ? obj.rejectedAlternatives : [];
+  if (rawRejected.some((item) => !item || !hasExactKeys(item, ["text", "reason"]) || typeof item.text !== "string" || typeof item.reason !== "string")) repaired++;
+  const rejected = rawRejected
     .filter((r: any) => r && r.text)
     .map((r: any) => ({ text: asString(r.text), reason: asString(r.reason) }));
 
@@ -364,13 +453,16 @@ function parseProposal(raw: string, society: Society, spanIndex: number) {
 
 function parseRevision(raw: string, society: Society, spanIndex: number, ownR1: ScoredCandidate[]) {
   let repaired = 0;
-  const obj = extractJSON(raw);
+  const obj = extractStrictJSON(raw);
+  if (!hasExactKeys(obj, ["final", "changedFromRound1", "answerToStrongestObjection", "steelmanOfBestRival", "changeMyMind", "maintainedObjections"])) repaired++;
+  if (!validRawScored(obj.final)) repaired++;
   const final = coerceScored(obj.final ?? {}, () => repaired++);
   const r1key = ownR1[0] ? candidateKey(ownR1[0].candidate) : "";
   const changed =
     typeof obj.changedFromRound1 === "boolean"
       ? obj.changedFromRound1
       : candidateKey(final.candidate) !== r1key;
+  if (typeof obj.changedFromRound1 !== "boolean") repaired++;
 
   const need = (v: unknown, label: string) => {
     const s = asString(v);
@@ -381,7 +473,10 @@ function parseRevision(raw: string, society: Society, spanIndex: number, ownR1: 
     return s;
   };
 
-  const maintained: Objection[] = (Array.isArray(obj.maintainedObjections) ? obj.maintainedObjections : [])
+  if (!Array.isArray(obj.maintainedObjections)) repaired++;
+  const rawMaintained: any[] = Array.isArray(obj.maintainedObjections) ? obj.maintainedObjections : [];
+  if (rawMaintained.some((objection) => !validRawObjection(objection))) repaired++;
+  const maintained: Objection[] = rawMaintained
     .filter((o: any) => o && (o.text || o.targetKey))
     .map((o: any) => ({
       id: stableId("mobj", society, asString(o.targetKey), asString(o.text), spanIndex),
@@ -422,6 +517,58 @@ function coerceScored(c: any, onRepair: () => void): ScoredCandidate {
     affectedPartyImpact: clamp01(c.affectedPartyImpact, 0.5),
     warrant,
     evidenceRefs: Array.isArray(c.evidenceRefs) ? c.evidenceRefs.map(asString) : [],
+  };
+}
+
+function validRawScored(value: any): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  if (!hasExactKeys(value, ["text", "isStop", "confidence", "factualityRisk", "legalRisk", "fairnessRisk", "affectedPartyImpact", "warrant", "evidenceRefs"])) return false;
+  if (typeof value.text !== "string" || typeof value.isStop !== "boolean") return false;
+  if (value.isStop ? value.text !== "" : value.text.trim().length === 0) return false;
+  if (typeof value.warrant !== "string" || value.warrant.trim().length === 0) return false;
+  if (!Array.isArray(value.evidenceRefs) || !value.evidenceRefs.every((item: unknown) => typeof item === "string")) return false;
+  return ["confidence", "factualityRisk", "legalRisk", "fairnessRisk", "affectedPartyImpact"].every((key) =>
+    typeof value[key] === "number" && Number.isFinite(value[key]) && value[key] >= 0 && value[key] <= 1,
+  );
+}
+
+function validRawObjection(value: any): boolean {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      hasExactKeys(value, ["targetKey", "text", "severity", "kind"]) &&
+      typeof value.targetKey === "string" &&
+      value.targetKey.trim() &&
+      typeof value.text === "string" &&
+      value.text.trim() &&
+      typeof value.severity === "number" &&
+      Number.isFinite(value.severity) &&
+      value.severity >= 0 &&
+      value.severity <= 1 &&
+      ["factual", "legal", "policy", "fairness", "user_impact", "cost"].includes(value.kind),
+  );
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
+  return Object.keys(value).length === keys.length && keys.every((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
+function parseSafetyVerdict(raw: string, expectedKey: string) {
+  let repaired = 0;
+  const value = extractStrictJSON(raw);
+  if (!hasExactKeys(value, ["candidateKey", "veto", "legalRisk", "publicReason"])) repaired++;
+  if (value.candidateKey !== expectedKey) repaired++;
+  if (typeof value.veto !== "boolean") repaired++;
+  if (typeof value.legalRisk !== "number" || !Number.isFinite(value.legalRisk) || value.legalRisk < 0 || value.legalRisk > 1) repaired++;
+  if (typeof value.publicReason !== "string" || !value.publicReason.trim()) repaired++;
+  return {
+    repaired,
+    verdict: {
+      candidateKey: expectedKey,
+      veto: typeof value.veto === "boolean" ? value.veto : false,
+      legalRisk: clamp01(value.legalRisk, 1),
+      publicReason: asString(value.publicReason) || "(safety review invalid)",
+    },
   };
 }
 

@@ -7,7 +7,7 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 
 **Objective:** Rao is the evaluation-methodology and reliability referee. We are not asking "is this good?" — we are asking him to adjudicate five prespecified design decisions and to attack our frozen working answers. Every decision has a written fallback, so any answer he gives is progress.
 
-**Posture:** on Wednesday Krishnan adjudicated the construct question at the clinical level (escalation tuple, formal vocabulary, kappa panel, stronger-than-Delphi experimental design — all now implemented or preregistered). Today is the measurement-engineering layer: units, failure definitions, comparators, timing, and the governance evidence bar. Bring the worksheet filled in; take his edits verbatim.
+**Posture:** on Wednesday Krishnan sharpened the construct question at the clinical level (escalation tuple, formal vocabulary, agreement panel, stronger-than-ordinary-Delphi experimental design). The local action tuple and portions of the agreement analysis are implemented; external terminology mappings, full tuple synthesis, and parts of the planned statistics remain research requirements. Today is the measurement-engineering layer: units, failure definitions, comparators, timing, and the governance evidence bar. Bring the worksheet filled in; take his edits verbatim.
 
 ---
 
@@ -17,13 +17,13 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 
 > "Professor Rao — thank you. Five minutes of setup, then five specific decisions we'd like your judgment on.
 >
-> We've built Tribunal: a working system where a high-stakes AI verdict is decided span by span under sealed ballots, anonymized cross-examination, a binding safety veto, and preserved dissent, on a hash-chained ledger anyone can re-verify. We're adapting it to one clinical workflow: complex-case specialist escalation. Professor Krishnan pushed us hard on construct validity on Wednesday; we rebuilt the evaluation design around a bounded escalation tuple instead of generic 'clinical consensus.'
+> We've built Tribunal: a working system where a high-stakes AI verdict is decided span by span under sealed ballots, aggregate identity-hidden critique, a binding safety-veto path, and preserved dissent, on a hash-chained ledger whose internal consistency can be replayed and checked. We're adapting it to one clinical workflow: complex-case specialist escalation. Professor Krishnan pushed us hard on construct validity on Wednesday; we rebuilt the evaluation design around a bounded escalation tuple instead of generic 'clinical consensus.'
 >
 > We prepared for this conversation using your own instruments — we filled in your AI Use Case Worksheet for our scenario, and we tried to apply the reliability-engineering framing from your trustworthy-AI work. That surfaced exactly the questions we can't settle ourselves."
 
 ### 0:35–1:30 — What exists, compressed
 
-> "What's real today: the deliberation engine runs with cross-vendor panels and tamper-evident ledgers. For the clinical layer we've preregistered a paired five-arm mechanism experiment — every sealed case-agent state receives control, valid evidence, an unsupported majority count, both in conflict, or an irrelevant-evidence placebo — and the analysis harness is implemented, tested, and fail-closed: it refuses attrition, session reuse, or prompt drift, and its receipts replay the entire analysis from hashes. We ran the falsification gate with six scripted adversarial policies; the analyzer recovers each programmed effect exactly. So the instrument is calibrated — what we measure with it next is what today decides.
+> "What's real today: the deliberation engine runs with cross-vendor panels and tamper-evident ledgers. For the clinical layer we've preregistered a paired five-arm mechanism experiment — every sealed case-agent state receives control, valid evidence, an unsupported majority count, both in conflict, or an irrelevant-evidence placebo — and the analysis harness is implemented and tested. It rejects missing planned observations, preserves and reports explicit non-votes and attrition, checks fresh session/call identities, and detects specified drift in the recomputable user-prompt envelope. Its receipts bind and replay the implemented analysis within their stated trust boundary. We ran the functional falsification gate with six scripted adversarial policies; the analyzer recovered each programmed effect exactly. That verifies the implementation against programmed oracles; it does not statistically calibrate the instrument or establish model or clinical performance. What we measure next is what today decides.
 >
 > One honest gap we bring you: an authenticated literature pass on reliability engineering for AI-based clinical decision support came back with classical reliability papers and no direct transfer. We'd rather have you correct our framing than invent one."
 
@@ -69,7 +69,7 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 | Only 15 minutes | Skip §0:35–1:30 after the first sentence; decisions start at ~1:00; drop the close's first ask |
 | He dives deep on one decision | Let him. One adjudicated decision beats five grazed. Land decisions Two and Five in the last minute if nothing else |
 | He rejects the construct framing entirely | Do not defend. "What would you measure first?" — his answer becomes the primary endpoint candidate; record verbatim |
-| He asks for performance/accuracy numbers | "We claim none yet. The harness is calibrated on scripted adversaries; live-model numbers come after Saturday, and clinical numbers only after the silent-mode bar you're helping us set." |
+| He asks for performance/accuracy numbers | "We claim none yet. The analyzer passed deterministic functional/oracle checks on scripted adversaries; live-model numbers come after Saturday, and clinical numbers only after the silent-mode bar you're helping us set." |
 | He questions the reliability gap ("literature exists, you missed it") | Accept immediately, ask for the references — that is a better outcome than the gap; log them for verification |
 | Stall or generic turn | Reserve question: **"Which single failure, if it happened once, should make this system unshippable regardless of its average performance?"** |
 | He offers Abridge/Anthropic/hospital introductions | Accept concretely: propose the silent-mode protocol review as the artifact they'd see first |
@@ -87,7 +87,7 @@ Companion documents: `RAO_MEETING_ONE_PAGE_2026-07-17.md` (hand it over, don't r
 - Recite his own worksheet or reliability paper back at him beyond the one-line acknowledgment — he wrote them.
 - Present AIPSC checklist items as known — full text is pending; only the four percentages are verified.
 - Call the reliability literature pass "proof there is no prior work" — it is a bounded search-gap from retrieved abstracts, nothing stronger.
-- Claim the E2 falsification run says anything about real models — it calibrates the analyzer, full stop.
+- Claim the E2 falsification run says anything about real models — it functionally verifies the analyzer against programmed effects, full stop.
 - Exceed five minutes of setup. His edits are the deliverable; at 5:00 whatever is unsaid becomes the follow-up email.
 
 ## Post-meeting protocol (same day)

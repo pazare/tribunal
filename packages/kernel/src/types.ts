@@ -14,8 +14,8 @@
  *  3. STOP / abstain is a first-class candidate, never a magic string.
  *  4. Blind isolation is structural: a panelist's round-1 input contains no peer
  *     material by construction.
- *  5. Anonymized feedback carries NO panelist identity, provider, or seat — the
- *     type has no such field (field-level anonymization by the type system).
+ *  5. The anonymized arm omits attribution fields; the identity-visible control
+ *     arm includes them explicitly, making anonymization a real intervention.
  */
 
 // ---------------------------------------------------------------------------
@@ -230,7 +230,18 @@ export interface HashCheck {
 // Round 2: controlled Delphi feedback (anonymous) + revision
 // ---------------------------------------------------------------------------
 
-/** One candidate as peers see it. Contains NO identity/provider/seat field. */
+/** The disclosed author of a contribution in the identity-visible control arm. */
+export interface FeedbackAttribution {
+  seatId: string;
+  society: Society;
+  provider: Provider;
+}
+
+/**
+ * One candidate as peers see it. `attributions` is absent in the anonymized arm
+ * and required in the identity-visible control arm. This makes the ablation a
+ * real information intervention rather than a label-only change.
+ */
 export interface FeedbackCandidateSummary {
   candidate: Candidate;
   supportCount: number;
@@ -239,6 +250,7 @@ export interface FeedbackCandidateSummary {
   strongestArgument: string;
   strongestObjection?: string;
   evidenceConflicts: string[];
+  attributions?: FeedbackAttribution[];
 }
 
 export interface FeedbackPacket {
@@ -399,6 +411,8 @@ export type EventKind =
 
 export interface EventPayloadMap {
   run_started: {
+    /** Protocol 2 enforces quorum, safety coverage, and exact state-machine verification. */
+    protocolVersion: 2;
     packId: string;
     title: string;
     domain: string;
@@ -425,7 +439,7 @@ export interface EventPayloadMap {
   decision_closed: { spanIndex: number };
   run_finished: {
     finalAnswer: string;
-    stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "cancelled";
+    stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "degraded" | "cancelled";
     spanCount: number;
     totals: Record<string, number>;
     cancellation?: CancellationReceipt;
@@ -485,7 +499,7 @@ export interface RunResult {
   runId: string;
   packId: string;
   finalAnswer: string;
-  stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "cancelled";
+  stoppedBy: "stop_ratified" | "max_spans" | "budget" | "halted" | "degraded" | "cancelled";
   spanCount: number;
   events: LedgerEvent[];
   usageTotals: Record<string, number>;

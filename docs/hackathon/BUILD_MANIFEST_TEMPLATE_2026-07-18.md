@@ -15,6 +15,7 @@ git checkout -b pazare/hackathon-day-20260718 hackathon-prestart-20260718
 # 4. record the start receipt (template below) BEFORE any implementation commit
 mkdir -p runs/hackathon-20260718
 $EDITOR runs/hackathon-20260718/start.json
+$EDITOR BUILD_MANIFEST.md   # paste/fill the repo-root template below
 git add runs/hackathon-20260718/start.json BUILD_MANIFEST.md && git commit -m "hackathon: start receipt and build manifest"
 git push -u origin pazare/hackathon-day-20260718 --tags
 # 5. at submission time
@@ -76,7 +77,7 @@ Rule: if an organizer answer is not obtained, record `"unanswered"` — never fi
 - Models/endpoints: <exact model ids as receipted in run ledgers>
 
 ## Reproduce / verify
-- Tests: `npm test`; receipts: `npm run experiment:clinical:verify -- <run dir>`; ledger: `POST /api/verify`
+- Tests: `npm test`; receipts: `npm run experiment:clinical:verify -- <run dir> <fixture JSON path>`; ledger: `POST /api/verify`
 - Commit window: <first day-of sha> .. <final sha>, all timestamped after start receipt
 ```
 

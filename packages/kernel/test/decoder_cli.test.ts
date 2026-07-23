@@ -22,6 +22,8 @@ function executable(path: string, source: string): string {
 
 test("decoder CLI contracts pin models and effort while carrying the public prompt only on stdin", async () => {
   const dir = mkdtempSync(join(tmpdir(), "tribunal-decoder-cli-test-"));
+  const priorSecret = process.env.TRIBUNAL_TEST_SECRET_DO_NOT_FORWARD;
+  process.env.TRIBUNAL_TEST_SECRET_DO_NOT_FORWARD = "must-not-reach-decoder-child";
   try {
     const codexPrompt = join(dir, "codex-prompt.txt");
     const codexArgs = join(dir, "codex-args.json");
@@ -61,7 +63,9 @@ if (process.argv[2] === "--version") {
     fs.writeFileSync(${JSON.stringify(claudeArgs)}, JSON.stringify(process.argv.slice(2)));
     fs.writeFileSync(${JSON.stringify(claudeEnv)}, JSON.stringify({
       smallFastModel: process.env.ANTHROPIC_SMALL_FAST_MODEL,
-      nonessentialTraffic: process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+      nonessentialTraffic: process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC,
+      leakedSecret: process.env.TRIBUNAL_TEST_SECRET_DO_NOT_FORWARD,
+      leakedOpenRouterKey: process.env.OPENROUTER_API_KEY
     }));
     process.stdout.write(JSON.stringify({
       structured_output: { unit: { kind: "span", text: "OK" }, publicWarrant: "exact test" },
@@ -121,6 +125,8 @@ if (process.argv[2] === "--version") {
     assert.ok(codexReceipt.command.args.some((arg) => arg.startsWith("<output-schema:")));
     assert.ok(claudeReceipt.command.args.some((arg) => arg.startsWith("<json-schema:")));
   } finally {
+    if (priorSecret === undefined) delete process.env.TRIBUNAL_TEST_SECRET_DO_NOT_FORWARD;
+    else process.env.TRIBUNAL_TEST_SECRET_DO_NOT_FORWARD = priorSecret;
     rmSync(dir, { recursive: true, force: true });
   }
 });

@@ -110,7 +110,7 @@ test("decoder browser unlock permits HTTPS or an actual loopback HTTP connection
 
 test("decoder operator authorization accepts only the configured bearer or operator header", () => {
   const token = "0123456789abcdef".repeat(2);
-  assert.equal(decoderOperatorAuthorized({}, undefined), true);
+  assert.equal(decoderOperatorAuthorized({}, undefined), false);
   assert.equal(decoderOperatorAuthorized({}, token), false);
   assert.equal(
     decoderOperatorAuthorized({ authorization: `Bearer ${token}` }, token),
@@ -142,7 +142,7 @@ test("decoder operator authorization accepts only the configured bearer or opera
   const setCookie = decoderSessionCookie(first, true, now);
   assert.match(setCookie, /HttpOnly/);
   assert.match(setCookie, /SameSite=Strict/);
-  assert.match(setCookie, /Path=\/api\/decoder/);
+  assert.match(setCookie, /Path=\/api/);
   assert.match(setCookie, /Secure/);
   assert.match(setCookie, /Max-Age=28800/);
   assert.equal(setCookie.includes(token), false);
@@ -168,7 +168,11 @@ test("decoder operator authorization accepts only the configured bearer or opera
   assert.match(cleared, new RegExp(`^${DECODER_SESSION_COOKIE}=`));
   assert.match(cleared, /HttpOnly/);
   assert.match(cleared, /SameSite=Strict/);
-  assert.match(cleared, /Path=\/api\/decoder/);
+  assert.match(cleared, /Path=\/api/);
   assert.match(cleared, /Secure/);
   assert.match(cleared, /Max-Age=0/);
+
+  const unconfigured = new DecoderSessionStore();
+  assert.equal(unconfigured.authorized({}), false);
+  assert.equal(unconfigured.unlock({ authorization: `Bearer ${token}` }), null);
 });

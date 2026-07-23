@@ -10,7 +10,7 @@ Status: operational plan; public prompt, date, hours, city, and team-size rule v
 
 Ship one narrow clinician-facing workflow:
 
-> A complex-case escalation copilot that converts an Abridge-style clinical conversation plus structured facts into independent sealed agent assessments, detects whether apparent consensus is evidence-driven, and gives the clinician a concise, attributable specialist-escalation packet.
+> A complex-case escalation copilot that converts a permitted Abridge-style clinical conversation plus structured facts into separately generated, peer-isolated sealed agent assessments; tests whether revisions follow evidence or an unsupported count cue; and gives an assigned clinician decision owner a concise, attributable specialist-escalation packet.
 
 The system does not choose a treatment or overrule a clinician. It answers:
 
@@ -100,7 +100,7 @@ One case must complete this path live:
 ```text
 permitted transcript + structured facts
   -> attributable evidence spans
-  -> four independent sealed assessments
+  -> four separately generated, peer-isolated sealed assessments
   -> coded escalation tuples
   -> private evidence/majority-signal revision
   -> ratified action or explicit underdetermination
@@ -252,7 +252,7 @@ The minimum meaningful evaluation has two distinct parts that must not be pooled
 2. **Debate:** agents see preceding recommendations before deciding.
 3. **Tribunal:** agents vote independently, then revise privately under matched evidence/social-signal conditions.
 
-Architecture endpoints are descriptive criterion match on the planted/reference action, non-votes, preserved dissent, exact tuple match, latency, and measured model cost. If budgets differ, display the difference and do not attribute the result solely to architecture.
+The Saturday minimum compares three architectures: one model, ordinary visible debate, and Tribunal. The full research protocol later adds self-consistency, blind-without-revision, no-veto, and no-evidence-change ablations. Saturday endpoints are descriptive action-level criterion match, non-votes, preserved dissent, latency, and **recorded caller/provider-reported estimated** model-use cost. Exact tuple, specialty, urgency, and missing-evidence endpoints are shown only if they are integrated into the analyzer and pass tests day-of. If budgets differ, display the difference and do not attribute the result solely to architecture.
 
 Show every numerator and denominator, including baseline non-votes and post-arm attrition. If the sample is tiny, say “mechanism demonstration on N case families,” not “performance improvement.” A failed or null result remains useful if the ledger makes the mechanism diagnosable; a null social-cue contrast is not evidence of immunity. Preserve the first run before applying clinician feedback and use a frozen hold-out case family after fixes. A same-case improvement is a development demonstration, not unbiased performance evidence.
 

@@ -11,6 +11,8 @@ import type {
   ProposeResult,
   ReviseRequest,
   ReviseResult,
+  SafetyReviewRequest,
+  SafetyReviewResult,
 } from "./base.js";
 
 /**
@@ -143,6 +145,33 @@ export class OfflinePanelClient implements PanelClient {
         steelmanOfBestRival: `The strongest case for the rival is that ${bestSupported.strongestArgument}`,
         changeMyMind: changeMyMind(this.society, view),
         maintainedObjections: maintained,
+      },
+    };
+  }
+
+  async reviewSafety(req: SafetyReviewRequest): Promise<SafetyReviewResult> {
+    req.signal?.throwIfAborted();
+    const key = req.candidate.candidate.isStop ? "<STOP>" : req.candidate.candidate.text.trim();
+    const objection = req.maintainedObjections
+      .filter((item) => item.targetKey === key && (item.kind === "legal" || item.kind === "policy"))
+      .sort((a, b) => b.severity - a.severity)[0];
+    const veto = Boolean(objection && objection.severity >= 0.6);
+    return {
+      repaired: 0,
+      usage: {
+        provider: this.provider,
+        model: this.model,
+        modelSource: this.modelSource,
+        status: "ok",
+        transport: "offline",
+      },
+      verdict: {
+        candidateKey: key,
+        veto,
+        legalRisk: req.candidate.legalRisk,
+        publicReason: veto
+          ? `Dedicated safety review vetoes "${key}": ${objection!.text}`
+          : `Dedicated safety review found no veto-level legal or policy objection to "${key}".`,
       },
     };
   }

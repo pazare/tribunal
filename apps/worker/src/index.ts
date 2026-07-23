@@ -1,8 +1,9 @@
-/**
- * Tribunal verify worker — faithful port of packages/kernel/src/ledger.ts verifyLedger().
- * CANONICAL SOURCE: packages/kernel/src/ledger.ts and packages/kernel/src/hash.ts
- * Keep field names and rules in sync when the kernel changes.
- */
+/** Tribunal verify worker — WebCrypto hash checks plus the canonical protocol verifier. */
+
+import {
+  verifyLedgerStructure,
+  type LedgerProblem,
+} from "../../../packages/kernel/src/ledger-structure.js";
 
 export interface Env {}
 
@@ -32,19 +33,6 @@ async function sha256Hex(input: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function normalize(s: string): string {
-  return s.replace(/\s+/g, " ").trim();
-}
-
-type ProblemReason = "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch" | "truncated";
-
-interface VerifyProblem {
-  seq: number;
-  kind: string;
-  reason: ProblemReason;
-  detail: string;
-}
-
 interface LedgerEvent {
   seq: number;
   runId: string;
@@ -60,83 +48,63 @@ interface VerifyResult {
   ok: boolean;
   events: number;
   head: string;
-  problems: VerifyProblem[];
+  problems: LedgerProblem[];
   answerConsistent: boolean;
 }
 
 async function verifyLedger(events: LedgerEvent[]): Promise<VerifyResult> {
-  const problems: VerifyProblem[] = [];
+  const problems: LedgerProblem[] = [];
   let prev = GENESIS_HASH;
-  let committed = "";
-  let finalAnswer: string | null = null;
 
   for (let i = 0; i < events.length; i++) {
     const e = events[i];
-    if (e.seq !== i) {
-      problems.push({ seq: e.seq, kind: e.kind, reason: "bad_seq", detail: `expected seq ${i}` });
-    }
+    if (!e || typeof e !== "object") continue;
     const { hash, ...body } = e;
     const recomputed = await sha256Hex(canonicalJSON(body));
     if (recomputed !== hash) {
       problems.push({
-        seq: e.seq,
-        kind: e.kind,
+        seq: Number.isInteger(e.seq) ? e.seq : i,
+        kind: typeof e.kind === "string" ? e.kind : "(invalid)",
         reason: "bad_hash",
-        detail: `stored ${hash.slice(0, 12)}… != recomputed ${recomputed.slice(0, 12)}…`,
+        detail: `stored ${typeof hash === "string" ? hash.slice(0, 12) : "(invalid)"}… != recomputed ${recomputed.slice(0, 12)}…`,
       });
     }
     if (e.prevHash !== prev) {
       problems.push({
-        seq: e.seq,
-        kind: e.kind,
+        seq: Number.isInteger(e.seq) ? e.seq : i,
+        kind: typeof e.kind === "string" ? e.kind : "(invalid)",
         reason: "broken_link",
-        detail: `prevHash ${e.prevHash.slice(0, 12)}… != actual ${prev.slice(0, 12)}…`,
+        detail: `prevHash ${typeof e.prevHash === "string" ? e.prevHash.slice(0, 12) : "(invalid)"}… != actual ${prev.slice(0, 12)}…`,
       });
     }
-    prev = e.hash;
-
-    if (e.kind === "span_committed") {
-      const p = e.payload as { isStop?: boolean; text?: string };
-      if (!p.isStop) committed += p.text ?? "";
+    if (e.kind === "proposals_revealed" && e.payload && typeof e.payload === "object") {
+      const proposals = Array.isArray((e.payload as any).proposals) ? (e.payload as any).proposals : [];
+      const checks = Array.isArray((e.payload as any).hashChecks) ? (e.payload as any).hashChecks : [];
+      for (const proposal of proposals) {
+        const check = checks.find((item: any) => item?.seatId === proposal?.seatId);
+        const actual = await sha256Hex(canonicalJSON(proposal));
+        if (!check || check.recomputed !== actual) {
+          problems.push({
+            seq: Number.isInteger(e.seq) ? e.seq : i,
+            kind: e.kind,
+            reason: "invalid_payload",
+            detail: `revealed proposal hash does not recompute for ${String(proposal?.seatId ?? "(unknown seat)")}`,
+          });
+        }
+      }
     }
-    if (e.kind === "run_finished") {
-      finalAnswer = (e.payload as { finalAnswer?: string }).finalAnswer ?? null;
-    }
+    prev = typeof e.hash === "string" ? e.hash : "";
   }
 
-  // Parity with kernel: a complete run must end with run_finished, otherwise
-  // tail-truncation (dropping the final-answer binding) would verify.
-  const last = events[events.length - 1];
-  if (!last || last.kind !== "run_finished") {
-    problems.push({
-      seq: last ? last.seq : 0,
-      kind: last ? last.kind : "(empty)",
-      reason: "truncated",
-      detail: last
-        ? `ledger ends at "${last.kind}" — a complete run must end with run_finished`
-        : "empty ledger",
-    });
-  }
-
-  let answerConsistent = true;
-  if (finalAnswer !== null) {
-    answerConsistent = normalize(finalAnswer) === normalize(committed);
-    if (!answerConsistent) {
-      problems.push({
-        seq: events.length - 1,
-        kind: "run_finished",
-        reason: "answer_mismatch",
-        detail: "final answer does not equal the concatenation of committed spans",
-      });
-    }
-  }
+  const structure = verifyLedgerStructure(events as unknown[]);
+  problems.push(...structure.problems);
 
   return {
     ok: problems.length === 0,
     events: events.length,
     head: prev,
     problems,
-    answerConsistent,
+    answerConsistent: structure.answerConsistent,
   };
 }
 

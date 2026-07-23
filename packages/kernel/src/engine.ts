@@ -72,7 +72,10 @@ export interface RunOptions {
   clock?: "logical" | "wall";
 }
 
-const SAFETY_VETO_THRESHOLD = 0.6;
+/** Strict-majority quorum, with an absolute floor that forbids one-seat ratification. */
+function requiredPanelQuorum(panelSize: number): number {
+  return Math.max(2, Math.floor(panelSize / 2) + 1);
+}
 
 export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   const { pack, config, seats } = opts;
@@ -107,6 +110,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   }
 
   append("run_started", null, {
+    protocolVersion: 2,
     packId: pack.id,
     title: pack.title,
     domain: pack.domain,
@@ -133,6 +137,90 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   const cancelled = () => Boolean(opts.signal?.aborted);
   let stoppedBy: RunResult["stoppedBy"] = "max_spans";
   let spanCount = 0;
+  const quorum = requiredPanelQuorum(seats.length);
+  const rosterUsable =
+    seats.length >= 2 &&
+    new Set(seats.map((seat) => seat.seatId)).size === seats.length &&
+    seats.filter((seat) => seat.client.society === "safety").length >= 1;
+
+  const reviewEveryEligibleCandidate = async (
+    baseCase: CaseFile,
+    revisions: Revision[],
+    seed: number,
+  ): Promise<SafetyVerdict[] | null> => {
+    const candidates = new Map<string, ScoredCandidate>();
+    for (const revision of revisions) {
+      const key = candidateKey(revision.final.candidate);
+      if (!candidates.has(key)) candidates.set(key, revision.final);
+    }
+    const reviewers = revisions
+      .filter((revision) => revision.society === "safety")
+      .map((revision) => ({
+        revision,
+        seat: seats.find((seat) => seat.seatId === revision.seatId),
+      }))
+      .filter((item): item is { revision: Revision; seat: PanelSeat } => Boolean(item.seat));
+    if (!candidates.size || !reviewers.length) return null;
+
+    const attempts = await Promise.all(
+      reviewers.flatMap(({ revision, seat }) =>
+        [...candidates.entries()].map(([expectedKey, candidate]) =>
+          seat.client
+            .reviewSafety({
+              view: viewFor(baseCase, seat, config, memory, pack.evidenceBySociety),
+              candidate,
+              maintainedObjections: revision.maintainedObjections,
+              seed,
+              signal: opts.signal,
+            })
+            .then((result) => ({ seat, expectedKey, ...result }))
+            .catch((error) => ({ seat, expectedKey, error: error as Error })),
+        ),
+      ),
+    );
+
+    let invalid = false;
+    const accepted = new Map<string, Array<{ seatId: string; verdict: SafetyVerdict }>>();
+    for (const attempt of attempts) {
+      if ("error" in attempt) {
+        const usage = errUsage(attempt.seat.client, attempt.error, cancelled());
+        recordUsage(usageTotals, usage, 0);
+        append("provider_call", baseCase.slot.index, { seatId: attempt.seat.seatId, usage });
+        invalid = true;
+        continue;
+      }
+      recordUsage(usageTotals, attempt.usage, attempt.repaired);
+      if (attempt.repaired > 0 || !validSafetyVerdictForCandidate(attempt.verdict, attempt.expectedKey)) {
+        append("provider_call", baseCase.slot.index, {
+          seatId: attempt.seat.seatId,
+          usage: { ...attempt.usage, status: "incomplete" },
+        });
+        invalid = true;
+        continue;
+      }
+      append("provider_call", baseCase.slot.index, { seatId: attempt.seat.seatId, usage: attempt.usage });
+      const rows = accepted.get(attempt.expectedKey) ?? [];
+      rows.push({ seatId: attempt.seat.seatId, verdict: attempt.verdict });
+      accepted.set(attempt.expectedKey, rows);
+    }
+
+    const verdicts: SafetyVerdict[] = [];
+    for (const key of candidates.keys()) {
+      const rows = accepted.get(key) ?? [];
+      if (rows.length !== reviewers.length) invalid = true;
+      if (!rows.length) continue;
+      const rawVeto = rows.some((row) => row.verdict.veto);
+      verdicts.push({
+        candidateKey: key,
+        veto: config.flags.safetyVeto && rawVeto,
+        legalRisk: Math.max(...rows.map((row) => row.verdict.legalRisk)),
+        publicReason: rows
+          .map((row) => `${row.seatId}: ${row.verdict.publicReason}`)
+          .join(" | ") + (!config.flags.safetyVeto && rawVeto ? " | veto power disabled by registered ablation" : ""),
+      });
+    }
+    return invalid ? null : verdicts;
+  };
 
   // STOP is a first-class decision, so a complete verdict must END by electing
   // it. If every pack slot commits substantive text, a final completion span
@@ -156,7 +244,10 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
   // slot is appended so the run can still end by an explicit STOP rather than
   // slot exhaustion. Runs that ratify STOP on the first completion slot — every
   // offline run — never grow the queue, so their ledgers are unchanged.
-  const slotQueue: DecisionSlot[] = [...pack.slots, completionSlot];
+  // A run with no usable safety seat or no possible multi-seat quorum terminates
+  // as explicitly degraded. It never opens a decision or synthesizes a verdict.
+  const slotQueue: DecisionSlot[] = rosterUsable ? [...pack.slots, completionSlot] : [];
+  if (!rosterUsable) stoppedBy = "degraded";
   let completionRetried = false;
   for (let qi = 0; qi < slotQueue.length; qi++) {
     if (cancelled()) {
@@ -212,16 +303,23 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
         });
         continue;
       }
-      proposals.push(r.proposal);
       recordUsage(usageTotals, r.usage, r.repaired);
+      if (r.repaired > 0 || !validProposalForSeat(r.proposal, r.seat, slot.index)) {
+        append("provider_call", slot.index, {
+          seatId: r.seat.seatId,
+          usage: { ...r.usage, status: "incomplete" },
+        });
+        continue;
+      }
+      proposals.push(r.proposal);
       append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
     }
     if (cancelled()) {
       stoppedBy = "cancelled";
       break;
     }
-    if (proposals.length === 0) {
-      stoppedBy = "halted";
+    if (!hasQuorumWithSafety(proposals, quorum)) {
+      stoppedBy = "degraded";
       break;
     }
 
@@ -285,6 +383,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
               ownRound1: p.candidates,
               feedback: ordered,
               guidance: packet.guidance,
+              feedbackAnonymized: config.flags.anonymizeFeedback,
               seed: config.seed,
               signal: opts.signal,
             })
@@ -300,8 +399,15 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
           append("provider_call", slot.index, { seatId: r.seat.seatId, usage });
           continue;
         }
-        revisions.push(r.revision);
         recordUsage(usageTotals, r.usage, r.repaired);
+        if (r.repaired > 0 || !validRevisionForSeat(r.revision, r.seat, slot.index)) {
+          append("provider_call", slot.index, {
+            seatId: r.seat.seatId,
+            usage: { ...r.usage, status: "incomplete" },
+          });
+          continue;
+        }
+        revisions.push(r.revision);
         append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
         append("revision_received", slot.index, { revision: r.revision });
       }
@@ -309,15 +415,25 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
         stoppedBy = "cancelled";
         break;
       }
-      if (revisions.length === 0) revisions = synthesizeFinals(proposals);
+      if (!hasQuorumWithSafety(revisions, quorum)) {
+        stoppedBy = "degraded";
+        break;
+      }
     } else {
       revisions = synthesizeFinals(proposals);
     }
 
     // ---- Safety review (veto power) ---------------------------------------
-    const leadingKey = leadingCandidateKey(revisions);
-    const safety = computeSafety(revisions, leadingKey, config.flags.safetyVeto);
-    append("safety_review", slot.index, { verdicts: safety, vetoEnabled: config.flags.safetyVeto });
+    const safety = await reviewEveryEligibleCandidate(baseCase, revisions, config.seed);
+    if (cancelled()) {
+      stoppedBy = "cancelled";
+      break;
+    }
+    if (!safety) {
+      stoppedBy = "degraded";
+      break;
+    }
+    append("safety_review", slot.index, { verdicts: safety.slice(), vetoEnabled: config.flags.safetyVeto });
 
     // ---- Human intervention (auditor in the loop) ------------------------
     const pulled = opts.pullHumanInterventions ? await opts.pullHumanInterventions(slot.index) : [];
@@ -344,6 +460,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
     const effectiveVetoEnabled = config.flags.safetyVeto || humanVetoPresent;
 
     // ---- Constitutional ratification -------------------------------------
+    let ratificationSafety = safety;
     let decision = ratify({
       spanIndex: slot.index,
       revisions,
@@ -377,6 +494,7 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
               ownRound1: [prev.final],
               feedback: applyOrder(packet2.summaries, order),
               guidance: packet2.guidance,
+              feedbackAnonymized: config.flags.anonymizeFeedback,
               seed: config.seed + 1,
               signal: opts.signal,
             })
@@ -393,8 +511,15 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
           append("provider_call", slot.index, { seatId: r.seat.seatId, usage });
           continue;
         }
-        revisions2.push(r.revision);
         recordUsage(usageTotals, r.usage, r.repaired);
+        if (r.repaired > 0 || !validRevisionForSeat(r.revision, r.seat, slot.index)) {
+          append("provider_call", slot.index, {
+            seatId: r.seat.seatId,
+            usage: { ...r.usage, status: "incomplete" },
+          });
+          continue;
+        }
+        revisions2.push(r.revision);
         append("provider_call", slot.index, { seatId: r.seat.seatId, usage: r.usage });
         append("revision_received", slot.index, { revision: r.revision });
       }
@@ -402,17 +527,38 @@ export async function runTribunal(opts: RunOptions): Promise<RunResult> {
         stoppedBy = "cancelled";
         break;
       }
-      if (revisions2.length > 0) revisions = revisions2;
-      const safety2 = computeSafety(revisions, leadingCandidateKey(revisions), config.flags.safetyVeto);
+      if (!hasQuorumWithSafety(revisions2, quorum)) {
+        stoppedBy = "degraded";
+        break;
+      }
+      revisions = revisions2;
+      const safety2 = await reviewEveryEligibleCandidate(baseCase, revisions, config.seed + 1);
+      if (cancelled()) {
+        stoppedBy = "cancelled";
+        break;
+      }
+      if (!safety2) {
+        stoppedBy = "degraded";
+        break;
+      }
       append("safety_review", slot.index, { verdicts: safety2, vetoEnabled: config.flags.safetyVeto });
+      ratificationSafety = [...safety2, ...safety.filter((s) => s.veto)];
       decision = ratify({
         spanIndex: slot.index,
         revisions,
-        safety: [...safety2, ...safety.filter((s) => s.veto)],
+        safety: ratificationSafety,
         vetoEnabled: effectiveVetoEnabled,
         carriedDissent,
         escalationRoundsDone: 1,
       });
+    }
+    // Ratification may move away from the initial leader (for example after a
+    // veto). The actually selected candidate must therefore have an explicit
+    // safety verdict in the final review round, not merely inherit a review of
+    // a different candidate.
+    if (!ratificationSafety.some((item) => item.candidateKey === candidateKey(decision.selected.candidate))) {
+      stoppedBy = "degraded";
+      break;
     }
     append("ratification", slot.index, { decision });
     for (const d of decision.dissents) append("dissent_preserved", slot.index, { dissent: d });
@@ -582,41 +728,71 @@ function synthesizeFinals(proposals: Proposal[]): Revision[] {
   });
 }
 
-function leadingCandidateKey(revisions: Revision[]): string {
-  const support = new Map<string, number>();
-  for (const r of revisions) {
-    const k = candidateKey(r.final.candidate);
-    support.set(k, (support.get(k) ?? 0) + r.final.confidence);
-  }
-  return [...support.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "<STOP>";
+function hasQuorumWithSafety(items: Array<{ seatId: string; society: string }>, quorum: number): boolean {
+  return new Set(items.map((item) => item.seatId)).size >= quorum && items.some((item) => item.society === "safety");
 }
 
-function computeSafety(revisions: Revision[], leadingKey: string, vetoEnabled: boolean): SafetyVerdict[] {
-  const safetyRevs = revisions.filter((r) => r.society === "safety");
-  const verdicts: SafetyVerdict[] = [];
-  for (const sr of safetyRevs) {
-    const legalObjection = sr.maintainedObjections
-      .filter((o) => o.targetKey === leadingKey && (o.kind === "legal" || o.kind === "policy"))
-      .sort((a, b) => b.severity - a.severity)[0];
-    const veto = vetoEnabled && !!legalObjection && legalObjection.severity >= SAFETY_VETO_THRESHOLD;
-    verdicts.push({
-      candidateKey: leadingKey,
-      veto,
-      legalRisk: sr.final.legalRisk,
-      publicReason: veto
-        ? `Safety seat vetoes "${short(leadingKey)}": ${legalObjection!.text}`
-        : `Safety seat reviewed "${short(leadingKey)}"; no veto (legal risk ${sr.final.legalRisk.toFixed(2)}).`,
-    });
-  }
-  if (verdicts.length === 0) {
-    verdicts.push({
-      candidateKey: leadingKey,
-      veto: false,
-      legalRisk: 0,
-      publicReason: "No safety seat on this panel; no veto available.",
-    });
-  }
-  return verdicts;
+function validProposalForSeat(proposal: Proposal, seat: PanelSeat, spanIndex: number): boolean {
+  return (
+    proposal?.seatId === seat.seatId &&
+    proposal?.society === seat.client.society &&
+    proposal?.provider === seat.client.provider &&
+    proposal?.spanIndex === spanIndex &&
+    Array.isArray(proposal.candidates) &&
+    proposal.candidates.length > 0 &&
+    proposal.candidates.every(validScoredCandidate) &&
+    typeof proposal.publicWarrant === "string" &&
+    proposal.publicWarrant.trim().length > 0 &&
+    Array.isArray(proposal.objections) &&
+    Array.isArray(proposal.rejectedAlternatives)
+  );
+}
+
+function validRevisionForSeat(revision: Revision, seat: PanelSeat, spanIndex: number): boolean {
+  return (
+    revision?.seatId === seat.seatId &&
+    revision?.society === seat.client.society &&
+    revision?.provider === seat.client.provider &&
+    revision?.spanIndex === spanIndex &&
+    validScoredCandidate(revision.final) &&
+    typeof revision.changedFromRound1 === "boolean" &&
+    nonblank(revision.answerToStrongestObjection) &&
+    nonblank(revision.steelmanOfBestRival) &&
+    nonblank(revision.changeMyMind) &&
+    Array.isArray(revision.maintainedObjections)
+  );
+}
+
+function validScoredCandidate(candidate: ScoredCandidate): boolean {
+  if (!candidate || typeof candidate !== "object" || !candidate.candidate) return false;
+  const { text, isStop } = candidate.candidate;
+  if (typeof text !== "string" || typeof isStop !== "boolean") return false;
+  if (isStop ? text !== "" : text.trim().length === 0) return false;
+  if (!nonblank(candidate.warrant)) return false;
+  return [
+    candidate.confidence,
+    candidate.factualityRisk,
+    candidate.legalRisk,
+    candidate.fairnessRisk,
+    candidate.affectedPartyImpact,
+  ].every((value) => typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1);
+}
+
+function nonblank(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function validSafetyVerdictForCandidate(verdict: SafetyVerdict, expectedKey: string): boolean {
+  return Boolean(
+    verdict &&
+      verdict.candidateKey === expectedKey &&
+      typeof verdict.veto === "boolean" &&
+      typeof verdict.legalRisk === "number" &&
+      Number.isFinite(verdict.legalRisk) &&
+      verdict.legalRisk >= 0 &&
+      verdict.legalRisk <= 1 &&
+      nonblank(verdict.publicReason),
+  );
 }
 
 function recordUsage(totals: Record<string, number>, usage: UsageRecord, repaired: number) {
@@ -641,9 +817,6 @@ function errUsage(client: PanelClient, err: unknown, signalAborted = false): Usa
 
 function uniq<T>(xs: T[]): T[] {
   return [...new Set(xs)];
-}
-function short(key: string): string {
-  return key.length > 48 ? key.slice(0, 45) + "…" : key;
 }
 function spacer(prefix: string, next: string): string {
   if (!prefix) return "";

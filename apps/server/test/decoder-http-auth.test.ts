@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
 import { mkdtempSync, rmSync } from "node:fs";
+import { request as httpRequest } from "node:http";
 import { createServer as createNetServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -63,6 +64,7 @@ test("decoder HTTP auth fails closed and rotates an opaque browser session", asy
       PORT: String(port),
       TRIBUNAL_RUNS_DIR: runsDir,
       TRIBUNAL_DECODER_OPERATOR_TOKEN: TOKEN,
+      TRIBUNAL_ALLOWED_HOSTS: `tribunal.internal:${port}`,
       TRIBUNAL_DECODER_ALLOWED_ORIGINS: "https://tribunal.example",
       TRIBUNAL_DECODER_TRUST_PROXY: "false",
     },
@@ -84,6 +86,61 @@ test("decoder HTTP auth fails closed and rotates an opaque browser session", asy
   assert.equal(unauthorized.status, 401);
   assert.equal(unauthorized.headers.get("cache-control"), "no-store");
   assert.match(unauthorized.headers.get("set-cookie") ?? "", /Max-Age=0/);
+
+  const safePacks = await fetch(`${baseUrl}/api/packs`);
+  assert.equal(safePacks.status, 200);
+
+  const safeHealth = await fetch(`${baseUrl}/api/health`);
+  assert.equal(safeHealth.status, 200);
+  assert.deepEqual(await safeHealth.json(), { ok: true, service: "tribunal-api" });
+
+  const protectedRuns = await fetch(`${baseUrl}/api/runs`);
+  assert.equal(protectedRuns.status, 401);
+  assert.deepEqual(await protectedRuns.json(), { error: "Tribunal operator authorization required" });
+
+  // Provider health starts version subprocesses, so it is not the passive
+  // health surface and must stop before any probe when unauthenticated.
+  const protectedProviderHealth = await fetch(`${baseUrl}/api/panel`);
+  assert.equal(protectedProviderHealth.status, 401);
+
+  const protectedMutation = await fetch(`${baseUrl}/api/run`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ packId: "irrelevant", mode: "offline" }),
+  });
+  assert.equal(protectedMutation.status, 401);
+
+  const bearerAuthorizedGeneral = await fetch(`${baseUrl}/api/runs`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  });
+  assert.equal(bearerAuthorizedGeneral.status, 200);
+
+  const reboundStatus = await new Promise<number | undefined>((resolveStatus, rejectRequest) => {
+    const rebound = httpRequest(`${baseUrl}/api/packs`, {
+      headers: { Host: `attacker.example:${port}` },
+    }, (response) => {
+      response.resume();
+      response.once("end", () => resolveStatus(response.statusCode));
+    });
+    rebound.once("error", rejectRequest);
+    rebound.end();
+  });
+  assert.equal(reboundStatus, 421);
+
+  const hostDerivedOriginStatus = await new Promise<number | undefined>((resolveStatus, rejectRequest) => {
+    const request = httpRequest(`${baseUrl}/api/packs`, {
+      headers: {
+        Host: `tribunal.internal:${port}`,
+        Origin: `http://tribunal.internal:${port}`,
+      },
+    }, (response) => {
+      response.resume();
+      response.once("end", () => resolveStatus(response.statusCode));
+    });
+    request.once("error", rejectRequest);
+    request.end();
+  });
+  assert.equal(hostDerivedOriginStatus, 403);
 
   const hostile = await fetch(`${baseUrl}/api/packs`, {
     headers: { Origin: "https://hostile.example" },
@@ -115,7 +172,7 @@ test("decoder HTTP auth fails closed and rotates an opaque browser session", asy
   const setCookie = unlocked.headers.get("set-cookie") ?? "";
   assert.match(
     setCookie,
-    /^tribunal_decoder_session=[A-Za-z0-9_-]{43}; Path=\/api\/decoder; HttpOnly; SameSite=Strict; Max-Age=28800$/,
+    /^tribunal_decoder_session=[A-Za-z0-9_-]{43}; Path=\/api; HttpOnly; SameSite=Strict; Max-Age=28800$/,
   );
   assert.equal(setCookie.includes(TOKEN), false);
   const sessionCookie = setCookie.split(";", 1)[0];
@@ -124,6 +181,11 @@ test("decoder HTTP auth fails closed and rotates an opaque browser session", asy
     headers: { Cookie: sessionCookie },
   });
   assert.equal(authorized.status, 200);
+
+  const authorizedGeneral = await fetch(`${baseUrl}/api/runs`, {
+    headers: { Cookie: sessionCookie },
+  });
+  assert.equal(authorizedGeneral.status, 200);
 
   const duplicate = await fetch(`${baseUrl}/api/decoder/runs`, {
     headers: { Cookie: `${sessionCookie}; ${sessionCookie}` },

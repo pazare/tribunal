@@ -72,12 +72,12 @@ export function decoderSessionTransportAllowed(input: {
 export function assertDecoderNetworkPolicy(host: string, operatorToken?: string): void {
   if (operatorToken && Buffer.byteLength(operatorToken, "utf8") < MIN_OPERATOR_TOKEN_BYTES) {
     throw new Error(
-      `TRIBUNAL_DECODER_OPERATOR_TOKEN must be at least ${MIN_OPERATOR_TOKEN_BYTES} bytes`,
+      `TRIBUNAL_OPERATOR_TOKEN (or legacy TRIBUNAL_DECODER_OPERATOR_TOKEN) must be at least ${MIN_OPERATOR_TOKEN_BYTES} bytes`,
     );
   }
   if (!isLoopbackHost(host) && !operatorToken) {
     throw new Error(
-      "TRIBUNAL_DECODER_OPERATOR_TOKEN is required when HOST is not loopback",
+      "TRIBUNAL_OPERATOR_TOKEN (or legacy TRIBUNAL_DECODER_OPERATOR_TOKEN) is required when HOST is not loopback",
     );
   }
 }
@@ -177,7 +177,7 @@ export class DecoderSessionStore {
   }
 
   authorized(headers: IncomingHttpHeaders): boolean {
-    if (!this.operatorToken) return true;
+    if (!this.operatorToken) return false;
     return tokenMatches(suppliedToken(headers), this.operatorToken) || this.validSession(headers);
   }
 
@@ -209,7 +209,9 @@ export class DecoderSessionStore {
 }
 
 function sessionCookieAttributes(secure: boolean): string {
-  return `Path=/api/decoder; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
+  // The same operator session protects every quota-bearing, mutating, and
+  // ledger-bearing API route, not only Decoder Lab.
+  return `Path=/api; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
 }
 
 export function decoderSessionCookie(
@@ -229,6 +231,6 @@ export function decoderOperatorAuthorized(
   headers: IncomingHttpHeaders,
   operatorToken?: string,
 ): boolean {
-  if (!operatorToken) return true;
+  if (!operatorToken) return false;
   return tokenMatches(suppliedToken(headers), operatorToken);
 }

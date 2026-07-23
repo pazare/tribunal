@@ -23,6 +23,8 @@ The earlier application payload states that entrants retain ownership while gran
 
 ## Not published on the descriptive event page
 
+On 2026-07-16, the team inspected the public event page and ran a read-only search of the connected mailbox available in this workspace. Neither surface exposed a detailed organizer rules artifact. This is a bounded retrieval result—not evidence that the rules do not exist or that another account lacks them. Import an organizer-provided artifact if available; otherwise record exact answers at check-in.
+
 - exact judging rubric and weights;
 - submission mechanism and deadline;
 - prize categories;

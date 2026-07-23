@@ -269,13 +269,13 @@ export function computeAuditability(events: LedgerEvent[]): AuditabilityReport {
     );
   }
 
-  // ---- A10: hash chain verifies (unanchored caveat stated) -------------------
+  // ---- A10: hash chain + protocol state machine verify -----------------------
   {
     const v = verifyLedger(events);
     items.push(
       item(
         "A10",
-        "Hash chain verifies (tamper-evident)",
+        "Ledger verifies (hash chain + protocol state machine)",
         v.ok && v.answerConsistent,
         v.ok
           ? `${v.events} events verify; head ${v.head.slice(0, 12)}…; answer cross-check ${v.answerConsistent ? "passes" : "FAILS"}. Caveat: tamper-evident WITHOUT an external anchor — publish the head hash to anchor it.`
@@ -346,7 +346,7 @@ export function baselineReport(label = "single-model baseline"): AuditabilityRep
     item("A7", "Named ratification rule + public reason", false, why("no named decision rule exists")),
     item("A8", "Material dissent preserved", false, why("there is no second voice to dissent")),
     item("A9", "Deliberation memory persisted", false, why("no memory of the decision exists")),
-    item("A10", "Hash chain verifies (tamper-evident)", false, why("there is no chain to verify")),
+    item("A10", "Ledger verifies (hash chain + protocol state machine)", false, why("there is no chain to verify")),
     item("A11", "STOP ratified explicitly", false, why("generation just ends")),
     item("A12", "Typed, schema-validatable event log", false, why("there is no event log")),
   ];
