@@ -18,9 +18,12 @@ npm run demo  # expect VERIFY: OK + tamper FAILED ✓
 Optional live proof:
 
 ```bash
+export TRIBUNAL_OPERATOR_TOKEN="$(openssl rand -hex 32)"
 npm run dev   # :5173 UI + :8787 API
-curl -s http://localhost:8787/api/panel | jq .
-curl -s http://localhost:8787/api/runs | jq .
+curl -s http://localhost:8787/api/panel \
+  -H "Authorization: Bearer $TRIBUNAL_OPERATOR_TOKEN" | jq .
+curl -s http://localhost:8787/api/runs \
+  -H "Authorization: Bearer $TRIBUNAL_OPERATOR_TOKEN" | jq .
 ```
 
 ---

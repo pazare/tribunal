@@ -1,16 +1,18 @@
 import type { Objection, Provider, ScoredCandidate, Society } from "../types.js";
 import { candidateKey } from "../types.js";
 import { stableId } from "../hash.js";
-import { proposePrompt, revisePrompt } from "../prompt.js";
+import { proposePrompt, revisePrompt, safetyPrompt } from "../prompt.js";
 import {
   asString,
   clamp01,
-  extractJSON,
+  extractStrictJSON,
   type PanelClient,
   type ProposeRequest,
   type ProposeResult,
   type ReviseRequest,
   type ReviseResult,
+  type SafetyReviewRequest,
+  type SafetyReviewResult,
 } from "./base.js";
 
 /**
@@ -103,7 +105,13 @@ export class OpenRouterPanelClient implements PanelClient {
   }
 
   async revise(req: ReviseRequest): Promise<ReviseResult> {
-    const { system, user } = revisePrompt(req.view, req.ownRound1, req.feedback, req.guidance);
+    const { system, user } = revisePrompt(
+      req.view,
+      req.ownRound1,
+      req.feedback,
+      req.guidance,
+      req.feedbackAnonymized ?? true,
+    );
     const t0 = Date.now();
     const { text, usage, model, servingProvider } = await this.chat(system, user, req.seed, req.signal);
     const latencyMs = Date.now() - t0;
@@ -134,6 +142,30 @@ export class OpenRouterPanelClient implements PanelClient {
         changeMyMind: parsed.cmm,
         maintainedObjections: parsed.maintained,
       },
+    };
+  }
+
+  async reviewSafety(req: SafetyReviewRequest): Promise<SafetyReviewResult> {
+    const expectedKey = candidateKey(req.candidate.candidate);
+    const { system, user } = safetyPrompt(req.view, expectedKey, req.candidate.candidate.text);
+    const t0 = Date.now();
+    const { text, usage, model, servingProvider } = await this.chat(system, user, req.seed, req.signal);
+    const parsed = parseSafetyVerdict(text, expectedKey);
+    return {
+      repaired: parsed.repaired,
+      usage: {
+        provider: this.provider,
+        model: model ?? this.model,
+        modelSource: model ? "response" : this.modelSource,
+        requestedModel: this.model,
+        ...(servingProvider ? { servingProvider } : {}),
+        latencyMs: Date.now() - t0,
+        tokensIn: usage?.prompt_tokens,
+        tokensOut: usage?.completion_tokens,
+        status: "ok",
+        transport: "http",
+      },
+      verdict: parsed.verdict,
     };
   }
 
@@ -198,12 +230,18 @@ export class OpenRouterPanelClient implements PanelClient {
 
 function parseProposal(raw: string, society: Society, spanIndex: number) {
   let repaired = 0;
-  const obj = extractJSON(raw);
+  const obj = extractStrictJSON(raw);
+  if (!hasExactKeys(obj, ["candidates", "rejectedAlternatives", "publicWarrant", "objections"])) repaired++;
   const rawCands: any[] = Array.isArray(obj.candidates) ? obj.candidates : [];
+  if (!Array.isArray(obj.candidates) || obj.candidates.length === 0) repaired++;
+  for (const candidate of rawCands) if (!validRawScored(candidate)) repaired++;
   const scored: ScoredCandidate[] = rawCands.length
     ? rawCands.map((c) => coerceScored(c, () => repaired++))
     : [coerceScored({ isStop: true }, () => repaired++)];
-  const objections: Objection[] = (Array.isArray(obj.objections) ? obj.objections : [])
+  if (!Array.isArray(obj.objections)) repaired++;
+  const rawObjections: any[] = Array.isArray(obj.objections) ? obj.objections : [];
+  if (rawObjections.some((objection) => !validRawObjection(objection))) repaired++;
+  const objections: Objection[] = rawObjections
     .filter((o: any) => o && (o.text || o.targetKey))
     .map((o: any) => ({
       id: stableId("obj", society, asString(o.targetKey), asString(o.text), spanIndex),
@@ -218,7 +256,10 @@ function parseProposal(raw: string, society: Society, spanIndex: number) {
     publicWarrant = scored[0]?.warrant || "(no public warrant returned)";
     repaired++;
   }
-  const rejected = (Array.isArray(obj.rejectedAlternatives) ? obj.rejectedAlternatives : [])
+  if (!Array.isArray(obj.rejectedAlternatives)) repaired++;
+  const rawRejected: any[] = Array.isArray(obj.rejectedAlternatives) ? obj.rejectedAlternatives : [];
+  if (rawRejected.some((item) => !item || !hasExactKeys(item, ["text", "reason"]) || typeof item.text !== "string" || typeof item.reason !== "string")) repaired++;
+  const rejected = rawRejected
     .filter((r: any) => r && r.text)
     .map((r: any) => ({ text: asString(r.text), reason: asString(r.reason) }));
   return { scored, objections, publicWarrant, rejected, repaired };
@@ -226,13 +267,16 @@ function parseProposal(raw: string, society: Society, spanIndex: number) {
 
 function parseRevision(raw: string, society: Society, spanIndex: number, ownR1: ScoredCandidate[]) {
   let repaired = 0;
-  const obj = extractJSON(raw);
+  const obj = extractStrictJSON(raw);
+  if (!hasExactKeys(obj, ["final", "changedFromRound1", "answerToStrongestObjection", "steelmanOfBestRival", "changeMyMind", "maintainedObjections"])) repaired++;
+  if (!validRawScored(obj.final)) repaired++;
   const final = coerceScored(obj.final ?? {}, () => repaired++);
   const r1key = ownR1[0] ? candidateKey(ownR1[0].candidate) : "";
   const changed =
     typeof obj.changedFromRound1 === "boolean"
       ? obj.changedFromRound1
       : candidateKey(final.candidate) !== r1key;
+  if (typeof obj.changedFromRound1 !== "boolean") repaired++;
   const need = (v: unknown, label: string) => {
     const s = asString(v);
     if (!s) {
@@ -241,7 +285,10 @@ function parseRevision(raw: string, society: Society, spanIndex: number, ownR1: 
     }
     return s;
   };
-  const maintained: Objection[] = (Array.isArray(obj.maintainedObjections) ? obj.maintainedObjections : [])
+  if (!Array.isArray(obj.maintainedObjections)) repaired++;
+  const rawMaintained: any[] = Array.isArray(obj.maintainedObjections) ? obj.maintainedObjections : [];
+  if (rawMaintained.some((objection) => !validRawObjection(objection))) repaired++;
+  const maintained: Objection[] = rawMaintained
     .filter((o: any) => o && (o.text || o.targetKey))
     .map((o: any) => ({
       id: stableId("mobj", society, asString(o.targetKey), asString(o.text), spanIndex),
@@ -281,6 +328,58 @@ function coerceScored(c: any, onRepair: () => void): ScoredCandidate {
     affectedPartyImpact: clamp01(c.affectedPartyImpact, 0.5),
     warrant,
     evidenceRefs: Array.isArray(c.evidenceRefs) ? c.evidenceRefs.map(asString) : [],
+  };
+}
+
+function validRawScored(value: any): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  if (!hasExactKeys(value, ["text", "isStop", "confidence", "factualityRisk", "legalRisk", "fairnessRisk", "affectedPartyImpact", "warrant", "evidenceRefs"])) return false;
+  if (typeof value.text !== "string" || typeof value.isStop !== "boolean") return false;
+  if (value.isStop ? value.text !== "" : value.text.trim().length === 0) return false;
+  if (typeof value.warrant !== "string" || value.warrant.trim().length === 0) return false;
+  if (!Array.isArray(value.evidenceRefs) || !value.evidenceRefs.every((item: unknown) => typeof item === "string")) return false;
+  return ["confidence", "factualityRisk", "legalRisk", "fairnessRisk", "affectedPartyImpact"].every((key) =>
+    typeof value[key] === "number" && Number.isFinite(value[key]) && value[key] >= 0 && value[key] <= 1,
+  );
+}
+
+function validRawObjection(value: any): boolean {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      hasExactKeys(value, ["targetKey", "text", "severity", "kind"]) &&
+      typeof value.targetKey === "string" &&
+      value.targetKey.trim() &&
+      typeof value.text === "string" &&
+      value.text.trim() &&
+      typeof value.severity === "number" &&
+      Number.isFinite(value.severity) &&
+      value.severity >= 0 &&
+      value.severity <= 1 &&
+      ["factual", "legal", "policy", "fairness", "user_impact", "cost"].includes(value.kind),
+  );
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
+  return Object.keys(value).length === keys.length && keys.every((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
+function parseSafetyVerdict(raw: string, expectedKey: string) {
+  let repaired = 0;
+  const value = extractStrictJSON(raw);
+  if (!hasExactKeys(value, ["candidateKey", "veto", "legalRisk", "publicReason"])) repaired++;
+  if (value.candidateKey !== expectedKey) repaired++;
+  if (typeof value.veto !== "boolean") repaired++;
+  if (typeof value.legalRisk !== "number" || !Number.isFinite(value.legalRisk) || value.legalRisk < 0 || value.legalRisk > 1) repaired++;
+  if (typeof value.publicReason !== "string" || !value.publicReason.trim()) repaired++;
+  return {
+    repaired,
+    verdict: {
+      candidateKey: expectedKey,
+      veto: typeof value.veto === "boolean" ? value.veto : false,
+      legalRisk: clamp01(value.legalRisk, 1),
+      publicReason: asString(value.publicReason) || "(safety review invalid)",
+    },
   };
 }
 

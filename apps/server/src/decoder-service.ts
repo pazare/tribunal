@@ -12,9 +12,10 @@ import {
   writeFileSync,
 } from "node:fs";
 import type { ServerResponse } from "node:http";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import {
   runDecoder,
+  minimalCliEnvironment,
   verifyDecoderLedger,
   type DecoderClient,
   type DecoderEvent,
@@ -975,7 +976,10 @@ interface VersionProbe {
 
 function probeVersion(binary: string, args: string[]): Promise<VersionProbe> {
   return new Promise((resolve) => {
-    const child = spawn(binary, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(binary, args, {
+      env: minimalCliEnvironment(),
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let output = "";
     let settled = false;
     const finish = (result: VersionProbe) => {
@@ -1015,7 +1019,9 @@ function healthAgent(
   return {
     clientId: client.clientId as "codex" | "claude",
     provider: client.provider as "openai" | "anthropic",
-    binary,
+    // Health is intentionally unauthenticated, so do not expose configured
+    // absolute executable paths or user-directory structure.
+    binary: basename(binary),
     present: probe.present,
     ...(probe.version ? { version: probe.version } : {}),
     requestedModel: client.requestedModel,

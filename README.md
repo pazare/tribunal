@@ -6,13 +6,13 @@
 
 When a single model denies your loan, rejects your insurance claim, flags your benefits, or takes down your post, you get fluent text and no verifiable record of what was checked, who could have objected, or whether a safety concern was overruled. Post-hoc explanations are known-unfaithful.
 
-Tribunal replaces sampling with **election**. The output is decoded in atomic surface spans (the disposition, the required disclosure, …), and each span goes through electoral mechanisms adapted from human institutions — **secret ballots** (sealed commitments before reveal), **anonymized cross-examination** with ballot-order rotation, on-the-record vote changes, a binding **safety veto**, ratification under a **named constitutional rule**, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger** you can re-verify yourself. The explanation is not attached to the generation — it *is* the generation.
+Tribunal replaces one-shot generation with a recorded election over intended review-unit spans (the disposition, the required disclosure, …). Each span goes through mechanisms adapted from human institutions: **secret ballots** (sealed commitments before reveal), aggregate identity-hidden critique with ballot-order rotation, on-the-record vote changes, candidate-level safety review, ratification under a named rule, and **minority reports** (preserved dissent). Every step lands in a hash-chained, tamper-evident **verdict ledger**. The protocol-v2 verifier checks exact schemas and kinds, run/span identity, legal phase transitions, strict-majority quorum with mandatory safety participation, safety coverage of the selected candidate, terminal uniqueness, hash linkage, and exact final-answer reconstruction. The explanation is not attached after generation—it is part of the recorded procedure.
 
 - **Six chartered seats** (evidence, adversary, law/policy, affected party, safety with veto, concision) — rival AI vendors in live modes, scripted stand-ins offline; cross-vendor seating can reduce correlated failure.
 - **Event-sourced ledger** — every phase is a typed event; edit anything and the chain breaks (`POST /api/verify`, or `npm run demo`).
 - **A1–A12 auditability scorecard** scored from the run's own artifacts; a plain single-model baseline scores **0/12 by construction** (that asymmetry is the honest point). Three committed live runs score an honest **11/12** — the panel refused to ratify STOP, and [the ledger shows exactly why](docs/honesty.md#the-scorecard-fails-our-own-live-runs--on-purpose).
 
-Tests: **52** kernel · **8** decoder server · **9** decoder UI · **14** scorecard · **2** packs (`npm test`).
+Tests: **52** kernel · **8** decoder server · **9** decoder UI · **14** scorecard · **2** packs · **51** clinical-eval (`npm test`).
 
 Built at [RAISE Summit Hackathon 2026](https://github.com/pazare/tribunal) (Cursor track). License: MIT.
 
@@ -55,9 +55,9 @@ No — different question. Feature attribution explains a **score**; Tribunal ma
 | **Question answered** | Which input features moved this model's score | Whether the decision survives adversarial scrutiny, and on what recorded grounds |
 | **When it runs** | Post-hoc, on a decision already made | During decoding — every span is contested and elected before it ships |
 | **Artifact produced** | Feature weights (Shapley values / local surrogate coefficients) | Hash-chained ledger: sealed ballots, anonymous critique, vetoes, named decision rule, preserved dissent |
-| **Free-text / LLM decisions** | Not designed for them (no feature vector over a generated paragraph) | Native — the unit of explanation is an argued, cross-examined span of text |
-| **Gaming resistance** | Adversarial models can fool attribution audits ([Slack et al., AIES 2020](https://dl.acm.org/doi/10.1145/3375627.3375830)) | The record is tamper-evident; editing any event breaks the chain; spoof guards fail trivial rationale (A2/A5) |
-| **Regulator-ready reasons** | Weights must be translated into the "specific reasons" notices require | The verdict ships with verbatim public reasons and the losing arguments — the notice writes itself |
+| **Free-text / LLM decisions** | Not designed for them (no feature vector over a generated paragraph) | Native — the unit of explanation is a contested surface review unit with public warrants and aggregate critique |
+| **Record-tampering detection** | Adversarial models can fool attribution audits ([Slack et al., AIES 2020](https://dl.acm.org/doi/10.1145/3375627.3375830)) | Editing a committed event breaks the supplied hash chain; A2/A5 add limited anti-triviality heuristics, not strategic-gaming immunity |
+| **Candidate notice material** | Weights must be translated into the "specific reasons" notices require | The verdict preserves public reasons and losing arguments that may support a notice, but clinician/legal review must determine completeness and compliance |
 
 Honest footnote: SHAP/LIME remain the right tool for debugging feature-based scoring models. Tribunal governs the decision *procedure* and can sit on top of any underlying scorer.
 
@@ -65,11 +65,11 @@ Honest footnote: SHAP/LIME remain the right tool for debugging feature-based sco
 
 ## How it works
 
-The verdict is decoded one atomic surface span at a time. Each span is an election with eight phases, each emitting ledger events:
+The verdict is decoded one bounded surface review unit at a time. The engine does not prove linguistic or semantic atomicity. Each unit is an election with eight phases, each emitting ledger events:
 
 1. **Secret ballot** — each seat drafts its candidate span in isolation, without peer material.
 2. **Sealed commitment** — SHA-256 hash of each ballot ledgered **before** reveal (no rewriting after seeing the room).
-3. **Anonymized cross-examination** — critiques with authorship hidden; candidate order rotated per recipient (ballot-order/position-bias control).
+3. **Aggregate identity-hidden critique** — each seat receives structured critique summaries with explicit author identity hidden; candidate order rotates per recipient (a ballot-order/position-bias control). This is Delphi-style feedback and revision, not interactive cross-examination.
 4. **Revision** — answer the strongest objection; steelman the best rival; state what would change your vote — all on the record.
 5. **Safety review** — safety seat may **veto** any candidate with a public reason.
 6. **Election** — a **named** constitutional rule elects the span; public reason on record.
@@ -96,7 +96,7 @@ Full event-kind list and package map: [`docs/architecture.md`](docs/architecture
 git clone https://github.com/pazare/tribunal.git
 cd tribunal
 npm install
-npm test                 # 52 kernel + 8 server + 9 web + 2 packs + 14 scorecard tests
+npm test                 # 52 kernel + 8 server + 9 web + 2 packs + 14 scorecard + 51 clinical-eval tests
 npm run smoke --workspace @tribunal/web  # isolated offline UI/API browser gate
 npm run demo             # offline deterministic run + tamper demo (no API keys)
 npm run dev              # API :8787 + web UI :5173
@@ -129,16 +129,20 @@ Decoder Lab. After completion, the UI verifies the persisted run and labels it
 the full observable decoder transcript; provider computation not emitted
 through its CLI is outside the observable interface.
 
-The decoder server binds to loopback by default, admits one two-agent run at a
+The server binds to loopback by default, admits one two-agent decoder run at a
 time, and stores private decoder artifacts under ignored, owner-only
-`runs/decoder/` paths. A non-loopback bind requires
-`TRIBUNAL_DECODER_OPERATOR_TOKEN` on every decoder route.
+`runs/decoder/` paths. Quota-bearing, mutating, intervention, decoder, and
+ledger-bearing routes require one operator credential even on loopback. Set
+`TRIBUNAL_OPERATOR_TOKEN` to at least 32 bytes; when omitted on loopback, the
+server prints a random process-local token that rotates at restart.
 
 ```bash
+export TRIBUNAL_OPERATOR_TOKEN="$(openssl rand -hex 32)"
 npm run dev
 
 curl -s -X POST http://localhost:8787/api/decoder/runs \
   -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TRIBUNAL_OPERATOR_TOKEN" \
   -d '{"userPrompt":"Respond with exactly OK and then STOP.","maxRounds":2}'
 ```
 
@@ -157,24 +161,38 @@ separate terminal state. Exact protocol and honesty boundaries:
 
 ### CLI mode (zero new credentials)
 
-Uses locally authenticated agent CLIs — keys read at call time, never stored:
+Uses locally authenticated agent CLIs. Protected-data child processes receive a
+small explicit environment allowlist, not the server's API keys or arbitrary
+secrets; authentication must therefore come from each CLI's owner-only local
+credential store:
 
 | Provider | CLI | Notes |
 |----------|-----|-------|
-| OpenAI | `codex` | ChatGPT-authenticated Codex |
-| xAI | `~/.grok/bin/agent` | Grok agent (explicit path avoids binary shadowing) |
-| Anthropic | `claude` | Pin model via env |
-| Cursor | `cursor-agent` | Optional model override |
+| OpenAI | `codex` | Protected-data path uses stdin, ephemeral/read-only mode, ignored local rules/config, and no MCP servers |
+| xAI | `~/.grok/bin/agent` | Public synthetic probe only; protected-data tool/session isolation not established |
+| Anthropic | `claude` | Protected-data path uses stdin, disabled tools, and no session persistence |
+| Cursor | `cursor-agent` | Public synthetic probe only; protected-data tool/session isolation not established |
 
 ```bash
 export TRIBUNAL_CLAUDE_MODEL=sonnet   # pinned alias, not the default
 # export TRIBUNAL_CURSOR_MODEL=...    # optional
 
-npm run demo:real                     # smoke test across available CLIs
+npm run demo:real                     # public synthetic fixture only
 # or POST /api/run  { "packId": "lending-adverse-action", "mode": "cli" }
 ```
 
-Probe availability: `GET http://localhost:8787/api/panel`
+Probe availability with the bearer/session credential: `GET http://localhost:8787/api/panel`.
+The unauthenticated `GET /api/health` is a
+passive liveness check and never starts a provider subprocess. The authenticated
+`POST /api/run` protected-data path currently accepts only the Codex and Claude
+adapters; xAI and Cursor fail closed rather than receiving a case through an
+unverified argv/tool/session boundary.
+
+These are local transport controls, not a proof of provider-side deletion,
+non-retention, or HIPAA eligibility. The installed CLI executable and its local
+credential store remain trusted computing-base components; send patient data
+only under an independently approved provider contract, configuration, and
+institutional governance decision.
 
 ### OpenRouter mode (one key, five vendors)
 
@@ -214,13 +232,14 @@ Deterministic scripted panel — **not model output**. Always labeled in `run_st
 ```bash
 curl -s -X POST http://localhost:8787/api/verify \
   -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TRIBUNAL_OPERATOR_TOKEN" \
   -d '{"runId":"<id>"}'
 # or  -d '{"events":[...]}'   # full ledger JSON
 ```
 
 Returns `verify` (hash chain + answer cross-check) and `audit` (A1–A12).
 
-**Cloudflare Worker** (edge port, no kernel imports): see [`apps/worker/README.md`](apps/worker/README.md). Deploy with `npx wrangler deploy -c apps/worker/wrangler.jsonc` when you have a CF account.
+**Cloudflare Worker** (WebCrypto plus the shared canonical state verifier): see [`apps/worker/README.md`](apps/worker/README.md). Deploy with `npx wrangler deploy -c apps/worker/wrangler.jsonc` when you have a CF account.
 
 **Anchoring caveat:** verification proves the bytes you supply are internally consistent. An adversary with the only copy can forge a new consistent chain. Publish the **head hash** externally to anchor — committed real runs store `head` in `runs/<runId>/meta.json`.
 
@@ -229,7 +248,8 @@ Checks performed:
 1. Recompute SHA-256 over each event body (`seq`, `runId`, `spanIndex`, `ts`, `kind`, `payload`, `prevHash`).
 2. Verify `prevHash` linkage from genesis (64 zeroes).
 3. Contiguous `seq` from 0.
-4. Concatenation of non-STOP `span_committed` text equals `run_finished.finalAnswer` (whitespace-normalized).
+4. Exact event schemas/kinds, one run id, legal span/phase transitions, terminal uniqueness, and exact prefix/final-answer reconstruction.
+5. For protocol v2, strict-majority quorum, mandatory safety-seat participation, and a dedicated safety verdict covering every eligible candidate (including the one actually ratified).
 
 ---
 
@@ -254,11 +274,39 @@ Details: [`docs/honesty.md`](docs/honesty.md).
 |------|------|
 | `packages/kernel` | Engine, ledger, panel adapters, `verifyLedger()` |
 | `packages/scorecard` | A1–A12 checklist + baseline 0/12 |
-| `packages/packs` | Four live domain cases: lending, insurance, benefits, moderation — each with a planted trap |
+| `packages/packs` | Four constructed/synthetic demonstration cases with real-world problem anchors: lending, insurance, benefits, moderation—each with a planted trap |
 | `apps/server` | Node SSE API, exact seating, intervention queue, safe cancellation, persistence |
 | `apps/web` | Vite React deliberation-theater UI |
 | `apps/worker` | Cloudflare Worker verify endpoint (ready to deploy) |
 | `runs/` | Replayable real-run ledgers + head hashes for anchoring |
+
+---
+
+## Tribunal Clinical research extension
+
+`packages/clinical-eval` is a research and safety-evaluation layer for a bounded clinician-controlled question: whether a complex case warrants specialist escalation or whether named evidence is insufficient. Each seat also records a proposed specialty and urgency when escalating, but the current panel summary synthesizes action only and preserves specialty/urgency disagreement rather than inventing one destination or time. It is not an autonomous diagnostic, treatment, referral, or medical-advice system.
+
+The package includes:
+
+- a versioned local per-seat escalation tuple and cross-field validation; external terminology mappings and panel-level specialty/urgency synthesis remain planned;
+- deterministic agreement-statistic oracles;
+- a five-arm evidence-versus-unsupported-majority experiment;
+- case-clustered paired analysis with explicit non-vote denominators;
+- a four-seat clinician packet that preserves blind and revised outcomes, exposure, sourced assertions, urgent dissent, vetoes, and underdetermination;
+- complete evidence-record and case-state commitments;
+- human-authority and verifier registries with explicit hash/registry-only trust boundaries; and
+- pre-call manifests, exact per-call receipts, replay verification, and post-run safety-artifact binding without claiming independent provider, time, or anchor authentication.
+
+The committed pre-event mechanism run contains 240 deterministic scripted assignments across eight author-defined fixture families, six programmed policies, and five conditions. It verifies analyzer behavior only; it is not an LLM, clinician, or clinical-performance result.
+
+Start with the [complete technical onboarding and Rao-meeting guide](docs/hackathon/SANTIAGO_ONBOARDING_AND_RAO_PREP_2026-07-17.md), then read the [research methods protocol](docs/hackathon/RESEARCH_METHODS_PROTOCOL_2026-07-16.md) and [Saturday execution plan](docs/hackathon/SATURDAY_EXECUTION_PLAN_2026-07-18.md).
+
+```bash
+npm run experiment:clinical:simulate -- --output /tmp/tribunal-clinical-run
+npm run experiment:clinical:verify -- /tmp/tribunal-clinical-run packages/clinical-eval/fixtures/mechanism-fixtures-v0.1.json
+```
+
+Clinical validity, patient benefit, specialist equivalence, prospective safety, and cost-effectiveness require later independently labeled retrospective, silent-mode, human-factors, and prospective studies. They are not claimed here.
 
 ---
 
@@ -293,10 +341,11 @@ Nothing above implies a specific sponsor runtime was exercised in a given demo u
 
 ```bash
 docker build -t tribunal .
-export TRIBUNAL_DECODER_OPERATOR_TOKEN="$(openssl rand -hex 32)"
+export TRIBUNAL_OPERATOR_TOKEN="$(openssl rand -hex 32)"
 docker run --rm \
   --publish 127.0.0.1:8787:8787 \
-  --env TRIBUNAL_DECODER_OPERATOR_TOKEN \
+  --env TRIBUNAL_OPERATOR_TOKEN \
+  --env TRIBUNAL_ALLOWED_HOSTS=127.0.0.1:8787 \
   tribunal
 ```
 
@@ -305,13 +354,14 @@ non-loopback bind makes the operator token mandatory even though the host port
 above is safely limited to loopback. Open `http://127.0.0.1:8787/` and enter the
 token when Decoder Lab asks to unlock. The browser sends it once in an
 `Authorization` header, then uses a random opaque session cookie marked
-`HttpOnly`, `SameSite=Strict`, and `Path=/api/decoder`; the token is never put
+`HttpOnly`, `SameSite=Strict`, and `Path=/api`; the token is never put
 in web storage, a URL, or the client bundle. Session cookies expire after eight
 hours; a server restart or `DELETE /api/decoder/session` revokes them for new
 requests. Direct API clients can send the token in an
 `Authorization: Bearer …` header. Browser origins are
-matched exactly; set `TRIBUNAL_DECODER_ALLOWED_ORIGINS` to a comma-separated
-list when a trusted HTTPS reverse proxy serves a different origin. Set
+matched exactly, as are request Host headers; set `TRIBUNAL_ALLOWED_ORIGINS`
+and `TRIBUNAL_ALLOWED_HOSTS` to comma-separated exact values when a trusted
+HTTPS reverse proxy serves a different origin/hostname. Set
 `TRIBUNAL_DECODER_TRUST_PROXY=true` only when that proxy overwrites
 `X-Forwarded-Proto` and the backend cannot be reached directly. Add
 `--env OPENROUTER_API_KEY` only when that variable is already exported and
@@ -319,10 +369,11 @@ OpenRouter mode is needed. The image build fails if the web UI does not compile;
 the live two-agent CLI decoder also requires its CLI binaries and authenticated
 state inside the container.
 
-Keep the published host port on loopback as shown. The decoder session gate is
-not a whole-service multi-user access layer: the governed-case operator APIs
-remain local-trust surfaces. Any off-device deployment must put the entire
-service behind an authenticated TLS reverse proxy, not merely expose port 8787.
+Keep the published host port on loopback as shown. The operator gate covers the
+sensitive local APIs, but it remains a single-operator boundary rather than a
+multi-user identity/role system. Any off-device deployment must also put the
+entire service behind an authenticated TLS reverse proxy, not merely expose
+port 8787.
 The operator token must contain at least 32 bytes; the example generates 32
 random bytes represented as 64 hexadecimal characters.
 

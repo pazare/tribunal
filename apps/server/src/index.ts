@@ -10,6 +10,7 @@
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -21,11 +22,11 @@ import {
   buildPanel,
   buildPanelFromProviders,
   CliPanelClient,
-  CLI_DEFAULT_ASSIGNMENT,
   DEFAULT_FLAGS,
   DEFAULT_SOCIETIES,
   OPENROUTER_DEFAULT_ASSIGNMENT,
   makeDefaultDecoderClients,
+  minimalCliEnvironment,
   type ControlFlags,
   type CancellationReceipt,
   type HumanIntervention,
@@ -45,6 +46,13 @@ import {
   decoderSessionCookie,
   DecoderSessionStore,
 } from "./decoder-auth.js";
+import {
+  buildAllowedHosts,
+  buildAllowedOrigins,
+  exactAllowedOrigin,
+  operatorAuthorizationRequired,
+  requestHasAllowedHost,
+} from "./request-security.js";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 // Node 20.12+ can load the documented repo-local .env file without another
@@ -62,19 +70,26 @@ const PORT = Number(process.env.PORT ?? 8787);
 // CLIs and spend API keys, so it must never listen on all interfaces unless
 // the operator explicitly opts in (e.g. HOST=0.0.0.0 inside a container).
 const HOST = process.env.HOST ?? "127.0.0.1";
-const DECODER_OPERATOR_TOKEN = process.env.TRIBUNAL_DECODER_OPERATOR_TOKEN?.trim() || undefined;
+const primaryOperatorToken = process.env.TRIBUNAL_OPERATOR_TOKEN?.trim() || undefined;
+const legacyOperatorToken = process.env.TRIBUNAL_DECODER_OPERATOR_TOKEN?.trim() || undefined;
+if (primaryOperatorToken && legacyOperatorToken && primaryOperatorToken !== legacyOperatorToken) {
+  throw new Error("TRIBUNAL_OPERATOR_TOKEN and TRIBUNAL_DECODER_OPERATOR_TOKEN must match when both are set");
+}
+const CONFIGURED_OPERATOR_TOKEN = primaryOperatorToken ?? legacyOperatorToken;
 const DECODER_TRUST_PROXY = process.env.TRIBUNAL_DECODER_TRUST_PROXY === "true";
-assertDecoderNetworkPolicy(HOST, DECODER_OPERATOR_TOKEN);
-const decoderSessions = new DecoderSessionStore(DECODER_OPERATOR_TOKEN);
-const DECODER_ALLOWED_ORIGINS = new Set([
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://[::1]:5173",
-  ...(process.env.TRIBUNAL_DECODER_ALLOWED_ORIGINS ?? "")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean),
-]);
+assertDecoderNetworkPolicy(HOST, CONFIGURED_OPERATOR_TOKEN);
+// Loopback development still requires a credential. When the operator did not
+// configure one, generate a high-entropy process-local token and show it only in
+// the local terminal; every restart rotates it and revokes all sessions.
+const OPERATOR_TOKEN_WAS_GENERATED = !CONFIGURED_OPERATOR_TOKEN;
+const OPERATOR_TOKEN = CONFIGURED_OPERATOR_TOKEN ?? randomBytes(32).toString("base64url");
+const decoderSessions = new DecoderSessionStore(OPERATOR_TOKEN);
+const ALLOWED_HOSTS = buildAllowedHosts(PORT, process.env.TRIBUNAL_ALLOWED_HOSTS);
+const ALLOWED_ORIGINS = buildAllowedOrigins(
+  PORT,
+  process.env.TRIBUNAL_ALLOWED_ORIGINS,
+  process.env.TRIBUNAL_DECODER_ALLOWED_ORIGINS,
+);
 // Resolve repository assets from this file, not process.cwd(). Workspace npm
 // scripts launch with apps/server as cwd; tying paths to cwd made both persisted
 // runs and the production web build disappear under that supported entrypoint.
@@ -94,6 +109,16 @@ const decoderService = createDecoderService({
 });
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const CLI_PROVIDERS: Provider[] = ["openai", "xai", "anthropic", "cursor"];
+// Only these general CLI adapters currently establish all three protected-data
+// controls: prompt on stdin plus reviewed tool-surface, session, and filesystem
+// restrictions (the exact controls differ by provider).
+const PROTECTED_CLI_PROVIDERS: Provider[] = ["openai", "anthropic"];
+const PROTECTED_CLI_DEFAULT_ASSIGNMENT = Object.fromEntries(
+  DEFAULT_SOCIETIES.map((society, index) => [
+    society,
+    PROTECTED_CLI_PROVIDERS[index % PROTECTED_CLI_PROVIDERS.length],
+  ]),
+) as Record<Society, Provider>;
 const OPENROUTER_PROVIDERS: Provider[] = [
   "openai", "anthropic", "xai", "google", "microsoft", "nvidia", "meta", "deepseek", "mistral",
 ];
@@ -121,25 +146,10 @@ class HttpError extends Error {
   }
 }
 
-function directRequestOrigin(req: IncomingMessage): string | null {
-  const host = req.headers.host;
-  if (!host) return null;
-  const encrypted = Boolean((req.socket as typeof req.socket & { encrypted?: boolean }).encrypted);
-  return `${encrypted ? "https" : "http"}://${host}`;
-}
-
-/** Browser origins allowed to call this API (exact dev/configured UI + same origin). */
+/** Browser origins allowed to call this API (exact defaults/configuration only). */
 function corsOriginFor(req: IncomingMessage): string | null {
   const origin = req.headers.origin;
-  if (!origin) return null;
-  try {
-    const parsed = new URL(origin);
-    if (!["http:", "https:"].includes(parsed.protocol) || parsed.origin !== origin) return null;
-    const directOrigin = directRequestOrigin(req);
-    return origin === directOrigin || DECODER_ALLOWED_ORIGINS.has(origin) ? origin : null;
-  } catch {
-    return null;
-  }
+  return exactAllowedOrigin(origin, ALLOWED_ORIGINS);
 }
 
 function forwardedProtocol(req: IncomingMessage): string | undefined {
@@ -236,7 +246,10 @@ function recordedLedger(runId: string): LedgerEvent[] | null {
 
 function probeCli(bin: string, args: string[]): Promise<{ present: boolean; note: string }> {
   return new Promise((resolveProbe) => {
-    const child = spawn(bin, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(bin, args, {
+      env: minimalCliEnvironment(),
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let output = "";
     let settled = false;
     const finish = (result: { present: boolean; note: string }) => {
@@ -409,8 +422,10 @@ async function startRun(body: {
   if (providers.some((provider) => typeof provider !== "string")) {
     return { error: "every provider must be a string" };
   }
-  if (mode === "cli" && providers.some((provider) => !CLI_PROVIDERS.includes(provider as Provider))) {
-    return { error: `CLI providers must be one or more of: ${CLI_PROVIDERS.join(", ")}` };
+  if (mode === "cli" && providers.some((provider) => !PROTECTED_CLI_PROVIDERS.includes(provider as Provider))) {
+    return {
+      error: `protected-data CLI runs currently permit only: ${PROTECTED_CLI_PROVIDERS.join(", ")}; other adapters are probe-only because reviewed stdin/tool/session/filesystem controls are not established`,
+    };
   }
   if (mode === "openrouter" && providers.length > 0) {
     return { error: "OpenRouter uses the audited six-seat vendor/model assignment; custom pools are not supported by this API" };
@@ -446,8 +461,10 @@ async function startRun(body: {
     if (typeof raw.provider !== "string") return { error: `assignment.${society}.provider is required` };
     const provider = raw.provider as Provider;
     if (mode === "cli") {
-      if (!CLI_PROVIDERS.includes(provider)) {
-        return { error: `assignment.${society}.provider must be one of: ${CLI_PROVIDERS.join(", ")}` };
+      if (!PROTECTED_CLI_PROVIDERS.includes(provider)) {
+        return {
+          error: `assignment.${society}.provider must be a protected-data-capable CLI: ${PROTECTED_CLI_PROVIDERS.join(", ")}`,
+        };
       }
       if (raw.model != null && raw.model !== "") {
         return { error: `assignment.${society}.model cannot override the authenticated ${provider} CLI model` };
@@ -498,6 +515,8 @@ async function startRun(body: {
         ? buildPanel({ mode, assignment, cliTimeoutMs: 180_000 })
         : providers.length && mode === "cli"
         ? buildPanelFromProviders(providers as Provider[], { mode, cliTimeoutMs: 180_000 })
+        : mode === "cli"
+        ? buildPanelFromProviders(PROTECTED_CLI_PROVIDERS, { mode, cliTimeoutMs: 180_000 })
         : buildPanel({ mode, cliTimeoutMs: 180_000 });
   } catch (e: any) {
     return { error: e.message };
@@ -694,11 +713,15 @@ function json(res: ServerResponse, status: number, data: unknown) {
 }
 
 const server = createServer(async (req, res) => {
+  if (!requestHasAllowedHost(req, ALLOWED_HOSTS)) {
+    return json(res, 421, { error: "request Host is not allowed" });
+  }
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
   const decoderPath = path === "/api/decoder" || path.startsWith("/api/decoder/");
+  const protectedPath = operatorAuthorizationRequired(req.method, path);
 
-  if (decoderPath) {
+  if (decoderPath || protectedPath) {
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Referrer-Policy", "no-referrer");
@@ -723,8 +746,27 @@ const server = createServer(async (req, res) => {
 
   if (req.method === "OPTIONS") return json(res, 204, {});
 
+  // A single operator credential/session gates every route that can spend
+  // provider quota, mutate a run, or expose case/ledger contents. This applies
+  // on loopback too: loopback reachability is not authorization.
+  if (protectedPath && !decoderSessions.authorized(req.headers)) {
+    res.setHeader("WWW-Authenticate", 'Bearer realm="tribunal-operator"');
+    res.setHeader("Set-Cookie", clearDecoderSessionCookie(secureDecoderCookie(req)));
+    return json(res, 401, { error: "Tribunal operator authorization required" });
+  }
+
   try {
-    // ---- packs ------------------------------------------------------------
+    // Passive health only: no provider subprocess, credential, case, ledger, or
+    // filesystem detail. Provider-specific health endpoints are operator-gated.
+    if (req.method === "GET" && path === "/api/health") {
+      res.setHeader("Cache-Control", "no-store");
+      return json(res, 200, { ok: true, service: "tribunal-api" });
+    }
+
+    // ---- source-controlled public/synthetic packs -------------------------
+    // This route is deliberately public so the static docket can render before
+    // unlock. Never load patient/restricted documents into the PACKS registry;
+    // case-bearing runtime and ledger routes are operator-gated below.
     if (req.method === "GET" && path === "/api/packs") {
       return json(
         res,
@@ -764,7 +806,10 @@ const server = createServer(async (req, res) => {
           clientView: "answer_plus_summary",
           assignments: {
             cli: Object.fromEntries(
-              DEFAULT_SOCIETIES.map((society) => [society, { provider: CLI_DEFAULT_ASSIGNMENT[society] }]),
+              DEFAULT_SOCIETIES.map((society) => [
+                society,
+                { provider: PROTECTED_CLI_DEFAULT_ASSIGNMENT[society] },
+              ]),
             ),
             openrouter: OPENROUTER_DEFAULT_ASSIGNMENT,
           },
@@ -774,15 +819,29 @@ const server = createServer(async (req, res) => {
           maxSpans: { min: MAX_SPANS_MIN, max: MAX_SPANS_MAX },
           debateRounds: { min: 0, max: 1 },
         },
-        cliProviders: CLI_PROVIDERS,
+        cliProviders: PROTECTED_CLI_PROVIDERS,
+        probeCliProviders: CLI_PROVIDERS,
         openrouterProviders: OPENROUTER_PROVIDERS,
         societies: DEFAULT_SOCIETIES,
         interventions: ["objection", "veto", "question", "affirm"],
         channels: ["typed", "voice"],
         interventionQueue: { listPending: true, removePending: true, receiptIds: true },
-        seating: { cliPool: true, exactSixSeat: ["cli", "openrouter"], cliModelOverride: false },
+        seating: {
+          cliPool: true,
+          exactSixSeat: ["cli", "openrouter"],
+          cliModelOverride: false,
+          protectedDataCliProviders: PROTECTED_CLI_PROVIDERS,
+          probeOnlyCliProviders: CLI_PROVIDERS.filter(
+            (provider) => !PROTECTED_CLI_PROVIDERS.includes(provider),
+          ),
+        },
         verification: { runId: true, events: true, targetedTamper: true },
         cancellation: { liveRuns: true, preservesCompleteLedger: true, gracefulShutdown: true },
+        authorization: {
+          sensitiveRoutesRequireOperator: true,
+          browserSessionEndpoint: "/api/decoder/session",
+          generatedLoopbackTokenRotatesOnRestart: OPERATOR_TOKEN_WAS_GENERATED,
+        },
         charters: Object.values(CHARTERS),
       });
     }
@@ -801,7 +860,13 @@ const server = createServer(async (req, res) => {
         targets.map(async (p) => {
           const t0 = Date.now();
           try {
-            const client = new CliPanelClient(`probe_${p}`, "concision", p, { timeoutMs: 60_000 });
+            const client = new CliPanelClient(`probe_${p}`, "concision", p, {
+              timeoutMs: 60_000,
+              // This fixed liveness micro-case is public synthetic data. Real
+              // case runs retain the protected-data default and fail closed on
+              // transports without established isolation.
+              protectedData: false,
+            });
             // A real, minimal propose() against a truthful micro-case.
             const view = {
               case: {
@@ -894,11 +959,6 @@ const server = createServer(async (req, res) => {
       decoderSessions.revoke(req.headers);
       res.setHeader("Set-Cookie", clearDecoderSessionCookie(secureDecoderCookie(req)));
       return json(res, 200, { ok: true });
-    }
-    if (decoderPath && !decoderSessions.authorized(req.headers)) {
-      res.setHeader("WWW-Authenticate", 'Bearer realm="tribunal-decoder"');
-      res.setHeader("Set-Cookie", clearDecoderSessionCookie(secureDecoderCookie(req)));
-      return json(res, 401, { error: "decoder operator authorization required" });
     }
     try {
       if (req.method === "GET" && path === "/api/decoder/health") {
@@ -1167,6 +1227,9 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`tribunal api listening on http://${HOST}:${PORT}`);
+  if (OPERATOR_TOKEN_WAS_GENERATED) {
+    console.warn(`generated process-local Tribunal operator token (rotates on restart): ${OPERATOR_TOKEN}`);
+  }
   console.log(`packs: ${PACKS.map((p) => p.id).join(", ")}`);
   console.log(`runs dir: ${RUNS_DIR}`);
 });

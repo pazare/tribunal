@@ -1,4 +1,6 @@
 import { canonicalJSON, sha256Hex, hashOf } from "./hash.js";
+import { verifyLedgerStructure } from "./ledger-structure.js";
+import type { LedgerProblem } from "./ledger-structure.js";
 import type { EventKind, EventPayloadMap, LedgerEvent } from "./types.js";
 
 export const GENESIS_HASH = "0".repeat(64);
@@ -61,12 +63,7 @@ export interface VerifyResult {
   events: number;
   /** Recomputed head hash — publish this to anchor the chain externally. */
   head: string;
-  problems: {
-    seq: number;
-    kind: string;
-    reason: "bad_hash" | "broken_link" | "bad_seq" | "answer_mismatch" | "truncated";
-    detail: string;
-  }[];
+  problems: LedgerProblem[];
   /** True iff the concatenation of committed spans equals the run's final answer. */
   answerConsistent: boolean;
 }
@@ -76,9 +73,10 @@ export interface VerifyResult {
  *  1. every event's hash recomputes exactly (no field was altered);
  *  2. every event links to the prior event's hash (no reorder/insert/delete);
  *  3. sequence numbers are contiguous from 0;
- *  4. the committed spans concatenate to the final answer recorded at run_finished
- *     (defeats a "relink the whole chain then swap the answer" forgery, unless the
- *     forger also re-derives every span — the point of the cross-check).
+ *  4. exact schemas and the protocol state machine hold, including run/span
+ *     binding, quorum, safety/veto/dissent coverage, phase ordering, and one
+ *     terminal event; and
+ *  5. committed spans concatenate exactly to the answer at run_finished.
  *
  * Tamper-evidence is real but *unanchored*: an adversary holding the only copy can
  * recompute a fully self-consistent chain. Anchoring requires publishing the head
@@ -87,83 +85,57 @@ export interface VerifyResult {
 export function verifyLedger(events: LedgerEvent[]): VerifyResult {
   const problems: VerifyResult["problems"] = [];
   let prev = GENESIS_HASH;
-  let committed = "";
-  let finalAnswer: string | null = null;
 
   for (let i = 0; i < events.length; i++) {
-    const e = events[i];
-    if (e.seq !== i) {
-      problems.push({ seq: e.seq, kind: e.kind, reason: "bad_seq", detail: `expected seq ${i}` });
-    }
+    const e = events[i] as LedgerEvent | undefined;
+    if (!e || typeof e !== "object") continue;
     const { hash, ...body } = e;
     const recomputed = sha256Hex(canonicalJSON(body));
     if (recomputed !== hash) {
       problems.push({
-        seq: e.seq,
-        kind: e.kind,
+        seq: Number.isInteger(e.seq) ? e.seq : i,
+        kind: typeof e.kind === "string" ? e.kind : "(invalid)",
         reason: "bad_hash",
-        detail: `stored ${hash.slice(0, 12)}… != recomputed ${recomputed.slice(0, 12)}…`,
+        detail: `stored ${typeof hash === "string" ? hash.slice(0, 12) : "(invalid)"}… != recomputed ${recomputed.slice(0, 12)}…`,
       });
     }
     if (e.prevHash !== prev) {
       problems.push({
-        seq: e.seq,
-        kind: e.kind,
+        seq: Number.isInteger(e.seq) ? e.seq : i,
+        kind: typeof e.kind === "string" ? e.kind : "(invalid)",
         reason: "broken_link",
-        detail: `prevHash ${e.prevHash.slice(0, 12)}… != actual ${prev.slice(0, 12)}…`,
+        detail: `prevHash ${typeof e.prevHash === "string" ? e.prevHash.slice(0, 12) : "(invalid)"}… != actual ${prev.slice(0, 12)}…`,
       });
     }
-    prev = e.hash;
-
-    if (e.kind === "span_committed") {
-      const p = e.payload as EventPayloadMap["span_committed"];
-      if (!p.isStop) committed += p.text;
+    if (e.kind === "proposals_revealed" && e.payload && typeof e.payload === "object") {
+      const proposals = Array.isArray((e.payload as any).proposals) ? (e.payload as any).proposals : [];
+      const checks = Array.isArray((e.payload as any).hashChecks) ? (e.payload as any).hashChecks : [];
+      for (const proposal of proposals) {
+        const check = checks.find((item: any) => item?.seatId === proposal?.seatId);
+        const actual = hashOf(proposal);
+        if (!check || check.recomputed !== actual) {
+          problems.push({
+            seq: Number.isInteger(e.seq) ? e.seq : i,
+            kind: e.kind,
+            reason: "invalid_payload",
+            detail: `revealed proposal hash does not recompute for ${String(proposal?.seatId ?? "(unknown seat)")}`,
+          });
+        }
+      }
     }
-    if (e.kind === "run_finished") {
-      finalAnswer = (e.payload as EventPayloadMap["run_finished"]).finalAnswer;
-    }
+    prev = typeof e.hash === "string" ? e.hash : "";
   }
 
-  // A complete run always ends in run_finished. Without this check, chopping
-  // trailing events (including the final-answer binding itself) would still
-  // verify — a truncation forgery. An intact chain that just stops early is
-  // therefore rejected, not passed vacuously.
-  const last = events[events.length - 1];
-  if (!last || last.kind !== "run_finished") {
-    problems.push({
-      seq: last ? last.seq : 0,
-      kind: last ? last.kind : "(empty)",
-      reason: "truncated",
-      detail: last
-        ? `ledger ends at "${last.kind}" — a complete run must end with run_finished`
-        : "empty ledger",
-    });
-  }
-
-  let answerConsistent = true;
-  if (finalAnswer !== null) {
-    answerConsistent = normalize(finalAnswer) === normalize(committed);
-    if (!answerConsistent) {
-      problems.push({
-        seq: events.length - 1,
-        kind: "run_finished",
-        reason: "answer_mismatch",
-        detail: "final answer does not equal the concatenation of committed spans",
-      });
-    }
-  }
+  const structure = verifyLedgerStructure(events);
+  problems.push(...structure.problems);
 
   return {
     ok: problems.length === 0,
     events: events.length,
     head: prev,
     problems,
-    answerConsistent,
+    answerConsistent: structure.answerConsistent,
   };
-}
-
-function normalize(s: string): string {
-  return s.replace(/\s+/g, " ").trim();
 }
 
 /** Convenience: recompute the head hash of a serialized ledger (for anchoring). */

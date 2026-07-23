@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { hashOf } from "../hash.js";
+import { minimalCliEnvironment } from "./cli-environment.js";
 import {
   decodeClaudeCliEnvelope,
   type DecoderClient,
@@ -215,7 +216,7 @@ function spawnWithReceipt(
     let settleFallback: ReturnType<typeof setTimeout> | undefined;
     const child = spawn(bin, args, {
       cwd,
-      env: { ...process.env, NO_COLOR: "1", CI: "1", ...options.environment },
+      env: minimalCliEnvironment(options.environment),
       stdio: ["pipe", "pipe", "pipe"],
       detached: process.platform !== "win32",
     });

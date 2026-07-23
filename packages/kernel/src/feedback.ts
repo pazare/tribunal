@@ -8,15 +8,15 @@ import type {
 import { mulberry32FromString } from "./rng.js";
 
 /**
- * Build the canonical (ledger-side) anonymized Delphi feedback packet from the
+ * Build the canonical (ledger-side) controlled-feedback packet from the
  * revealed proposals. The packet aggregates, per distinct candidate:
  *   - support count (how many seats proposed it),
  *   - mean confidence + dispersion (spread of confidence — a disagreement signal),
  *   - the strongest supporting argument (highest-confidence warrant), and
  *   - the strongest objection against it (highest-severity objection).
  *
- * Crucially, `FeedbackCandidateSummary` has NO field for seat/society/provider, so
- * anonymization is enforced by the type system, not by scrubbing after the fact.
+ * In the anonymized arm, attribution is omitted. In the identity-visible control
+ * arm, the same summary carries explicit seat/society/provider attributions.
  */
 export function buildFeedbackPacket(
   proposals: Proposal[],
@@ -32,6 +32,7 @@ export function buildFeedbackPacket(
       args: { text: string; conf: number }[];
       objections: { text: string; severity: number }[];
       evidenceConflicts: Set<string>;
+      attributions: { seatId: string; society: Proposal["society"]; provider: Proposal["provider"] }[];
     }
   >();
 
@@ -44,9 +45,11 @@ export function buildFeedbackPacket(
         args: [],
         objections: [],
         evidenceConflicts: new Set<string>(),
+        attributions: [],
       };
       slot.confidences.push(sc.confidence);
       slot.args.push({ text: sc.warrant, conf: sc.confidence });
+      slot.attributions.push({ seatId: p.seatId, society: p.society, provider: p.provider });
       byKey.set(key, slot);
     }
     for (const o of p.objections) {
@@ -69,6 +72,7 @@ export function buildFeedbackPacket(
         strongestArgument: strongestArg,
         strongestObjection: strongestObj,
         evidenceConflicts: [...s.evidenceConflicts],
+        ...(!anonymize ? { attributions: s.attributions } : {}),
       };
     });
 

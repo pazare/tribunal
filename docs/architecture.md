@@ -7,11 +7,11 @@ Tribunal is an npm-workspaces monorepo. The **kernel** owns the due-process engi
 | Package / app | Role |
 |---------------|------|
 | `@tribunal/kernel` | Engine, ledger, panel adapters (CLI, OpenRouter, offline), `verifyLedger()` |
-| `@tribunal/scorecard` | A1–A12 auditability checklist with anti-spoof guards |
+| `@tribunal/scorecard` | A1–A12 auditability checklist with limited anti-triviality checks |
 | `@tribunal/packs` | Domain case files — lending, insurance, benefits, moderation (all implemented) |
 | `@tribunal/server` | Node HTTP + SSE API, exact seat assignment, intervention queue, safe cancellation, run persistence |
 | `@tribunal/web` | Vite React deliberation-theater UI |
-| `apps/worker` | Cloudflare Worker port of `verifyLedger()` (no kernel imports) |
+| `apps/worker` | Cloudflare Worker: WebCrypto hash checks plus the shared canonical protocol state verifier |
 | `runs/` | Committed replayable run ledgers (live CLI + scripted offline) + `meta.json` head hashes |
 
 ## Event kinds (verdict ledger)
@@ -20,15 +20,15 @@ Every phase emits a typed, hash-chained event. Kinds are defined in `packages/ke
 
 | Kind | When |
 |------|------|
-| `run_started` | Panel roster, config, offline vs live note |
+| `run_started` | Protocol version, panel roster, config, offline vs live note |
 | `decision_opened` | New decision slot begins |
 | `case_presented` | Full case file shown to the engine |
 | `blind_commitment` | SHA-256 seal of each round-1 proposal **before** reveal |
 | `proposals_revealed` | Proposals + hash recomputation checks |
-| `feedback_issued` | Anonymized Delphi feedback packet |
+| `feedback_issued` | Anonymized packet or identity-visible control-arm packet |
 | `feedback_view_assigned` | Per-recipient candidate order (position-bias control) |
 | `revision_received` | Seat answers strongest objection, steelmans rival |
-| `safety_review` | Safety seat verdicts; veto power |
+| `safety_review` | Dedicated safety-seat verdict for every eligible candidate; veto power |
 | `escalation_triggered` | Evidence escalation path fired |
 | `ratification` | Named constitutional rule + public reason |
 | `dissent_preserved` | Material minority dissent on the record |
@@ -60,7 +60,7 @@ Every phase emits a typed, hash-chained event. Kinds are defined in `packages/ke
 └──────┬───────────────────────────────┘
        ▼
 ┌──────────────────────────────────────┐
-│ feedback_issued (anonymous)           │
+│ feedback_issued (anonymous/control)   │
 │ feedback_view_assigned (order perm)   │
 └──────┬───────────────────────────────┘
        ▼
@@ -69,7 +69,8 @@ Every phase emits a typed, hash-chained event. Kinds are defined in `packages/ke
 └──────┬───────────────────────────────┘
        ▼
 ┌──────────────────────────────────────┐
-│ safety_review (+ human veto inject)   │
+│ candidate-level safety calls/review   │
+│ (+ separately attributed human veto)  │
 └──────┬───────────────────────────────┘
        ▼
 ┌──────────────────────────────────────┐
@@ -83,7 +84,9 @@ Every phase emits a typed, hash-chained event. Kinds are defined in `packages/ke
    (next slot or run_finished)
 ```
 
-Between slots, `memory_updated` may carry unresolved objections forward. `run_finished` closes the chain; `verifyLedger()` checks hash linkage and that committed spans concatenate to `finalAnswer`.
+Between slots, `memory_updated` may carry unresolved objections forward. Protocol v2 requires a strict-majority quorum (four of six in the default panel), valid safety-seat participation, and a dedicated safety verdict for every eligible candidate. Any proposal, revision, or safety response that required repair is an `incomplete` non-vote. Quorum or safety loss terminates as `degraded`; it cannot ratify from one survivor.
+
+`run_finished` closes the chain. `verifyLedger()` checks exact event envelopes and payload schemas, known kinds, one consistent run id, legal span/phase transitions, quorum and safety coverage, terminal uniqueness, prefix evolution, hash linkage, and exact `finalAnswer` reconstruction. Immutable unversioned ledgers are verified under the legacy v1 contract; new runs declare `protocolVersion: 2`.
 
 ## Hash chain
 
@@ -96,7 +99,7 @@ Implementation: `packages/kernel/src/hash.ts`, `packages/kernel/src/ledger.ts`. 
 | Mode | Transport | Use |
 |------|-----------|-----|
 | `offline` | Deterministic scripted panel | CI, `npm run demo`, tests — **not model output** |
-| `cli` | Spawn local authenticated CLIs | OpenAI Codex, xAI Grok, Anthropic Claude, Cursor agent |
+| `cli` | Spawn locally installed CLIs using their existing local authentication | OpenAI Codex, xAI Grok, Anthropic Claude, Cursor agent |
 | `openrouter` | HTTP via `OPENROUTER_API_KEY` | One key, five vendor models on the default roster |
 
 Default seat societies: `evidence`, `adversary`, `law_policy`, `affected_party`, `safety` (veto), `concision`.

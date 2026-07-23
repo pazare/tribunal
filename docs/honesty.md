@@ -6,21 +6,21 @@ Tribunal's value proposition is **auditability**, not better answers. Every publ
 
 | Claim | Meaning |
 |-------|---------|
-| Due-process structure | Blind proposal, sealed commitments, anonymized feedback, revision, safety veto, named ratification, preserved dissent, STOP as first-class |
-| Cross-provider panel | Different vendors' models on different seats can reduce correlated failure modes — committed live runs used two vendors (openai+xai) and three vendors (openai+xai+anthropic) round-robined across six seats |
+| Due-process structure | Blind proposal, sealed commitments, aggregate identity-hidden feedback, revision, safety veto, named ratification, preserved dissent, STOP as first-class |
+| Cross-provider panel | Different vendor routes create provider heterogeneity; committed live runs used two vendors (openai+xai) and three vendors (openai+xai+anthropic) round-robined across six seats. No causal reduction in correlated error has been demonstrated. |
 | Event-sourced verdict ledger | Hash-chained, schema-typed events emitted **during** the run |
 | Tamper detection | Any field edit, reorder, or deletion breaks hash linkage or the answer cross-check |
-| Human auditor in the loop | Typed or voice interventions become real `human_intervention` events; vetoes bind outcomes |
+| Human auditor input channel | Typed or manually transcribed voice interventions become `human_intervention` events; vetoes bind outcomes. Actor labels are operator-supplied and unsigned, so the ledger does not independently prove human identity or that a voice transcript is verbatim. |
 | Safe cancellation | A stop seals `run_finished.stoppedBy=cancelled` with actor, reason, time, and exact IDs for queued interventions that never applied; it is never labeled a verdict |
-| A1–A12 scorecard | Twelve checklist items scored only from the run's own artifacts, with anti-spoof guards |
-| Independent verify | Anyone can re-run `verifyLedger()` on exported events (`POST /api/verify`, `npm run demo`, or the Cloudflare Worker) |
+| A1–A12 scorecard | Twelve checklist items scored only from the run's own artifacts, with limited anti-triviality checks |
+| Replay verification | Anyone can re-run `verifyLedger()` on exported events (`POST /api/verify`, `npm run demo`, or the same-repository Cloudflare Worker port); a separately operated or independently authored verifier is not implied |
 
 ## What we do NOT claim
 
 | Non-claim | Why |
 |-----------|-----|
 | Better decision quality | No controlled study here; fluent text can still be wrong |
-| Faithful "chain of thought" | Post-hoc rationales are unreliable; we record cross-examined public warrants instead |
+| Faithful "chain of thought" | Post-hoc rationales are unreliable; we record structured public warrants and aggregate critiques instead |
 | Cryptographic proof to third parties | Chains are **unanchored** unless the head hash is published outside the copy you are verifying |
 | Perfect anonymization | We strip identity/provider/seat fields by type; we do not claim stylometric anonymity |
 | Offline panel as AI | Deterministic offline mode is scripted for CI/tests and is always labeled |
@@ -51,7 +51,7 @@ failed attempt.
 3. Offline mode is never presented as model output.
 4. CLI keys and `OPENROUTER_API_KEY` are env-only, never stored.
 5. Single-model baseline scores **0/12 by construction** on A1–A12. That asymmetry is the honest point, not a stacked deck.
-6. Anonymization removes identity fields, not writing style.
+6. Identity hiding removes explicit identity fields and rotates candidate order; it does not remove writing style or prove anonymity.
 7. Back-filled or trivial rationale **fails** scorecard items even when structure passes.
 8. If kernel ledger logic changes, update `apps/worker/src/index.ts` in the same change.
 9. Cancellation preserves already-ratified spans, records aborted calls as `cancelled`, and never implies that queued interventions applied.
@@ -62,7 +62,7 @@ failed attempt.
 
 - **A1** — Blind commitments precede reveal; sealed hash matches proposal.
 - **A2** — Public warrant on every candidate; repairs fail.
-- **A3** — Feedback anonymized (no identity fields).
+- **A3** — Feedback hides explicit identity fields; stylometric anonymity is not claimed.
 - **A4** — Per-recipient candidate order randomized.
 - **A5** — Revision round with substantive objection answer + steelman (non-trivial).
 - **A6** — Safety veto exercised as real code path when enabled.
@@ -79,7 +79,7 @@ failed attempt.
 
 Three committed live cli runs score **11/12**, missing only A11 ("STOP ratified explicitly"), and the ledgers show exactly why:
 
-- `run_a25a5165e3a7` (insurance, openai+xai+anthropic, 346 events): on both completion spans every seat proposed STOP first — then, after anonymous cross-examination, the panel ratified text naming an unsupported physician-review attestation instead of declaring the verdict whole.
+- `run_a25a5165e3a7` (insurance, openai+xai+anthropic, 346 events): on both completion spans every seat proposed STOP first — then, after aggregate identity-hidden critique and revision, the panel ratified text naming an unsupported physician-review attestation instead of declaring the verdict whole.
 - `run_5467a5efcf9c` (lending, openai+xai+anthropic, 306 events): on the completion retry span STOP won majority support 3–2 — and the safety seat's binding veto (`safety_gate`) overrode it, electing a scope-limitation clause instead.
 - `run_b51538e11c68` (insurance, openai+xai+anthropic, 201 events): the earliest of the three; the completion span committed notice text and the run ended by slot exhaustion — the miss that motivated the completion-retry mechanism.
 

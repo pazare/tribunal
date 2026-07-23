@@ -25,6 +25,8 @@ export interface PanelBuildOptions {
   /** Provider assignment per society. Falls back to sensible defaults. */
   assignment?: Partial<Record<Society, { provider: Provider; model?: string }>>;
   cliTimeoutMs?: number;
+  /** Defaults true; false is only for public/synthetic CLI probes and tests. */
+  protectedData?: boolean;
 }
 
 /**
@@ -58,7 +60,12 @@ export const OPENROUTER_DEFAULT_ASSIGNMENT: Record<Society, { provider: Provider
  */
 export function buildPanelFromProviders(
   providers: Provider[],
-  opts: { mode: Exclude<PanelMode, "offline">; cliTimeoutMs?: number; models?: Partial<Record<Provider, string>> },
+  opts: {
+    mode: Exclude<PanelMode, "offline">;
+    cliTimeoutMs?: number;
+    models?: Partial<Record<Provider, string>>;
+    protectedData?: boolean;
+  },
 ): PanelSeat[] {
   if (!providers.length) throw new Error("buildPanelFromProviders: no providers given");
   return DEFAULT_SOCIETIES.map((society, i) => {
@@ -69,6 +76,7 @@ export function buildPanelFromProviders(
         ? new CliPanelClient(seatId, society, provider, {
             timeoutMs: opts.cliTimeoutMs,
             modelLabel: opts.models?.[provider],
+            protectedData: opts.protectedData,
           })
         : new OpenRouterPanelClient(seatId, society, provider, {
             model: opts.models?.[provider] ?? OPENROUTER_DEFAULT_ASSIGNMENT[society].model,
@@ -88,6 +96,7 @@ export function buildPanel(opts: PanelBuildOptions): PanelSeat[] {
       client = new CliPanelClient(seatId, society, provider, {
         timeoutMs: opts.cliTimeoutMs,
         modelLabel: opts.assignment?.[society]?.model,
+        protectedData: opts.protectedData,
       });
     } else {
       const def = OPENROUTER_DEFAULT_ASSIGNMENT[society];

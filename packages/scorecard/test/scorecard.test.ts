@@ -156,7 +156,7 @@ test("A12 rejects cancelled run_finished without a typed cancellation receipt", 
   rehash(malformed);
 
   const rep = computeAuditability(malformed);
-  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, true);
+  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, false, "protocol verifier must reject a rehashed schema forgery");
   assert.equal(rep.items.find((i) => i.id === "A12")!.pass, false);
 });
 
@@ -192,7 +192,7 @@ test("A12 rejects a cancellation receipt on a non-cancelled run", async () => {
   rehash(malformed);
 
   const rep = computeAuditability(malformed);
-  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, true);
+  assert.equal(rep.items.find((i) => i.id === "A10")!.pass, false, "protocol verifier must reject false terminal provenance even after rehashing");
   assert.equal(rep.items.find((i) => i.id === "A11")!.pass, true);
   assert.equal(rep.items.find((i) => i.id === "A12")!.pass, false);
 });
